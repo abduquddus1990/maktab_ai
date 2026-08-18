@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Maktab AI — O'zbekiston #1 AI Ta'lim Platformasi</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#fbf8ff;color:#12183b;-webkit-font-smoothing:antialiased}
+.mont{font-family:'Montserrat',sans-serif}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:#4b3bff;color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:16px;padding:14px 28px;border-radius:10px;text-decoration:none;transition:all .2s;box-shadow:0 4px 16px rgba(75,59,255,.25)}
+.btn-primary:hover{background:#2f06e9;transform:translateY(-1px);box-shadow:0 8px 24px rgba(75,59,255,.35)}
+.btn-outline{display:inline-flex;align-items:center;gap:8px;border:1.5px solid #c7c4da;color:#12183b;font-family:'Montserrat',sans-serif;font-weight:700;font-size:16px;padding:14px 28px;border-radius:10px;text-decoration:none;transition:all .2s;background:#fff}
+.btn-outline:hover{border-color:#4b3bff;color:#4b3bff;transform:translateY(-1px)}
+.card{background:#fff;border-radius:20px;box-shadow:0 4px 20px rgba(20,26,61,.05);border:1px solid #E7E9F4}
+.card:hover{box-shadow:0 12px 30px rgba(20,26,61,.1)}
+.ms{font-family:'Material Symbols Outlined';font-size:24px;line-height:1}
+/* section titles */
+.eyebrow{display:inline-flex;align-items:center;gap:6px;background:#f0eeff;color:#4b3bff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;border-radius:999px;margin-bottom:20px;letter-spacing:.3px}
+/* hero */
+.hero{padding:80px 0 60px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(75,59,255,.06) 0%,transparent 70%);pointer-events:none}
+/* subjects grid */
+.subj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.subj-card{background:#fff;border-radius:20px;padding:24px;text-align:center;border:1.5px solid #E7E9F4;cursor:pointer;transition:all .2s;text-decoration:none;color:#12183b}
+.subj-card:hover{border-color:#4b3bff;transform:translateY(-4px);box-shadow:0 12px 30px rgba(75,59,255,.12)}
+.subj-card:hover .subj-icon{background:#4b3bff;color:#fff}
+.subj-icon{width:56px;height:56px;border-radius:16px;background:#f0eeff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px;transition:all .2s}
+/* testimonials */
+.testi{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+/* stat cards */
+.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+/* chat bubble */
+.chat-ai{background:#f0eeff;border-radius:6px 16px 16px 16px;padding:12px 14px;font-size:13px;color:#12183b;line-height:1.6}
+.chat-user{background:#4b3bff;border-radius:16px 6px 16px 16px;padding:12px 14px;font-size:13px;color:#fff;line-height:1.6}
+@media(max-width:900px){
+  .hero-inner{flex-direction:column!important}
+  .hero-cards{display:none!important}
+  .subj-grid{grid-template-columns:repeat(2,1fr)}
+  .stat-cards{grid-template-columns:repeat(2,1fr)}
+  .testi{grid-template-columns:1fr}
+  .map-inner{flex-direction:column!important}
+}
+</style>
+</head>
+<body>
+
+<div id="nav-ph"></div>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner" style="display:flex;align-items:center;gap:60px">
+      <!-- Left -->
+      <div style="flex:1;min-width:0">
+        <div class="eyebrow">🎓 O'zbekiston #1 AI ta'lim platformasi</div>
+        <h1 class="mont" style="font-size:clamp(32px,4vw,52px);font-weight:900;line-height:1.15;color:#12183b;margin-bottom:20px">
+          Har bir o'quvchi<br>
+          <span style="color:#4b3bff">A'lo natija</span><br>
+          ko'rishi mumkin
+        </h1>
+        <p style="font-size:18px;color:#464557;margin-bottom:32px;line-height:1.7;max-width:480px">
+          24/7 AI repetitor + 640+ tasdiqlangan ustoz. O'zbekiston maktab dasturi (1–11 sinf) bo'yicha.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:32px">
+          <a href="/royxat.html" class="btn-primary">Bepul boshlash →</a>
+          <a href="/repetitorlar.html" class="btn-outline">Ustozlarni ko'rish</a>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:20px;font-size:14px;color:#464557;font-weight:500">
+          <span style="display:flex;align-items:center;gap:6px"><span style="color:#4b3bff;font-weight:700">✓</span> 51,080+ Faol o'quvchi</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="color:#4b3bff;font-weight:700">✓</span> 640+ Tasdiqlangan ustoz</span>
+          <span style="display:flex;align-items:center;gap=6px"><span style="color:#4b3bff;font-weight:700">✓</span> Bepul AI repetitor</span>
+        </div>
+      </div>
+      <!-- Right cards -->
+      <div class="hero-cards" style="flex-shrink:0;display:flex;flex-direction:column;gap:14px;width:300px">
+        <!-- AI Chat card -->
+        <div class="card" style="padding:20px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div style="width:40px;height:40px;background:linear-gradient(135deg,#4b3bff,#7c5cbf);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px">🤖</div>
+            <div>
+              <div class="mont" style="font-weight:700;font-size:14px">AI Repetitor</div>
+              <div style="font-size:12px;color:#464557;display:flex;align-items:center;gap:5px">
+                <span style="width:7px;height:7px;background:#22c55e;border-radius:50%;display:inline-block"></span> Online — 24/7
+              </div>
+            </div>
+          </div>
+          <div class="chat-user" style="margin-bottom:8px">"Kvadrat tenglamani tushuntirib bera olasizmi? 9-sinf"</div>
+          <div class="chat-ai">Albatta! ax²+bx+c=0. Keling, diskriminant usulini birga ko'raylik 📐</div>
+        </div>
+        <!-- Ustoz card -->
+        <div class="card" style="padding:18px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div style="width:46px;height:46px;background:linear-gradient(135deg,#f97316,#ec4899);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:900;font-size:18px;color:#fff">A</div>
+            <div style="flex:1">
+              <div class="mont" style="font-weight:700;font-size:14px">Akbar Toshmatov</div>
+              <div style="font-size:12px;color:#464557">Matematika · ⭐ 4.9 (128 ta izoh)</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#22c55e;background:#f0fdf4;padding:4px 10px;border-radius:999px">Jonli</div>
+          </div>
+          <div style="font-size:13px;color:#464557;margin-bottom:12px">360 000 so'm / oy</div>
+          <a href="/ustoz-profili.html" style="display:block;background:#fec700;color:#12183b;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;padding:10px;border-radius:10px;text-align:center;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#f5bb00'" onmouseout="this.style.background='#fec700'">Band qilish</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ MAP ══ -->
+<section style="padding:80px 0;background:#fff">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:56px">
+      <div class="eyebrow">📍 14 viloyat qamrab olingan</div>
+      <h2 class="mont" style="font-size:clamp(26px,3vw,38px);font-weight:900;color:#12183b;margin-bottom:14px">Butun O'zbekiston bo'ylab o'qiyaptilar</h2>
+      <p style="font-size:17px;color:#464557;max-width:500px;margin:0 auto">Shimoldan janubgacha — har bir maktabda Maktab AI</p>
+    </div>
+    <div class="map-inner" style="display:flex;align-items:flex-start;gap:32px">
+      <div id="map-container" style="flex:1;min-width:0"></div>
+      <div style="width:280px;flex-shrink:0">
+        <div style="background:#fbf8ff;border-radius:20px;padding:24px;border:1px solid #E7E9F4">
+          <div style="text-align:center;margin-bottom:24px">
+            <div class="mont" id="map-total" style="font-size:42px;font-weight:900;color:#4b3bff">0</div>
+            <div style="font-size:13px;color:#464557;margin-top:4px">Jami o'quvchilar</div>
+          </div>
+          <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:#c7c4da;margin-bottom:14px">Top viloyatlar</div>
+          <div id="map-ranking"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS ══ -->
+<section style="padding:72px 0;background:#fbf8ff">
+  <div class="container">
+    <div class="stat-cards">
+      <div class="card" style="padding:28px;text-align:center;transition:all .2s">
+        <div style="font-size:36px;margin-bottom:10px">👨‍🎓</div>
+        <div class="mont" id="stat-students" style="font-size:36px;font-weight:900;color:#4b3bff">0</div>
+        <div style="font-size:14px;color:#464557;margin-top:6px;font-weight:500">Faol o'quvchi</div>
+      </div>
+      <div class="card" style="padding:28px;text-align:center;transition:all .2s">
+        <div style="font-size:36px;margin-bottom:10px">👩‍🏫</div>
+        <div class="mont" id="stat-teachers" style="font-size:36px;font-weight:900;color:#4b3bff">0</div>
+        <div style="font-size:14px;color:#464557;margin-top:6px;font-weight:500">Tasdiqlangan ustoz</div>
+      </div>
+      <div class="card" style="padding:28px;text-align:center;transition:all .2s">
+        <div style="font-size:36px;margin-bottom:10px">📚</div>
+        <div class="mont" id="stat-lessons" style="font-size:36px;font-weight:900;color:#4b3bff">0</div>
+        <div style="font-size:14px;color:#464557;margin-top:6px;font-weight:500">O'tilgan dars</div>
+      </div>
+      <div class="card" style="padding:28px;text-align:center;transition:all .2s">
+        <div style="font-size:36px;margin-bottom:10px">🗺️</div>
+        <div class="mont" id="stat-regions" style="font-size:36px;font-weight:900;color:#4b3bff">0</div>
+        <div style="font-size:14px;color:#464557;margin-top:6px;font-weight:500">Viloyat qamrovi</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SUBJECTS ══ -->
+<section style="padding:80px 0;background:#fff">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="eyebrow">📖 Barcha fanlar</div>
+      <h2 class="mont" style="font-size:clamp(24px,3vw,36px);font-weight:900;color:#12183b;margin-bottom:12px">Barcha maktab fanlaridan AI yordami</h2>
+      <p style="font-size:16px;color:#464557">1-sinfdan 11-sinfgacha O'zbekiston darsliklari bo'yicha</p>
+    </div>
+    <div class="subj-grid">
+      <a href="/ai-chat.html?fan=Matematika" class="subj-card">
+        <div class="subj-icon"><img src="/assets/subjects/matematika.png" alt="Matematika" style="width:48px;height:48px;object-fit:contain"></div>
+        <div class="mont" style="font-weight:700;font-size:15px;margin-bottom:4px">Matematika</div>
+        <div style="font-size:12px;color:#464557">1–11 sinf</div>
+      </a>
+      <a href="/ai-chat.html?fan=Fizika" class="subj-card">
+        <div class="subj-icon"><img src="/assets/subjects/fizika.png" alt="Fizika" style="width:48px;height:48px;object-fit:contain"></div>
+        <div class="mont" style="font-weight:700;font-size:15px;margin-bottom:4px">Fizika</div>
+        <div style="font-size:12px;color:#464557">7–11 sinf</div>
+      </a>
+      <a href="/ai-chat.html?fan=Kimyo" class="subj-card">
+        <div class="subj-icon"><img src="/assets/subjects/kimyo.png" alt="Kimyo" style="width:48px;height:48px;object-fit:contain"></div>
+        <div class="mont" style="font-weight:700;font-size:15px;margin-bottom:4px">Kimyo</div>
+        <div style="font-size:12px;color:#464557">8–11 sinf</div>
+      </a>
+      <a href="/ai-chat.html?fan=Biologiya" class="subj-card">
+        <div class="subj-icon"><img src="/assets/subjects/biologiya.png" alt="Biologiya" style="width:48px;height:48px;object-fit:contain"></div>
+        <div class="mont" style="font-weight:700;font-size:15px;margin-bottom:4px">Biologiya</div>
+        <div style="font-size:12px;color:#464557">6–11 sinf</div>
+      </a>
+      <a href="/ai-chat.html?fan=Ingliz+tili" class="subj-card">
+        <div class="subj-icon"><img src="/assets/subjects/ingliz-tili.png" alt="Ingliz tili" style="width:48px;height:48px;object-fit:contain"></div>
+        <div class="mont" style="font-weight:700;font-size:15px;margin-bottom:4px">Ingliz tili</div>
+        <div style="font-size:12px;color:#464557">1–11 sinf</div>
+      </a>
+      <a href="/ai-chat.html?fan=Ona+tili" class="subj-card">
+        <div class="subj-icon"><img src="/assets/subjects/ona-tili.png" alt="Ona tili" style="width:48px;height:48px;object-fit:contain"></div>
+        <div class="mont" style="font-weight:700;font-size:15px;margin-bottom:4px">Ona tili</div>
+        <div style="font-size:12px;color:#464557">1–11 sinf</div>
+      </a>
+      <a href="/ai-chat.html?fan=Geografiya" class="subj-card">
+        <div class="subj-icon"><img src="/assets/subjects/geografiya.png" alt="Geografiya" style="width:48px;height:48px;object-fit:contain"></div>
+        <div class="mont" style="font-weight:700;font-size:15px;margin-bottom:4px">Geografiya</div>
+        <div style="font-size:12px;color:#464557">6–11 sinf</div>
+      </a>
+      <a href="/ai-chat.html?fan=Abitur" class="subj-card" style="border-color:#fec700">
+        <div class="subj-icon" style="background:#fffbeb"><img src="/assets/subjects/abitur.png" alt="Abitur" style="width:48px;height:48px;object-fit:contain"></div>
+        <div class="mont" style="font-weight:700;font-size:15px;margin-bottom:4px">Abitur</div>
+        <div style="font-size:12px;color:#464557">11-sinf DTM</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section style="padding:80px 0;background:#fbf8ff">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="eyebrow">💬 Ota-onalar fikri</div>
+      <h2 class="mont" style="font-size:clamp(24px,3vw,36px);font-weight:900;color:#12183b">Minglab oilalar ishonadi</h2>
+    </div>
+    <div class="testi">
+      <div class="card" style="padding:28px">
+        <div style="font-size:28px;margin-bottom:16px">⭐⭐⭐⭐⭐</div>
+        <p style="font-size:15px;color:#464557;line-height:1.8;margin-bottom:20px">"Farzandim matematikadan 3 balldan 5 ballga ko'tarildi. AI repetitor har kuni ishlaydi, biz uchun juda qulay!"</p>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:42px;height:42px;background:linear-gradient(135deg,#4b3bff,#ec4899);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;color:#fff">M</div>
+          <div>
+            <div class="mont" style="font-weight:700;font-size:14px">Mohira Yusupova</div>
+            <div style="font-size:12px;color:#464557">Toshkent — 8-sinf ota-onasi</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:28px">
+        <div style="font-size:28px;margin-bottom:16px">⭐⭐⭐⭐⭐</div>
+        <p style="font-size:15px;color:#464557;line-height:1.8;margin-bottom:20px">"AI repetitor 24/7 ishlaydi — kechqurun ham savol bera oladi. Namanganda yaxshi ustoz topish qiyin edi, endi muammo yo'q."</p>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:42px;height:42px;background:linear-gradient(135deg,#f97316,#fec700);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;color:#fff">S</div>
+          <div>
+            <div class="mont" style="font-weight:700;font-size:14px">Sardor Rahimov</div>
+            <div style="font-size:12px;color:#464557">Namangan — 10-sinf ota-onasi</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:28px">
+        <div style="font-size:28px;margin-bottom:16px">⭐⭐⭐⭐⭐</div>
+        <p style="font-size:15px;color:#464557;line-height:1.8;margin-bottom:20px">"Maktab AI tufayli qizim viloyat matematika olimpiadasi sovrindori bo'ldi! Ustozlar ham juda professional."</p>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:42px;height:42px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;color:#fff">D</div>
+          <div>
+            <div class="mont" style="font-weight:700;font-size:14px">Dilnoza Tursunova</div>
+            <div style="font-size:12px;color:#464557">Samarqand — 9-sinf ota-onasi</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA BANNER ══ -->
+<section style="padding:80px 0;background:linear-gradient(135deg,#4b3bff 0%,#7c5cbf 100%)">
+  <div class="container" style="text-align:center">
+    <h2 class="mont" style="font-size:clamp(26px,3.5vw,44px);font-weight:900;color:#fff;margin-bottom:16px">Bugun boshlang — bu bepul!</h2>
+    <p style="font-size:18px;color:rgba(255,255,255,.8);margin-bottom:36px;max-width:500px;margin-left:auto;margin-right:auto">AI repetitor bilan birinchi darsni hoziroq o'ting</p>
+    <a href="/royxat.html" style="display:inline-flex;align-items:center;gap:8px;background:#fec700;color:#12183b;font-family:'Montserrat',sans-serif;font-weight:800;font-size:17px;padding:16px 36px;border-radius:12px;text-decoration:none;transition:all .2s;box-shadow:0 8px 24px rgba(0,0,0,.2)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 32px rgba(0,0,0,.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 24px rgba(0,0,0,.2)'">
+      Bepul ro'yxatdan o'tish →
+    </a>
+  </div>
+</section>
+
+<div id="footer-ph"></div>
+
+<script src="/js/components.js"></script>
+<script src="/js/map.js"></script>
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+</script>
+</body>
+</html>

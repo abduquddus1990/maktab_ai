@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Maqola — MAKTAB AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--bg:#0A0A0F;--card:#1C1C1E;--card2:#2C2C2E;--primary:#FFC800;--text:#FFFFFF;--text2:#8A8A8E;--border:rgba(255,255,255,0.08);--shadow:0 8px 32px rgba(0,0,0,0.45)}
+[data-theme=light]{--bg:#F5F5F5;--card:#FFFFFF;--card2:#EBEBEB;--text:#1a1a1a;--text2:#666666;--border:rgba(0,0,0,0.08);--shadow:0 8px 32px rgba(0,0,0,0.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh;-webkit-tap-highlight-color:transparent;user-select:none}
+html *{transition:background-color .25s,color .25s,border-color .25s}
+.ms{font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased}
+.mont{font-family:'Montserrat',system-ui,sans-serif}
+.clay-card{background:var(--card);border-radius:24px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,0.04);border:1px solid var(--border)}
+.clay-btn-p{background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:16px;font-weight:800;color:#141414;box-shadow:0 4px 20px rgba(255,200,0,.35),0 2px 0 rgba(180,140,0,.4);border:none;cursor:pointer;font-family:'Montserrat',system-ui,sans-serif;transition:all .2s ease}
+.clay-btn-p:active{transform:scale(.95) translateY(1px)}
+.page{position:fixed;top:0;left:0;right:0;bottom:72px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page::-webkit-scrollbar{display:none}
+.bnav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:100;padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -4px 20px rgba(0,0,0,.15)}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text2);text-decoration:none;flex:1;padding:8px 4px;transition:color .2s}
+.ni .ms{font-size:22px}.ni span{font-size:11px;font-weight:600}
+.ni.active{color:var(--primary)}.ni.active .ms{font-variation-settings:'FILL' 1}
+.nc{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;padding:0 8px;flex-shrink:0}
+.nc-btn{width:52px;height:52px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,200,0,.45);margin-top:-20px}
+.nc-btn .ms{font-size:24px;color:#141414;font-variation-settings:'FILL' 1}
+.nc span{font-size:11px;font-weight:700;color:var(--primary)}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;font-family:'Montserrat',sans-serif}
+.tag-blue{background:rgba(59,130,246,.18);color:#60A5FA}
+.tag-yellow{background:rgba(255,200,0,.18);color:#FFC800}
+.tag-green{background:rgba(34,197,94,.18);color:#4ADE80}
+.tag-red{background:rgba(239,68,68,.18);color:#F87171}
+.tag-purple{background:rgba(168,85,247,.18);color:#C084FC}
+.tag-orange{background:rgba(249,115,22,.18);color:#FB923C}
+/* AI floating panel */
+.ai-panel{position:fixed;left:0;right:0;bottom:72px;background:var(--card);border-top:2px solid var(--primary);border-radius:24px 24px 0 0;padding:16px 20px 20px;z-index:50;transform:translateY(100%);transition:transform .4s cubic-bezier(.32,.72,0,1);box-shadow:0 -8px 32px rgba(0,0,0,.4);max-height:60vh;display:flex;flex-direction:column}
+.ai-panel.open{transform:translateY(0)}
+.ai-panel-body{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.ai-panel-body::-webkit-scrollbar{display:none}
+/* Typing dots animation */
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.dot{width:8px;height:8px;background:var(--primary);border-radius:50%;animation:bounce 1.4s infinite ease-in-out;display:inline-block}
+.dot:nth-child(1){animation-delay:0s}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+</style>
+</head>
+<body>
+
+<div class="page" id="articlePage">
+  <!-- HEADER -->
+  <header style="background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50">
+    <button onclick="history.back()" style="width:36px;height:36px;background:var(--card2);border:1px solid var(--border);border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span class="ms" style="font-size:20px;color:var(--text2)">arrow_back</span>
+    </button>
+    <h1 id="pageTitle" style="font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Maqola</h1>
+    <button onclick="toggleTheme()" id="theme-btn" style="width:36px;height:36px;background:var(--card2);border:1px solid var(--border);border-radius:12px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0">🌙</button>
+  </header>
+
+  <!-- ARTICLE CONTENT -->
+  <div style="padding:20px" id="articleContent">
+    <div style="text-align:center;padding:40px;color:var(--text2)">Yuklanmoqda...</div>
+  </div>
+</div>
+
+<!-- AI FLOATING PANEL -->
+<div class="ai-panel" id="aiPanel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:32px;height:32px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🤖</div>
+      <div>
+        <div style="font-size:14px;font-weight:800;font-family:'Montserrat',sans-serif">MAKTAB AI</div>
+        <div style="font-size:11px;color:var(--text2)">Maqolani tushuntirmoqda</div>
+      </div>
+    </div>
+    <button onclick="closeAiPanel()" style="width:32px;height:32px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">
+      <span class="ms" style="font-size:18px;color:var(--text2)">close</span>
+    </button>
+  </div>
+  <div class="ai-panel-body">
+    <div id="aiContent" style="font-size:14px;line-height:1.7;color:var(--text)">
+      <div style="display:flex;align-items:center;gap:6px;color:var(--text2)">
+        <span style="font-size:13px">Maktab AI yozmoqda</span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);flex-shrink:0" id="aiActions"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <a href="index.html" class="ni"><span class="ms">home</span><span>Asosiy</span></a>
+  <a href="student.html" class="ni"><span class="ms">school</span><span>Fanlar</span></a>
+  <a href="chat.html" class="nc">
+    <div class="nc-btn"><span class="ms">forum</span></div>
+    <span>AI Chat</span>
+  </a>
+  <a href="yangiliklar.html" class="ni active"><span class="ms">article</span><span>Yangiliklar</span></a>
+  <a href="parent.html" class="ni"><span class="ms">person</span><span>Profil</span></a>
+</nav>
+
+<script>
+function initTheme(){const t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);const b=document.getElementById('theme-btn');if(b)b.textContent=t==='dark'?'☀️':'🌙'}
+function toggleTheme(){const c=document.documentElement.getAttribute('data-theme')||'dark';const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);const b=document.getElementById('theme-btn');if(b)b.textContent=n==='dark'?'☀️':'🌙'}
+initTheme();
+
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand()}
+
+const maqolalar=[
+  {id:1,sarlavha:"Yangi o'quv yili 2026 boshlandi",tag:"Vazirlik",tagRang:"blue",vaqt:"5 min",sana:"15 May 2026",tavsif:"O'zbekiston maktablarida yangi o'quv yili rasman boshlandi. Bu yil bir qator muhim o'zgarishlar amalga oshiriladi...",
+   matn:`O'zbekiston Respublikasi Xalq ta'limi vazirligi rasmiy e'lon qilishicha, 2026-2027 o'quv yili mamlakatning barcha maktablarida rasman boshlandi.
+
+Bu yil bir qator muhim yangiliklar joriy etilmoqda:
+
+🔹 <strong>Yangi o'quv dasturlari</strong> — 1-4 sinflar uchun yangilangan darsliklar tarqatildi. Darsliklar zamonaviy pedagogika talablari asosida ishlab chiqilgan.
+
+🔹 <strong>Raqamli ta'lim</strong> — O'quvchilar endi MAKTAB AI kabi ilg'or texnologiyalardan foydalana olishadi. Har bir o'quvchiga shaxsiy AI mentor tayinlanadi.
+
+🔹 <strong>Sport va madaniyat</strong> — Maktablarda yangi sport zallar quriladi va madaniy tadbirlar ko'paytiriladi.
+
+🔹 <strong>O'qituvchilar malakasi</strong> — Bu yil 50,000 dan ortiq o'qituvchi malaka oshirish kurslarini yakunladi.
+
+Vazirlik ma'lumotlariga ko'ra, bu yil maktablarga 680,000 dan ortiq yangi birinchi sinf o'quvchisi qabul qilinadi. Bu — o'tgan yilga nisbatan 12% ko'p.
+
+Ta'lim sifatini yaxshilash bo'yicha islohotlar davom etmoqda. Prezident Shavkat Mirziyoyev ta'kidlaganidek: <em>"Biz har bir bolaga sifatli ta'lim berishimiz shart."</em>
+
+O'quv yilining birinchi kuni bolalar va ota-onalar uchun bayram bo'ldi. Mamlakat bo'ylab maktablarda tantanali lineyкalar o'tkazildi.`},
+  {id:2,sarlavha:"Matematika olimpiadasi g'oliblari",tag:"Olimpiada",tagRang:"yellow",vaqt:"3 min",sana:"14 May 2026",tavsif:"Respublika matematika olimpiadasining g'oliblari e'lon qilindi. Bu yil 500 dan ortiq o'quvchi ishtirok etdi...",
+   matn:`Respublika matematika olimpiadasining yakuniy natijalari e'lon qilindi. Bu yil mamlakatning barcha viloyatlaridan 500 dan ortiq o'quvchi ishtirok etdi.
+
+<strong>🥇 Birinchi o'rin</strong> — Toshkent shahri, 11-sinf o'quvchisi Alibek Yusupov (100 ball)
+
+<strong>🥈 Ikkinchi o'rin</strong> — Samarqand viloyati, 10-sinf o'quvchisi Zulfiya Rahimova (97 ball)
+
+<strong>🥉 Uchinchi o'rin</strong> — Farg'ona viloyati, 11-sinf o'quvchisi Jasur Toshmatov (95 ball)
+
+Bu yilgi olimpiadaning xususiyatlari:
+🔹 Masalalar xalqaro standartlar asosida tuzildi
+🔹 Birinchi marta onlayn va offline format qo'llanildi
+🔹 G'oliblar xalqaro olimpiadaga tavsiya etiladi
+
+G'oliblar Prezident stipendiyasiga tavsiya etiladi va xalqaro matematika olimpiadasida O'zbekistonni ifodalash imkoniyatiga ega bo'ladi.
+
+Keyingi olimpiada 2027 yil mart oyida o'tkaziladi. Barcha sinf o'quvchilari qatnasha oladi.`},
+  {id:3,sarlavha:"Yangi darsliklar tarqatildi",tag:"Xabar",tagRang:"green",vaqt:"4 min",sana:"13 May 2026",tavsif:"Xalq ta'limi vazirligi tomonidan yangi avlod darsliklari maktablarga tarqatildi...",
+   matn:`Xalq ta'limi vazirligi tomonidan yangi avlod darsliklari O'zbekiston maktablariga tarqatildi. Yangi darsliklar bir qator muhim farqlarga ega.
+
+<strong>Yangi darsliklarning afzalliklari:</strong>
+
+📚 <strong>Zamonaviy dizayn</strong> — Rang-barang, interaktiv elementlar bilan boyitilgan. O'quvchilar uchun qiziqarli va tushunarli.
+
+🧠 <strong>Kritik fikrlash</strong> — Har bir bobda mustaqil fikrlash va muammo yechish mashqlari bor.
+
+💻 <strong>QR kodlar</strong> — Darslikdagi QR kodlar orqali qo'shimcha video darslar ko'rish mumkin.
+
+🌍 <strong>Hayot bilan bog'liqlik</strong> — Masalalar real hayot vaziyatlaridan olingan.
+
+Yangi darsliklar quyidagi sinflar uchun tayyorlandi:
+• 1-4 sinf: Ona tili, Matematika, Atrofimizdagi olam
+• 5-9 sinf: Barcha fanlar yangi nashr
+• 10-11 sinf: Akademik yo'nalish darsliklari
+
+Vazirlik ma'lumotiga ko'ra, jami 8 million nusxa darslik tarqatildi. Darsliklar bepul beriladi.`},
+  {id:4,sarlavha:"DTM imtihon jadvali",tag:"Imtihon",tagRang:"red",vaqt:"6 min",sana:"12 May 2026",tavsif:"Davlat test markazi 2026 yil uchun imtihon jadvalini rasman e'lon qildi...",
+   matn:`Davlat test markazi (DTM) 2026 yil uchun imtihon jadvalini rasman e'lon qildi. Barcha abituriyentlar e'tiborli bo'lishi lozim.
+
+<strong>📅 Imtihon jadvali 2026:</strong>
+
+<strong>Birinchi bosqich (umumta'lim fanlari):</strong>
+• 15-20 iyun: Ona tili va adabiyot
+• 22-27 iyun: Matematika
+• 1-5 iyul: Ingliz tili / Rus tili
+
+<strong>Ikkinchi bosqich (ixtisoslik fanlari):</strong>
+• 10-20 iyul: Texnik yo'nalishlar
+• 22 iyul — 1 avgust: Ijtimoiy-gumanitar yo'nalishlar
+
+<strong>Muhim ma'lumotlar:</strong>
+✅ Ro'yxatdan o'tish muddati: 1-30 aprel
+✅ Imtihon to'lovi: 50,000 so'm
+✅ Natijalar: imtihondan 3 kun so'ng
+✅ Apellyatsiya muddati: 5 ish kuni
+
+Bu yil imtihonlar faqat kompyuter orqali o'tkaziladi. Qo'shimcha ma'lumot uchun dtm.uz saytiga murojaat qiling.
+
+<strong>⚠️ Eslatma:</strong> Hujjatlarni o'z vaqtida topshiring. Kech topshirilgan hujjatlar qabul qilinmaydi.`},
+  {id:5,sarlavha:"AI ta'limda yangi imkoniyatlar",tag:"Texnologiya",tagRang:"purple",vaqt:"7 min",sana:"11 May 2026",tavsif:"Sun'iy intellekt texnologiyalari O'zbekiston maktablarida keng joriy etilmoqda...",
+   matn:`Sun'iy intellekt (AI) texnologiyalari O'zbekiston maktablarida yangi bosqichga ko'tarilmoqda. MAKTAB AI loyihasi bu yo'nalishda muhim qadam bo'ldi.
+
+<strong>🤖 AI ta'limdagi imkoniyatlar:</strong>
+
+<strong>1. Shaxsiylashtirilgan ta'lim</strong>
+Har bir o'quvchi o'zining o'rganish tezligi va uslubiga mos ravishda dars oladi. AI o'quvchining kuchli va zaif tomonlarini tahlil qiladi.
+
+<strong>2. 24/7 yordam</strong>
+O'quvchilar istalgan vaqtda — kechasi ham — savollariga javob olishlari mumkin. O'qituvchi doim "hozir yo'q" bo'lmaydi.
+
+<strong>3. Interaktiv testlar</strong>
+AI avtomatik ravishda test yaratadi va natijalarni tahlil qiladi. O'quvchi qayerda xato qilayotganini darhol biladi.
+
+<strong>4. Ko'p tilli qo'llab-quvvatlash</strong>
+O'zbek, rus va ingliz tillarida dars berish imkoniyati.
+
+<strong>📊 Statistika:</strong>
+• 500,000+ o'quvchi AI ta'limdan foydalanmoqda
+• O'quv natijalari o'rtacha 34% yaxshilandi
+• O'qituvchilar yuки 40% kamaydi
+
+MAKTAB AI — bu O'zbekiston o'quvchilari uchun maxsus yaratilgan AI mentor. Hoziroq sinab ko'ring!`},
+  {id:6,sarlavha:"Eng yaxshi o'quvchilar taqdirlandi",tag:"Yutuq",tagRang:"orange",vaqt:"4 min",sana:"10 May 2026",tavsif:"Yil davomida ajoyib natijalar ko'rsatgan o'quvchilar davlat mukofotlari bilan taqdirlandi...",
+   matn:`O'zbekiston Prezidentining maxsus farmoyishi bilan yil davomida ajoyib natijalar ko'rsatgan o'quvchilar davlat mukofotlari bilan taqdirlandi.
+
+<strong>🏆 Taqdirlash marosimi:</strong>
+
+Toshkentdagi "O'zbekiston" milliy bog'ida o'tkazilgan tantanali marosimda 200 dan ortiq o'quvchi mukofot oldi.
+
+<strong>Mukofot turlari:</strong>
+🥇 "Zulfiya" davlat mukofoti — 15 ta o'quvchi
+🥈 "Mard o'g'lon" mukofoti — 25 ta o'quvchi
+🥉 Prezident stipendiyasi — 60 ta o'quvchi
+📜 Faxriy yorliq — 100+ o'quvchi
+
+<strong>G'oliblar haqida:</strong>
+Bu yilgi eng yosh g'olib — 12 yoshli Samarqandlik Nilufar Xoliqova. U matematika va kimyo olimpiadalarida birinchi o'rinni egalladi.
+
+11-sinf o'quvchisi Sherzod Nazarov xalqaro fizika olimpiadasida kumush medal qozondi va O'zbekistonni dunyoga tanittirdi.
+
+<strong>💡 Motivatsiya:</strong>
+Prezident Shavkat Mirziyoyev aytdi: "Bilim — kelajak. Bilimli farzandlar — kuchli O'zbekiston."
+
+Siz ham o'qishda qattiq harakat qiling — muvaffaqiyat sizni kutmoqda!`},
+  {id:7,sarlavha:"Ta'lim tizimi yangiliklari",tag:"Xabar",tagRang:"blue",vaqt:"5 min",sana:"9 May 2026",tavsif:"O'zbekiston ta'lim tizimida amalga oshirilayotgan islohotlar haqida batafsil ma'lumot...",
+   matn:`O'zbekiston ta'lim tizimida keng ko'lamdagi islohotlar amalga oshirilmoqda. Vazirlik bir qator muhim qarorlar qabul qildi.
+
+<strong>📋 Asosiy islohotlar:</strong>
+
+<strong>1. Maktab binolarini ta'mirlash</strong>
+2026 yilda 1,200 ta maktab binosi kapital ta'mirdan o'tkaziladi. Bunga 2 trillion so'm ajratildi.
+
+<strong>2. O'qituvchilar maoshi</strong>
+O'qituvchilar maoshi 2027 yilga qadar ikki barobarga oshiriladi. Bu kasb obro'sini ko'taradi.
+
+<strong>3. Inklyuziv ta'lim</strong>
+Nogironligi bor bolalar uchun maxsus sinflar va jihozlar ta'minlanadi. Har bir bola ta'lim olish huquqiga ega.
+
+<strong>4. Sport infrastrukturasi</strong>
+3,000 ta maktabga yangi sport jihozlari yetkaziladi. Suzish havzalari quriladi.
+
+<strong>5. Ovqatlanish sifati</strong>
+Maktab oshxonalarida sifat standarti joriy etiladi. Bolalar sog'lom ovqat iste'mol qiladi.
+
+<strong>📈 Natijalar:</strong>
+Bu islohotlar O'zbekiston ta'limini mintaqadagi eng rivojlangan tizimga aylantirish uchun mo'ljallangan. 2030 yilga qadar barcha maktablar zamonaviy talablarga javob berishi rejalashtirilgan.`},
+  {id:8,sarlavha:"Fan olimpiadasi natijalari",tag:"Olimpiada",tagRang:"green",vaqt:"3 min",sana:"8 May 2026",tavsif:"Barcha fanlar bo'yicha o'tkazilgan olimpiadalar yakunlandi va natijalar e'lon qilindi...",
+   matn:`Respublika miqyosida barcha fanlar bo'yicha o'tkazilgan olimpiadalar yakunlandi. Natijalar rasman e'lon qilindi.
+
+<strong>🏆 Olimpiada natijalari 2026:</strong>
+
+<table style="width:100%;border-collapse:collapse;font-size:13px;margin:10px 0">
+<tr style="background:var(--card2)"><td style="padding:8px;border-radius:8px 0 0 8px"><strong>Fan</strong></td><td style="padding:8px"><strong>G'olib</strong></td><td style="padding:8px;border-radius:0 8px 8px 0"><strong>Viloyat</strong></td></tr>
+<tr><td style="padding:8px">Matematika</td><td style="padding:8px">Alibek Y.</td><td style="padding:8px">Toshkent</td></tr>
+<tr style="background:var(--card2)"><td style="padding:8px">Fizika</td><td style="padding:8px">Kamola M.</td><td style="padding:8px">Samarqand</td></tr>
+<tr><td style="padding:8px">Kimyo</td><td style="padding:8px">Doniyor R.</td><td style="padding:8px">Farg'ona</td></tr>
+<tr style="background:var(--card2)"><td style="padding:8px">Biologiya</td><td style="padding:8px">Gulnora A.</td><td style="padding:8px">Buxoro</td></tr>
+<tr><td style="padding:8px">Informatika</td><td style="padding:8px">Sherzod N.</td><td style="padding:8px">Namangan</td></tr>
+</table>
+
+<strong>Umumiy natijalar:</strong>
+• Ishtirokchilar soni: 12,450 o'quvchi
+• Barcha viloyatlardan qatnashdi
+• 180 ta g'olib aniqlandi
+• 45 ta o'quvchi xalqaro olimpiadaga tavsiya etildi
+
+Keyingi yil olimpiadasi yanvar oyida boshlanganda ro'yxatdan o'ting. Tayyorgarlikni erta boshlang — MAKTAB AI bilan birga o'rganing!`}
+];
+
+const params=new URLSearchParams(location.search);
+const maqolaId=parseInt(params.get('id'))||1;
+const autoAI=params.get('ai')==='true';
+const maqola=maqolalar.find(m=>m.id===maqolaId)||maqolalar[0];
+
+document.getElementById('pageTitle').textContent=maqola.sarlavha;
+
+function renderArticle(){
+  document.getElementById('articleContent').innerHTML=`
+    <div class="clay-card" style="padding:20px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <span class="tag tag-${maqola.tagRang}">${maqola.tag}</span>
+        <span style="font-size:12px;color:var(--text2)">${maqola.vaqt} o'qish · ${maqola.sana}</span>
+      </div>
+      <h2 style="font-size:19px;font-weight:900;font-family:'Montserrat',sans-serif;line-height:1.35;margin-bottom:16px">${maqola.sarlavha}</h2>
+      <div style="font-size:14px;line-height:1.8;color:var(--text)">${maqola.matn}</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:100px">
+      <button onclick="openAiPanel()" class="clay-btn-p" style="padding:12px 20px;font-size:14px;border-radius:14px;display:flex;align-items:center;gap:8px;flex:1">
+        <span style="font-size:18px">🤖</span> AI tushuntirsin
+      </button>
+    </div>`;
+}
+
+renderArticle();
+
+async function maqolaniTushuntir(maqolaMatni){
+  const grade=localStorage.getItem('student_grade')||'4';
+  const response=await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyD2nOTfeR0M_Hp-K4goY4d5v4eexby01Ps',
+    {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        system_instruction:{parts:[{text:
+          `Sen MAKTAB AI. Faqat O'zbek tilida (lotin) javob ber.
+Bu maqolani ${grade}-sinf o'quvchisiga mos sodda tilda tushuntir.
+Maksimum 5 jumla. Muhim so'zlarni **kuchli** ko'rsat.
+Oxirida 1 ta savol ber: "Siz ham shu haqida nima o'ylaysiz?"`
+        }]},
+        contents:[{role:'user',parts:[{text:maqolaMatni}]}],
+        generationConfig:{maxOutputTokens:400,temperature:0.5}
+      })
+    }
+  );
+  const data=await response.json();
+  return data.candidates[0].content.parts[0].text;
+}
+
+function openAiPanel(){
+  const panel=document.getElementById('aiPanel');
+  panel.classList.add('open');
+  document.getElementById('aiContent').innerHTML=`
+    <div style="display:flex;align-items:center;gap:6px;color:var(--text2)">
+      <span style="font-size:13px">Maktab AI yozmoqda</span>
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    </div>`;
+  document.getElementById('aiActions').innerHTML='';
+
+  const plainText=maqola.sarlavha+'\n'+maqola.matn.replace(/<[^>]+>/g,' ');
+  maqolaniTushuntir(plainText).then(text=>{
+    const formatted=text
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g,'<em>$1</em>')
+      .replace(/\n/g,'<br>');
+    document.getElementById('aiContent').innerHTML=`<div style="font-size:14px;line-height:1.7">${formatted}</div>`;
+    const grade=localStorage.getItem('student_grade')||'4';
+    const fan=localStorage.getItem('last_fan')||'Tarix';
+    document.getElementById('aiActions').innerHTML=`
+      <button onclick="location.href='chat.html?fan=${encodeURIComponent(fan)}&sinf=${grade}'" class="clay-btn-p" style="width:100%;height:46px;font-size:14px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:8px">
+        <span class="ms" style="font-size:18px;color:#141414;font-variation-settings:'FILL' 1">forum</span>
+        Savolim bor — AI bilan suhbat
+      </button>`;
+  }).catch(()=>{
+    document.getElementById('aiContent').innerHTML=`<div style="color:#F87171;font-size:14px">Xatolik yuz berdi. Qayta urinib ko'ring.</div>`;
+  });
+}
+
+function closeAiPanel(){
+  document.getElementById('aiPanel').classList.remove('open');
+}
+
+if(autoAI){
+  setTimeout(openAiPanel,600);
+}
+</script>
+</body>
+</html>

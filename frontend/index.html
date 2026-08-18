@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>MAKTAB AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--bg:#0A0A0F;--card:#1C1C1E;--card2:#2C2C2E;--primary:#FFC800;--text:#FFFFFF;--text2:#8A8A8E;--border:rgba(255,255,255,0.08);--shadow:0 8px 32px rgba(0,0,0,0.45)}
+[data-theme=light]{--bg:#F5F5F5;--card:#FFFFFF;--card2:#EBEBEB;--text:#1a1a1a;--text2:#666666;--border:rgba(0,0,0,0.08);--shadow:0 8px 32px rgba(0,0,0,0.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh;-webkit-tap-highlight-color:transparent;user-select:none}
+html *{transition:background-color .25s,color .25s,border-color .25s,box-shadow .25s}
+.ms{font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,.mont{font-family:'Montserrat',system-ui,sans-serif}
+/* Clay */
+.clay-card{background:var(--card);border-radius:24px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,0.04);border:1px solid var(--border)}
+.clay-btn-p{background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:16px;font-weight:800;color:#141414;box-shadow:0 4px 20px rgba(255,200,0,.35),0 2px 0 rgba(180,140,0,.4);border:none;cursor:pointer;font-family:'Montserrat',system-ui,sans-serif;transition:all .2s ease;display:flex;align-items:center;justify-content:center;gap:8px}
+.clay-btn-p:active{transform:scale(.95) translateY(1px);box-shadow:0 2px 10px rgba(255,200,0,.2)}
+.clay-btn{background:var(--card2);border-radius:14px;color:var(--text);border:1px solid var(--border);cursor:pointer;font-family:'Inter',system-ui,sans-serif;transition:all .2s ease}
+.clay-btn:active{transform:scale(.96)}
+/* Page */
+.page{position:fixed;top:0;left:0;right:0;bottom:72px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page::-webkit-scrollbar{display:none}
+/* Bottom nav */
+.bnav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:100;padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -4px 20px rgba(0,0,0,.15)}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text2);text-decoration:none;flex:1;padding:8px 4px;transition:color .2s}
+.ni .ms{font-size:22px}.ni span{font-size:11px;font-weight:600}
+.ni.active{color:var(--primary)}.ni.active .ms{font-variation-settings:'FILL' 1}
+.nc{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;padding:0 8px;flex-shrink:0}
+.nc-btn{width:52px;height:52px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,200,0,.45);margin-top:-20px}
+.nc-btn .ms{font-size:24px;color:#141414;font-variation-settings:'FILL' 1}
+.nc span{font-size:11px;font-weight:700;color:var(--primary)}
+/* Horiz scroll */
+.hs{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.hs::-webkit-scrollbar{display:none}
+/* Section */
+.sec{font-family:'Montserrat',sans-serif;font-size:17px;font-weight:800;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec a{font-size:13px;color:var(--primary);font-weight:600;text-decoration:none;font-family:'Inter',sans-serif}
+/* Tabs */
+.tbar{display:flex;background:var(--card2);border-radius:14px;padding:4px;gap:4px;margin-bottom:16px}
+.tbtn{flex:1;height:36px;border-radius:10px;border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',system-ui,sans-serif;transition:all .2s}
+.tbtn.on{background:linear-gradient(135deg,#FFD700,#FFC800);color:#141414;box-shadow:0 2px 8px rgba(255,200,0,.3)}
+.tc{display:none}.tc.on{display:block}
+/* Sched / Task */
+.si{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.si:last-child{border-bottom:none}
+.ti{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.ti:last-child{border-bottom:none}
+.cb{width:24px;height:24px;border-radius:8px;border:2px solid var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.cb.on{background:var(--primary);border-color:var(--primary)}
+/* News card */
+.nc-a{width:200px;flex-shrink:0;background:var(--card);border-radius:20px;overflow:hidden;border:1px solid var(--border);text-decoration:none;color:var(--text);transition:transform .2s;display:block}
+.nc-a:active{transform:scale(.96)}
+/* Course card */
+.cc{width:168px;flex-shrink:0;border-radius:20px;padding:16px;cursor:pointer;transition:transform .15s}
+.cc:active{transform:scale(.96)}
+/* Leaderboard */
+.li{border-bottom:1px solid var(--border);padding:12px 0;display:flex;align-items:center;gap:12px}
+.li:last-child{border-bottom:none}
+/* Toast */
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--card2);color:var(--text);padding:10px 22px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:999;border:1px solid var(--border)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <!-- HEADER -->
+  <header style="background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50">
+    <img src="images/logo.png" alt="MAKTAB AI" style="height:32px;object-fit:contain"/>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="toggleTheme()" id="theme-btn" style="width:36px;height:36px;background:var(--card2);border:1px solid var(--border);border-radius:12px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center">🌙</button>
+      <div style="width:36px;height:36px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#141414;box-shadow:0 2px 8px rgba(255,200,0,.3);font-family:'Montserrat',sans-serif" id="uinit">O</div>
+    </div>
+  </header>
+
+  <div style="padding:20px 20px 16px">
+
+    <!-- HERO -->
+    <div class="clay-card" style="padding:20px;margin-bottom:20px;background:linear-gradient(135deg,#1a1200,#2d2000);position:relative;overflow:hidden">
+      <div style="position:absolute;right:-10px;top:-10px;width:90px;height:90px;background:var(--primary);opacity:.1;border-radius:50%"></div>
+      <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:52px;opacity:.9">🤖</div>
+      <p style="font-size:11px;color:var(--primary);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-family:'Montserrat',sans-serif">Xayrli kun! 👋</p>
+      <h2 style="font-size:22px;font-weight:900;margin-bottom:4px;font-family:'Montserrat',sans-serif;padding-right:70px" id="hero-name">Salom!</h2>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">O'zbekiston maktab dasturi · AI mentor</p>
+      <div style="display:flex;gap:20px">
+        <div><div style="font-size:22px;font-weight:900;color:var(--primary);font-family:'Montserrat',sans-serif" id="h-streak">0</div><div style="font-size:10px;color:var(--text2);margin-top:2px">kun streak</div></div>
+        <div style="width:1px;background:rgba(255,255,255,.1)"></div>
+        <div><div style="font-size:22px;font-weight:900;color:var(--primary);font-family:'Montserrat',sans-serif" id="h-tests">0</div><div style="font-size:10px;color:var(--text2);margin-top:2px">testlar</div></div>
+        <div style="width:1px;background:rgba(255,255,255,.1)"></div>
+        <div><div style="font-size:22px;font-weight:900;color:var(--primary);font-family:'Montserrat',sans-serif" id="h-score">—</div><div style="font-size:10px;color:var(--text2);margin-top:2px">ball</div></div>
+      </div>
+    </div>
+
+    <!-- YANGILIKLAR -->
+    <div style="margin-bottom:24px">
+      <div class="sec"><span>📰 Yangiliklar</span><a href="yangiliklar.html">Barchasi →</a></div>
+      <div class="hs" id="news-row"></div>
+    </div>
+
+    <!-- JADVAL & KUNDALIK -->
+    <div style="margin-bottom:24px">
+      <div class="sec"><span>📋 Jadval & Vazifalar</span></div>
+      <div class="clay-card" style="padding:16px">
+        <div class="tbar">
+          <button class="tbtn on" onclick="swTab(this,'ts')">📅 Darslar</button>
+          <button class="tbtn" onclick="swTab(this,'tt')">✅ Kundalik</button>
+        </div>
+        <div class="tc on" id="ts">
+          <div class="si">
+            <div style="width:44px;height:44px;background:rgba(33,150,243,.15);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📐</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:700">Matematika</div><div style="font-size:12px;color:var(--text2)">08:00 – 08:45 · 204-xona</div></div>
+            <div style="font-size:11px;color:var(--primary);font-weight:700;background:rgba(255,200,0,.12);padding:4px 10px;border-radius:8px">Hozir</div>
+          </div>
+          <div class="si">
+            <div style="width:44px;height:44px;background:rgba(255,152,0,.15);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📝</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:700">Ona tili</div><div style="font-size:12px;color:var(--text2)">09:00 – 09:45 · 301-xona</div></div>
+            <div style="font-size:11px;color:var(--text2);font-weight:600">Keyingi</div>
+          </div>
+          <div class="si">
+            <div style="width:44px;height:44px;background:rgba(255,87,34,.15);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">⚡</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:700">Fizika</div><div style="font-size:12px;color:var(--text2)">10:00 – 10:45 · 115-xona</div></div>
+            <div style="font-size:11px;color:var(--text2);font-weight:600">10:00</div>
+          </div>
+          <div class="si">
+            <div style="width:44px;height:44px;background:rgba(76,175,80,.15);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧬</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:700">Biologiya</div><div style="font-size:12px;color:var(--text2)">11:00 – 11:45 · 220-xona</div></div>
+            <div style="font-size:11px;color:var(--text2);font-weight:600">11:00</div>
+          </div>
+        </div>
+        <div class="tc" id="tt">
+          <div id="task-list"></div>
+          <button onclick="addTask()" style="margin-top:12px;width:100%;height:42px;border:2px dashed rgba(255,255,255,.12);border-radius:12px;background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px"><span>+</span> Vazifa qo'shish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REYTING PODIUM -->
+    <div style="margin-bottom:24px">
+      <div class="sec"><span>🏆 7 Kunlik Reyting</span></div>
+      <div class="clay-card" style="padding:20px">
+        <div style="display:flex;align-items:flex-end;justify-content:center;gap:10px;margin-bottom:20px">
+          <!-- 2nd -->
+          <div style="text-align:center;flex:1">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#B0BEC5,#78909C);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;margin:0 auto 6px;box-shadow:0 4px 12px rgba(120,144,156,.3);font-family:'Montserrat',sans-serif">M</div>
+            <div style="font-size:12px;font-weight:700;margin-bottom:2px">Malika T.</div>
+            <div style="font-size:11px;color:var(--text2)">870 ball</div>
+            <div style="height:60px;background:linear-gradient(135deg,#B0BEC5,#78909C);border-radius:14px 14px 0 0;margin-top:8px;display:flex;align-items:center;justify-content:center;font-size:22px">🥈</div>
+          </div>
+          <!-- 1st -->
+          <div style="text-align:center;flex:1">
+            <div style="font-size:20px;margin-bottom:4px">👑</div>
+            <div style="width:56px;height:56px;background:linear-gradient(135deg,#FFD700,#FFA000);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#141414;margin:0 auto 6px;box-shadow:0 4px 16px rgba(255,200,0,.4);font-family:'Montserrat',sans-serif">A</div>
+            <div style="font-size:14px;font-weight:800;font-family:'Montserrat',sans-serif">Aziz K.</div>
+            <div style="font-size:12px;color:var(--primary);font-weight:700">980 ball</div>
+            <div style="height:80px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:14px 14px 0 0;margin-top:8px;display:flex;align-items:center;justify-content:center;font-size:28px">🥇</div>
+          </div>
+          <!-- 3rd -->
+          <div style="text-align:center;flex:1">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#FF8A65,#E64A19);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;margin:0 auto 6px;box-shadow:0 4px 12px rgba(230,74,25,.3);font-family:'Montserrat',sans-serif">B</div>
+            <div style="font-size:12px;font-weight:700;margin-bottom:2px">Bobur N.</div>
+            <div style="font-size:11px;color:var(--text2)">760 ball</div>
+            <div style="height:44px;background:linear-gradient(135deg,#FF8A65,#E64A19);border-radius:14px 14px 0 0;margin-top:8px;display:flex;align-items:center;justify-content:center;font-size:20px">🥉</div>
+          </div>
+        </div>
+        <div style="padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:13px;color:var(--text2)">Sizning o'rningiz:</span>
+          <span style="font-size:16px;font-weight:900;color:var(--primary);font-family:'Montserrat',sans-serif">#47</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI KURSLAR -->
+    <div style="margin-bottom:24px">
+      <div class="sec"><span>🎓 AI Kurslar & Repititorlar</span><a href="student.html">Barchasi →</a></div>
+      <div class="hs" id="courses-row"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <a href="index.html" class="ni active"><span class="ms">home</span><span>Asosiy</span></a>
+  <a href="student.html" class="ni"><span class="ms">school</span><span>Fanlar</span></a>
+  <a href="chat.html" class="nc">
+    <div class="nc-btn"><span class="ms">forum</span></div>
+    <span>AI Chat</span>
+  </a>
+  <a href="yangiliklar.html" class="ni"><span class="ms">article</span><span>Yangiliklar</span></a>
+  <a href="parent.html" class="ni"><span class="ms">person</span><span>Profil</span></a>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// THEME
+function initTheme(){const t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);const b=document.getElementById('theme-btn');if(b)b.textContent=t==='dark'?'☀️':'🌙'}
+function toggleTheme(){const c=document.documentElement.getAttribute('data-theme')||'dark';const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);const b=document.getElementById('theme-btn');if(b)b.textContent=n==='dark'?'☀️':'🌙'}
+initTheme();
+
+// TELEGRAM
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand()}
+
+// USER
+const sv=JSON.parse(localStorage.getItem('maktab_student')||'{}');
+const tgU=tg?.initDataUnsafe?.user||{};
+const nm=sv.name||tgU.first_name||"O'quvchi";
+document.getElementById('hero-name').textContent=`Salom, ${nm}! 👋`;
+document.getElementById('uinit').textContent=nm[0]?.toUpperCase()||'O';
+const st=JSON.parse(localStorage.getItem('maktab_stats')||'{"streak":0,"tests":0,"score":0}');
+document.getElementById('h-streak').textContent=st.streak||0;
+document.getElementById('h-tests').textContent=st.tests||0;
+document.getElementById('h-score').textContent=st.score||'—';
+
+// YANGILIKLAR
+const yangiliklar=[
+  {id:1,sarlavha:"Yangi o'quv yili 2026 boshlandi",tag:"Vazirlik",vaqt:"5 min",rang:"#1565C0",e:"📚"},
+  {id:2,sarlavha:"Matematika olimpiadasi g'oliblari e'lon qilindi",tag:"Olimpiada",vaqt:"3 min",rang:"#E65100",e:"🏆"},
+  {id:3,sarlavha:"Yangi darsliklar tarqatildi",tag:"Xabar",vaqt:"4 min",rang:"#2E7D32",e:"📝"},
+  {id:4,sarlavha:"DTM imtihon jadvali e'lon qilindi",tag:"Imtihon",vaqt:"6 min",rang:"#C62828",e:"📋"},
+  {id:5,sarlavha:"AI ta'limda yangi imkoniyatlar",tag:"Texnologiya",vaqt:"7 min",rang:"#6A1B9A",e:"🤖"},
+  {id:6,sarlavha:"Eng yaxshi o'quvchilar taqdirlandi",tag:"Yutuq",vaqt:"4 min",rang:"#E65100",e:"🌟"},
+  {id:7,sarlavha:"O'zbekiston ta'lim tizimi yangiliklari",tag:"Xabar",vaqt:"5 min",rang:"#1565C0",e:"📰"},
+  {id:8,sarlavha:"Fan olimpiadasi natijalari",tag:"Olimpiada",vaqt:"3 min",rang:"#2E7D32",e:"🔬"},
+];
+const nr=document.getElementById('news-row');
+yangiliklar.forEach(n=>{
+  const a=document.createElement('a');
+  a.href=`yangiliklar.html?id=${n.id}`;
+  a.className='nc-a';
+  a.innerHTML=`<div style="height:100px;background:linear-gradient(135deg,${n.rang}33,${n.rang}66);display:flex;align-items:center;justify-content:center;font-size:42px">${n.e}</div><div style="padding:12px"><div style="display:inline-block;background:${n.rang};color:#fff;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:800;margin-bottom:8px">${n.tag}</div><div style="font-size:13px;font-weight:700;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${n.sarlavha}</div><div style="font-size:11px;color:var(--text2)">${n.vaqt} o'qiladi</div></div>`;
+  nr.appendChild(a);
+});
+
+// KURSLAR
+const kurslar=[
+  {nom:"Matematika AI Kurs",sinf:"9-11 sinf",dars:"45 dars",narx:"Bepul",g:"#0D47A1,#1565C0",e:"📐",fan:"Matematika"},
+  {nom:"Fizika repititor",sinf:"8-11 sinf",dars:"Online",narx:"29,000 so'm/oy",g:"#BF360C,#E64A19",e:"⚡",fan:"Fizika"},
+  {nom:"Ingliz tili AI",sinf:"Barcha sinflar",dars:"Cheksiz",narx:"Bepul sinov",g:"#1B5E20,#388E3C",e:"🇬🇧",fan:"Ingliz tili"},
+  {nom:"Kimyo mentor",sinf:"8-11 sinf",dars:"30 dars",narx:"19,000 so'm/oy",g:"#4A148C,#7B1FA2",e:"🧪",fan:"Kimyo"},
+];
+const sinf=sv.grade||7;
+const cr=document.getElementById('courses-row');
+kurslar.forEach(c=>{
+  const d=document.createElement('div');
+  d.className='cc';
+  d.style.background=`linear-gradient(135deg,${c.g})`;
+  d.onclick=()=>location.href=`chat.html?fan=${encodeURIComponent(c.fan)}&sinf=${sinf}`;
+  d.innerHTML=`<div style="font-size:28px;margin-bottom:10px">${c.e}</div><div style="font-size:14px;font-weight:800;font-family:'Montserrat',sans-serif;margin-bottom:3px">${c.nom}</div><div style="font-size:11px;color:rgba(255,255,255,.65);margin-bottom:3px">${c.sinf}</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:12px">${c.dars}</div><div style="display:inline-block;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700">${c.narx}</div>`;
+  cr.appendChild(d);
+});
+
+// TABS
+function swTab(btn,id){
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tc').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(id).classList.add('on');
+}
+
+// TASKS
+const TASKS=[
+  {t:"Matematika: 45-bet mashqlar",s:"7-sinf darslik",done:false},
+  {t:"Ona tili: insho tayyorlash",s:"Bajarildi",done:true},
+  {t:"Fizika: 3-bob savollari",s:"8-sinf darslik",done:false},
+  {t:"Ingliz tili: 12-dars so'zlar",s:"Eslab qolish",done:false},
+];
+function renderTasks(){
+  const L=document.getElementById('task-list');
+  L.innerHTML='';
+  TASKS.forEach((tk,i)=>{
+    const d=document.createElement('div');
+    d.className='ti';
+    d.onclick=()=>{TASKS[i].done=!TASKS[i].done;renderTasks()};
+    d.innerHTML=`<div class="cb ${tk.done?'on':''}">${tk.done?'<span style="font-size:13px;color:#141414">✓</span>':''}</div><div style="flex:1"><div style="font-size:14px;font-weight:600${tk.done?';text-decoration:line-through;color:var(--text2)':''}">${tk.t}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${tk.s}</div></div>`;
+    L.appendChild(d);
+  });
+}
+renderTasks();
+function addTask(){const t=prompt('Vazifa kiriting:');if(!t?.trim())return;TASKS.push({t:t.trim(),s:'Yangi',done:false});renderTasks()}
+
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+</script>
+</body>
+</html>

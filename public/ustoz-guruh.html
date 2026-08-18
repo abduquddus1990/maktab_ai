@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Guruh Boshqaruvi — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#fbf8ff;color:#12183b;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.mont{font-family:'Montserrat',sans-serif}
+.ms{font-family:'Material Symbols Outlined';font-size:22px;line-height:1;user-select:none}
+.app{display:flex;flex:1;overflow:hidden;height:calc(100dvh - 56px)}
+.sidebar{width:260px;background:#fff;border-right:1px solid #E7E9F4;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar-logo{padding:24px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #E7E9F4}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:12px;font-size:14px;font-weight:600;color:#464557;cursor:pointer;transition:all .2s;text-decoration:none;margin:0 8px 2px}
+.nav-item:hover{background:#f4f3ff;color:#4b3bff}
+.nav-item.active{background:#f0eeff;color:#4b3bff;font-weight:700}
+.nav-item .ms{font-size:20px}
+.sidebar-footer{margin-top:auto;padding:16px}
+.main{flex:1;overflow-y:auto;padding:28px 32px;scrollbar-width:thin;scrollbar-color:#E7E9F4 transparent}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-thumb{background:#E7E9F4;border-radius:2px}
+
+/* Group selector */
+.group-selector{display:flex;gap:10px;overflow-x:auto;margin-bottom:24px;padding-bottom:4px;scrollbar-width:none}
+.group-selector::-webkit-scrollbar{display:none}
+.gs-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border:1.5px solid #E7E9F4;border-radius:999px;font-size:14px;font-weight:600;color:#464557;cursor:pointer;background:#fff;white-space:nowrap;transition:all .2s;font-family:'Inter',sans-serif}
+.gs-btn.active{border-color:#4b3bff;background:#f0eeff;color:#4b3bff}
+.gs-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:2px solid #E7E9F4;margin-bottom:20px}
+.tab{padding:10px 20px;font-size:14px;font-weight:700;color:#464557;cursor:pointer;position:relative;transition:color .2s;display:flex;align-items:center;gap:6px}
+.tab.active{color:#4b3bff}
+.tab.active::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:#4b3bff;border-radius:1px}
+.badge-count{min-width:20px;height:20px;border-radius:999px;background:#f97316;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px}
+
+/* Cards */
+.item-card{background:#fff;border:1px solid #E7E9F4;border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:12px;transition:box-shadow .2s}
+.item-card:hover{box-shadow:0 4px 16px rgba(20,26,61,.07)}
+.i-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;color:#fff;flex-shrink:0}
+.btn-approve{padding:7px 16px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;font-size:13px;font-weight:700;color:#22c55e;cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif}
+.btn-approve:hover{background:#22c55e;color:#fff;border-color:#22c55e}
+.btn-reject{padding:7px 16px;background:#fff8f8;border:1.5px solid #fecaca;border-radius:10px;font-size:13px;font-weight:700;color:#ef4444;cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif}
+.btn-reject:hover{background:#ef4444;color:#fff;border-color:#ef4444}
+.btn-remove{padding:7px 14px;background:#fff;border:1.5px solid #E7E9F4;border-radius:10px;font-size:13px;font-weight:600;color:#464557;cursor:pointer;transition:all .2s}
+.btn-remove:hover{border-color:#ef4444;color:#ef4444}
+.btn-delete{padding:7px 14px;background:#fff8f8;border:1.5px solid #fecaca;border-radius:10px;font-size:13px;font-weight:700;color:#ef4444;cursor:pointer;transition:all .2s}
+.btn-delete:hover{background:#ef4444;color:#fff}
+.btn-allow{padding:7px 14px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;font-size:13px;font-weight:600;color:#22c55e;cursor:pointer;transition:all .2s}
+.btn-allow:hover{background:#22c55e;color:#fff}
+
+/* Announce composer */
+.composer{background:#fff;border:1.5px solid #E7E9F4;border-radius:16px;padding:16px;margin-bottom:24px}
+.composer-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;color:#12183b;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.composer-input{width:100%;padding:11px 14px;border:1.5px solid #E7E9F4;border-radius:12px;font-size:14px;font-family:'Inter',sans-serif;resize:none;height:80px;outline:none;color:#12183b;transition:border-color .2s}
+.composer-input:focus{border-color:#4b3bff}
+.btn-pin{padding:10px 20px;background:#fec700;color:#12183b;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;margin-top:10px}
+.btn-pin:hover{background:#f5bb00}
+
+/* Flagged message */
+.flagged-text{font-size:14px;color:#464557;line-height:1.6;padding:10px 14px;background:#fff8f8;border-radius:10px;border-left:3px solid #ef4444;margin-bottom:8px}
+
+/* Empty state */
+.empty-tab{text-align:center;padding:48px 20px;color:#464557}
+.empty-tab .ms{font-size:52px;color:#c7c4da;margin-bottom:12px;display:block}
+
+/* Mobile */
+.mob-sidebar-btn{display:none;background:none;border:none;cursor:pointer;padding:4px;color:#464557}
+@media(max-width:768px){
+  .sidebar{display:none;position:fixed;left:0;top:0;bottom:0;z-index:200;box-shadow:4px 0 20px rgba(0,0,0,.12)}
+  .sidebar.open{display:flex}
+  .mob-sidebar-btn{display:flex}
+  .main{padding:20px 16px}
+}
+</style>
+</head>
+<body>
+<!-- TOP NAV -->
+<div style="background:#fff;border-bottom:1px solid #E7E9F4;height:56px;display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;z-index:50">
+  <button class="mob-sidebar-btn" onclick="toggleSidebar()"><span class="ms" style="font-size:24px">menu</span></button>
+  <a href="/index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <img src="/logo.png" alt="Maktab AI" style="height:30px;object-fit:contain">
+    <span class="mont" style="font-weight:800;font-size:16px;color:#4b3bff">Maktab AI</span>
+  </a>
+  <div style="flex:1"></div>
+  <div style="width:36px;height:36px;background:linear-gradient(135deg,#f97316,#fec700);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;color:#fff" id="nav-avatar">U</div>
+  <span style="font-size:14px;font-weight:600;color:#12183b" id="nav-name">Ustoz</span>
+</div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:36px;height:36px;background:linear-gradient(135deg,#f97316,#fec700);border-radius:10px;display:flex;align-items:center;justify-content:center">
+        <span class="ms" style="color:#fff;font-size:18px">admin_panel_settings</span>
+      </div>
+      <div>
+        <div class="mont" style="font-weight:800;font-size:14px;color:#12183b">Guruh Boshqaruvi</div>
+        <div style="font-size:11px;color:#f97316;font-weight:600">● Ustoz paneli</div>
+      </div>
+    </div>
+    <nav style="padding:12px 8px;flex:1">
+      <div style="font-size:11px;font-weight:700;color:#c7c4da;letter-spacing:.5px;text-transform:uppercase;padding:0 12px;margin-bottom:8px">Menyu</div>
+      <a href="/ai-chat.html" class="nav-item"><span class="ms">home</span>Dashboard</a>
+      <a href="/ai-chat.html" class="nav-item"><span class="ms">smart_toy</span>AI Repetitor</a>
+      <a href="/guruhlar.html" class="nav-item"><span class="ms">group</span>Guruhlar</a>
+      <a href="/repetitorlar.html" class="nav-item"><span class="ms">school</span>Repetitorlar</a>
+      <a href="/yangiliklar.html" class="nav-item"><span class="ms">article</span>Yangiliklar</a>
+      <div style="font-size:11px;font-weight:700;color:#c7c4da;letter-spacing:.5px;text-transform:uppercase;padding:0 12px;margin:16px 0 8px">Ustoz</div>
+      <div class="nav-item active"><span class="ms">admin_panel_settings</span>Guruh boshqaruvi</div>
+      <a href="/guruh-yaratish.html" class="nav-item"><span class="ms">add_circle</span>Yangi guruh</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/index.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#464557;text-decoration:none;font-size:14px;font-weight:600;transition:all .2s" onmouseover="this.style.background='#f8f8fc'" onmouseout="this.style.background=''">
+        <span class="ms" style="font-size:20px">logout</span> Chiqish
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <h1 class="mont" style="font-size:24px;font-weight:900;color:#12183b">Guruh Boshqaruvi</h1>
+        <p style="font-size:14px;color:#464557;margin-top:4px">Guruhlaringizni boshqaring</p>
+      </div>
+      <a href="/guruh-yaratish.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#4b3bff;color:#fff;border-radius:12px;font-size:14px;font-weight:700;font-family:'Montserrat',sans-serif;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#2f06e9'" onmouseout="this.style.background='#4b3bff'">
+        <span class="ms" style="font-size:18px">add</span>Yangi guruh
+      </a>
+    </div>
+
+    <!-- Group selector -->
+    <div class="group-selector" id="group-selector"></div>
+
+    <!-- No groups -->
+    <div id="no-groups" style="display:none;text-align:center;padding:64px 20px;color:#464557">
+      <span class="ms" style="font-size:64px;color:#c7c4da;display:block;margin-bottom:16px">group_off</span>
+      <div class="mont" style="font-size:20px;font-weight:800;color:#12183b;margin-bottom:8px">Hali guruhingiz yo'q</div>
+      <p style="max-width:280px;margin:0 auto;line-height:1.6">Birinchi guruhingizni yarating va o'quvchilarni taklif qiling</p>
+      <a href="/guruh-yaratish.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#4b3bff;color:#fff;border-radius:12px;font-size:14px;font-weight:700;font-family:'Montserrat',sans-serif;text-decoration:none;margin-top:20px">
+        <span class="ms" style="font-size:18px">add</span>Guruh yaratish
+      </a>
+    </div>
+
+    <!-- Panel (shown when group selected) -->
+    <div id="group-panel" style="display:none">
+      <!-- Pinned announcement composer -->
+      <div class="composer">
+        <div class="composer-title">
+          <span class="ms" style="font-size:20px;color:#f59e0b">push_pin</span>
+          Guruhga e'lon yozish
+        </div>
+        <textarea class="composer-input" id="announce-input" placeholder="E'lon matni... (pinned xabar sifatida joylashadi)"></textarea>
+        <button class="btn-pin" onclick="postAnnouncement()">
+          <span class="ms" style="font-size:18px">push_pin</span>E'lonni chiqarish
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('members')" id="tab-members">
+          <span class="ms" style="font-size:18px">group</span>A'zolar
+          <span class="badge-count" id="badge-members" style="background:#4b3bff">0</span>
+        </div>
+        <div class="tab" onclick="switchTab('requests')" id="tab-requests">
+          <span class="ms" style="font-size:18px">pending</span>So'rovlar
+          <span class="badge-count" id="badge-requests">0</span>
+        </div>
+        <div class="tab" onclick="switchTab('moderation')" id="tab-moderation">
+          <span class="ms" style="font-size:18px">shield</span>Moderatsiya
+          <span class="badge-count" id="badge-moderation" style="background:#4b3bff">0</span>
+        </div>
+      </div>
+
+      <!-- Tab content -->
+      <div id="tab-content"></div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/groups.js"></script>
+<script>
+const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();}
+function getCurrentUser(){ try{return JSON.parse(localStorage.getItem('maktabai_currentUser'));}catch{return null;} }
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+const cu=getCurrentUser();
+let currentGroupId=null;
+let activeTab='members';
+
+/* Nav */
+if(cu){
+  document.getElementById('nav-avatar').textContent=initials(cu.name);
+  document.getElementById('nav-name').textContent=cu.name;
+}
+
+GS.seedDemo(cu);
+
+/* Get teacher groups (demo: use demo_teacher_01 or current user) */
+function getMyGroups(){
+  const uid=cu?String(cu.id):'demo_teacher_01';
+  let groups=GS.getTeacherGroups(uid);
+  if(groups.length===0) groups=GS.getTeacherGroups('demo_teacher_01'); // fallback demo
+  return groups;
+}
+
+function renderGroupSelector(){
+  const groups=getMyGroups();
+  const sel=document.getElementById('group-selector');
+  if(groups.length===0){ document.getElementById('no-groups').style.display='block'; document.getElementById('group-panel').style.display='none'; sel.innerHTML=''; return; }
+  document.getElementById('no-groups').style.display='none';
+  document.getElementById('group-panel').style.display='block';
+  if(!currentGroupId) currentGroupId=groups[0].id;
+  sel.innerHTML=groups.map(g=>`
+    <button class="gs-btn ${currentGroupId===g.id?'active':''}" onclick="selectGroup('${g.id}')">
+      <span class="gs-dot" style="background:${g.color}"></span>${g.name}
+    </button>`).join('');
+}
+
+function selectGroup(id){ currentGroupId=id; renderGroupSelector(); updateBadges(); renderTab(); }
+
+function updateBadges(){
+  if(!currentGroupId) return;
+  const members=GS.getGroupMembers(currentGroupId).filter(m=>m.status==='approved');
+  const requests=GS.getPending(currentGroupId);
+  const flagged=GS.getFlagged(currentGroupId);
+  document.getElementById('badge-members').textContent=members.length;
+  document.getElementById('badge-requests').textContent=requests.length;
+  document.getElementById('badge-moderation').textContent=flagged.length;
+  if(requests.length>0) document.getElementById('badge-requests').style.background='#f97316';
+  if(flagged.length>0) document.getElementById('badge-moderation').style.background='#ef4444';
+}
+
+const colors=['#4b3bff','#22c55e','#f97316','#ec4899','#06b6d4','#f59e0b','#7c5cbf'];
+function getColor(uid){ const idx=uid.split('').reduce((a,c)=>a+c.charCodeAt(0),0); return colors[idx%colors.length]; }
+
+function switchTab(t){
+  activeTab=t;
+  ['members','requests','moderation'].forEach(tab=>{
+    const el=document.getElementById('tab-'+tab);
+    el.classList.toggle('active',tab===t);
+  });
+  renderTab();
+}
+
+function renderTab(){
+  if(!currentGroupId){ document.getElementById('tab-content').innerHTML=''; return; }
+  const el=document.getElementById('tab-content');
+  if(activeTab==='members') renderMembers(el);
+  else if(activeTab==='requests') renderRequests(el);
+  else renderModeration(el);
+}
+
+function renderMembers(el){
+  const members=GS.getGroupMembers(currentGroupId).filter(m=>m.status==='approved');
+  if(members.length===0){ el.innerHTML=`<div class="empty-tab"><span class="ms">group_off</span><div class="mont" style="font-weight:700;font-size:16px;color:#12183b">A'zo yo'q</div><p style="margin-top:8px">O'quvchilarni taklif kodini yuboring</p></div>`; return; }
+  el.innerHTML=members.map((m,i)=>`
+    <div class="item-card">
+      <div class="i-avatar" style="background:${getColor(m.userId)}">${initials(m.userName)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:700;color:#12183b">${m.userName}</div>
+        <div style="font-size:12px;color:#464557;margin-top:2px">${m.role==='teacher'?'👨‍🏫 Ustoz':'O\'quvchi'} · ${timeAgo(m.joinedAt)} qo'shilgan</div>
+      </div>
+      ${m.role!=='teacher'?`<button class="btn-remove" onclick="removeMember('${m.userId}','${m.userName}')"><span class="ms" style="font-size:16px">person_remove</span></button>`:''}
+    </div>`).join('');
+}
+
+function renderRequests(el){
+  const requests=GS.getPending(currentGroupId);
+  if(requests.length===0){ el.innerHTML=`<div class="empty-tab"><span class="ms">check_circle</span><div class="mont" style="font-weight:700;font-size:16px;color:#12183b">Kutilayotgan so'rov yo'q</div><p style="margin-top:8px">Barcha so'rovlar ko'rib chiqilgan</p></div>`; return; }
+  el.innerHTML=requests.map(m=>`
+    <div class="item-card">
+      <div class="i-avatar" style="background:${getColor(m.userId)}">${initials(m.userName)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:700;color:#12183b">${m.userName}</div>
+        <div style="font-size:12px;color:#464557;margin-top:2px">So'rov: ${timeAgo(m.joinedAt)}</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-approve" onclick="approve('${m.userId}')">Tasdiqlash</button>
+        <button class="btn-reject" onclick="reject('${m.userId}')">Rad etish</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderModeration(el){
+  const flagged=GS.getFlagged(currentGroupId);
+  if(flagged.length===0){ el.innerHTML=`<div class="empty-tab"><span class="ms">shield</span><div class="mont" style="font-weight:700;font-size:16px;color:#12183b">Shikoyatli xabar yo'q</div><p style="margin-top:8px">Guruh moderatsiya nuqtai nazaridan yaxshi</p></div>`; return; }
+  el.innerHTML=flagged.map(m=>`
+    <div class="item-card" style="flex-direction:column;align-items:flex-start">
+      <div style="display:flex;align-items:center;gap:10px;width:100%;margin-bottom:8px">
+        <div class="i-avatar" style="background:${getColor(m.userId)};width:32px;height:32px;font-size:12px">${initials(m.userName)}</div>
+        <div style="flex:1">
+          <span style="font-size:13px;font-weight:700;color:#12183b">${m.userName}</span>
+          <span style="font-size:11px;color:#464557;margin-left:8px">${timeAgo(m.createdAt)}</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-allow" onclick="clearFlag('${m.id}')"><span class="ms" style="font-size:16px">check</span>Ruxsat</button>
+          <button class="btn-delete" onclick="deleteMsg('${m.id}')"><span class="ms" style="font-size:16px">delete</span>O'chirish</button>
+        </div>
+      </div>
+      <div class="flagged-text">${m.text}</div>
+    </div>`).join('');
+}
+
+function approve(uid){ GS.approveMember(currentGroupId,uid); updateBadges(); renderTab(); }
+function reject(uid){ GS.removeMember(currentGroupId,uid); updateBadges(); renderTab(); }
+function removeMember(uid,name){ if(confirm(`"${name}"ni guruhdan chiqarishni xohlaysizmi?`)){ GS.removeMember(currentGroupId,uid); updateBadges(); renderTab(); } }
+function clearFlag(id){ GS.clearFlag(id); updateBadges(); renderTab(); }
+function deleteMsg(id){ GS.deleteMessage(id); updateBadges(); renderTab(); }
+
+function postAnnouncement(){
+  const text=document.getElementById('announce-input').value.trim();
+  if(!text) return;
+  const uid=cu?String(cu.id):'demo_teacher_01';
+  const uname=cu?cu.name:'Kamoliddin Usmonov';
+  const msg=GS.sendMessage(currentGroupId,uid,uname,text,false);
+  GS.pinMessage(msg.id);
+  document.getElementById('announce-input').value='';
+  alert('E\'lon chiqarildi va guruhda pin qilindi! 📌');
+}
+
+renderGroupSelector();
+updateBadges();
+renderTab();
+</script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Profil — MAKTAB AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0A0A0F;--card:#1C1C1E;--card2:#2C2C2E;--primary:#FFC800;--text:#FFFFFF;--text2:#8A8A8E;--border:rgba(255,255,255,0.08);--shadow:0 8px 32px rgba(0,0,0,0.45)}
+[data-theme=light]{--bg:#F5F5F5;--card:#FFFFFF;--card2:#EBEBEB;--text:#1a1a1a;--text2:#666666;--border:rgba(0,0,0,0.08);--shadow:0 8px 32px rgba(0,0,0,0.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh;-webkit-tap-highlight-color:transparent;user-select:none}
+html *{transition:background-color .25s,color .25s,border-color .25s}
+.ms{font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased}
+.mont{font-family:'Montserrat',system-ui,sans-serif}
+.clay-card{background:var(--card);border-radius:24px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,0.04);border:1px solid var(--border)}
+.clay-btn-p{background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:16px;font-weight:800;color:#141414;box-shadow:0 4px 20px rgba(255,200,0,.35),0 2px 0 rgba(180,140,0,.4);border:none;cursor:pointer;font-family:'Montserrat',system-ui,sans-serif;transition:all .2s ease;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:54px;font-size:16px}
+.clay-btn-p:active{transform:scale(.95) translateY(1px)}
+.page{position:fixed;top:0;left:0;right:0;bottom:72px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page::-webkit-scrollbar{display:none}
+/* Screen system */
+.scr{position:fixed;inset:0;bottom:72px;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none}
+.scr::-webkit-scrollbar{display:none}
+.scr.on{display:block}
+/* Input */
+.inp{width:100%;height:52px;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:0 16px;font-size:15px;font-family:'Inter',system-ui,sans-serif;color:var(--text);outline:none;transition:border-color .2s}
+.inp:focus{border-color:rgba(255,200,0,.4)}
+/* OTP boxes */
+.otp-w{display:flex;gap:8px;justify-content:center;margin:20px 0}
+.otp-b{width:46px;height:58px;background:var(--card);border:2px solid var(--border);border-radius:16px;text-align:center;font-size:24px;font-weight:900;color:var(--text);font-family:'Montserrat',system-ui,sans-serif;caret-color:var(--primary);outline:none;transition:border-color .2s}
+.otp-b:focus{border-color:var(--primary)}
+/* Toggle */
+.tgl{width:52px;height:30px;background:var(--card2);border-radius:15px;cursor:pointer;position:relative;transition:background .3s;border:none;flex-shrink:0}
+.tgl.on{background:linear-gradient(135deg,#FFD700,#FFC800)}
+.tgl::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;border-radius:50%;transition:transform .3s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.tgl.on::after{transform:translateX(22px)}
+/* Bottom nav */
+.bnav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:100;padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -4px 20px rgba(0,0,0,.15)}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text2);text-decoration:none;flex:1;padding:8px 4px;transition:color .2s}
+.ni .ms{font-size:22px}.ni span{font-size:11px;font-weight:600}
+.ni.active{color:var(--primary)}.ni.active .ms{font-variation-settings:'FILL' 1}
+.nc{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;padding:0 8px;flex-shrink:0}
+.nc-btn{width:52px;height:52px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,200,0,.45);margin-top:-20px}
+.nc-btn .ms{font-size:24px;color:#141414;font-variation-settings:'FILL' 1}
+.nc span{font-size:11px;font-weight:700;color:var(--primary)}
+/* Child card */
+.cc{background:var(--card);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:14px;border:2px solid transparent;cursor:pointer;transition:all .15s;border:1px solid var(--border)}
+.cc.sel{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
+.cc:active{transform:scale(.98)}
+/* Toggle row */
+.tr{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.tr:last-child{border-bottom:none}
+/* Toast */
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--card2);color:var(--text);padding:10px 22px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:999;border:1px solid var(--border)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ========= LOGIN SCREEN ========= -->
+<div class="scr" id="s-login" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px">
+  <button onclick="toggleTheme()" id="theme-btn-l" style="position:absolute;top:16px;right:16px;width:36px;height:36px;background:var(--card2);border:1px solid var(--border);border-radius:12px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center">🌙</button>
+  <div style="width:80px;height:80px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 24px rgba(255,200,0,.3)">
+    <span class="ms" style="font-size:40px;color:#141414;font-variation-settings:'FILL' 1">lock</span>
+  </div>
+  <h1 style="font-size:26px;font-weight:900;text-align:center;margin-bottom:8px;font-family:'Montserrat',sans-serif">Ota-ona paneli</h1>
+  <p style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:6px">Faqat ota-onalar uchun 🔒</p>
+  <p style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:36px">Farzandingizning o'qishini nazorat qiling</p>
+  <div style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:16px">
+    <div>
+      <label style="font-size:13px;font-weight:700;color:var(--text2);display:block;margin-bottom:8px;font-family:'Montserrat',sans-serif">Telefon raqam</label>
+      <div style="display:flex;gap:8px">
+        <div style="height:52px;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:0 14px;display:flex;align-items:center;font-size:15px;font-weight:700;flex-shrink:0;font-family:'Montserrat',sans-serif">+998</div>
+        <input class="inp" type="tel" id="phone-inp" placeholder="90 123 45 67" maxlength="12" inputmode="numeric"/>
+      </div>
+    </div>
+    <button class="clay-btn-p" onclick="doLogin()">Davom etish →</button>
+    <p style="text-align:center;font-size:13px;color:var(--text2)">O'quvchi sifatida? <a href="index.html" style="color:var(--primary);font-weight:700;text-decoration:none">Asosiy sahifa →</a></p>
+  </div>
+</div>
+
+<!-- ========= OTP SCREEN ========= -->
+<div class="scr" id="s-otp" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px">
+  <div style="width:64px;height:64px;background:rgba(255,200,0,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:20px;border:2px solid rgba(255,200,0,.3)">
+    <span class="ms" style="font-size:30px;color:var(--primary);font-variation-settings:'FILL' 1">sms</span>
+  </div>
+  <h2 style="font-size:24px;font-weight:900;margin-bottom:8px;font-family:'Montserrat',sans-serif">Tasdiqlash kodi</h2>
+  <p style="font-size:14px;color:var(--text2);text-align:center;margin-bottom:4px"><span id="otp-phone">+998 90 *** ** **</span> ga SMS yuborildi</p>
+  <p style="font-size:12px;color:var(--text2);text-align:center;margin-bottom:8px">(Demo: istalgan 6 raqam ishlaydi)</p>
+  <div class="otp-w">
+    <input class="otp-b" maxlength="1" inputmode="numeric" oninput="otpNext(this,0)" onkeydown="otpBack(event,this,0)"/>
+    <input class="otp-b" maxlength="1" inputmode="numeric" oninput="otpNext(this,1)" onkeydown="otpBack(event,this,1)"/>
+    <input class="otp-b" maxlength="1" inputmode="numeric" oninput="otpNext(this,2)" onkeydown="otpBack(event,this,2)"/>
+    <input class="otp-b" maxlength="1" inputmode="numeric" oninput="otpNext(this,3)" onkeydown="otpBack(event,this,3)"/>
+    <input class="otp-b" maxlength="1" inputmode="numeric" oninput="otpNext(this,4)" onkeydown="otpBack(event,this,4)"/>
+    <input class="otp-b" maxlength="1" inputmode="numeric" oninput="otpNext(this,5)" onkeydown="otpBack(event,this,5)"/>
+  </div>
+  <p style="margin-bottom:24px;font-size:14px;color:var(--text2)">Qayta yuborish: <span id="timer" style="color:var(--primary);font-weight:700">00:59</span></p>
+  <div style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px">
+    <button class="clay-btn-p" onclick="doOtp()">Tasdiqlash ✓</button>
+    <button onclick="goLogin()" style="width:100%;height:46px;background:var(--card2);border:1px solid var(--border);border-radius:14px;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">← Orqaga</button>
+  </div>
+</div>
+
+<!-- ========= DASHBOARD SCREEN ========= -->
+<div class="scr page" id="s-dash">
+  <header style="background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50">
+    <h1 style="font-size:18px;font-weight:900;font-family:'Montserrat',sans-serif">👤 Profil</h1>
+    <div style="display:flex;gap:10px">
+      <button onclick="toggleTheme()" id="theme-btn" style="width:36px;height:36px;background:var(--card2);border:1px solid var(--border);border-radius:12px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center">🌙</button>
+      <button onclick="doLogout()" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#EF4444;font-size:13px;font-weight:700;padding:7px 14px;border-radius:12px;cursor:pointer;font-family:'Montserrat',sans-serif">Chiqish</button>
+    </div>
+  </header>
+  <div style="padding:20px;display:flex;flex-direction:column;gap:20px">
+
+    <!-- PROFILE CARD -->
+    <div class="clay-card" style="padding:20px;text-align:center">
+      <div style="width:72px;height:72px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;font-weight:900;color:#141414;box-shadow:0 8px 20px rgba(255,200,0,.3);font-family:'Montserrat',sans-serif" id="d-avatar">O</div>
+      <div style="font-size:20px;font-weight:900;font-family:'Montserrat',sans-serif;margin-bottom:4px" id="d-name">Foydalanuvchi</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px" id="d-phone">+998 ** *** ** **</div>
+      <div style="display:flex;gap:0;justify-content:center;background:var(--card2);border-radius:16px;overflow:hidden">
+        <div style="flex:1;padding:14px 0;border-right:1px solid var(--border)">
+          <div style="font-size:22px;font-weight:900;color:var(--primary);font-family:'Montserrat',sans-serif" id="d-tests">0</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">testlar</div>
+        </div>
+        <div style="flex:1;padding:14px 0;border-right:1px solid var(--border)">
+          <div style="font-size:22px;font-weight:900;color:var(--primary);font-family:'Montserrat',sans-serif" id="d-streak">0</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">streak</div>
+        </div>
+        <div style="flex:1;padding:14px 0">
+          <div style="font-size:22px;font-weight:900;color:var(--primary);font-family:'Montserrat',sans-serif" id="d-score">—</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">ball</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FARZANDLAR -->
+    <div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:12px;font-family:'Montserrat',sans-serif">👨‍👩‍👧 Farzandlar</div>
+      <div style="display:flex;flex-direction:column;gap:10px" id="children-list">
+        <div class="cc sel" onclick="selChild(this)">
+          <div style="width:46px;height:46px;background:#FFEB3B;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👦</div>
+          <div style="flex:1"><div style="font-size:15px;font-weight:700;font-family:'Montserrat',sans-serif">Alibek</div><div style="font-size:12px;color:var(--text2)">4-sinf</div></div>
+          <div style="font-size:11px;color:#4CAF50;font-weight:700;background:rgba(76,175,80,.15);padding:4px 10px;border-radius:8px">● Online</div>
+        </div>
+        <div class="cc" onclick="selChild(this)">
+          <div style="width:46px;height:46px;background:#E1BEE7;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👧</div>
+          <div style="flex:1"><div style="font-size:15px;font-weight:700;font-family:'Montserrat',sans-serif">Malika</div><div style="font-size:12px;color:var(--text2)">7-sinf</div></div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600">● Offline</div>
+        </div>
+      </div>
+      <button onclick="addChild()" style="margin-top:10px;width:100%;height:52px;border:2px dashed rgba(255,255,255,.12);border-radius:18px;background:transparent;color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px">+ Farzand qo'shish</button>
+    </div>
+
+    <!-- BUGUNGI FAOLIYAT -->
+    <div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:12px;font-family:'Montserrat',sans-serif">📊 Bugungi faoliyat</div>
+      <div class="clay-card" style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:var(--card2);border-radius:16px;padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:var(--primary);font-family:'Montserrat',sans-serif">45</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px">daqiqa o'qidi</div>
+        </div>
+        <div style="background:var(--card2);border-radius:16px;padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:var(--primary);font-family:'Montserrat',sans-serif">23</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px">savol berdi</div>
+        </div>
+        <div style="background:var(--card2);border-radius:16px;padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:var(--primary);font-family:'Montserrat',sans-serif">3</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px">test topshirdi</div>
+        </div>
+        <div style="background:var(--card2);border-radius:16px;padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:#4CAF50;font-family:'Montserrat',sans-serif">8.5</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px">o'rtacha ball</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOZLAMALAR -->
+    <div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:12px;font-family:'Montserrat',sans-serif">⚙️ Sozlamalar</div>
+      <div class="clay-card" style="padding:0 16px">
+        <div class="tr">
+          <div><div style="font-size:14px;font-weight:700">🌙 Kechasi bloklash</div><div style="font-size:12px;color:var(--text2)">22:00 dan keyin blok</div></div>
+          <button class="tgl" id="tgl-night" onclick="this.classList.toggle('on');saveTgl('night_block',this.classList.contains('on'))"></button>
+        </div>
+        <div class="tr">
+          <div><div style="font-size:14px;font-weight:700">🔔 Bildirishnomalar</div><div style="font-size:12px;color:var(--text2)">Dars eslatmalari</div></div>
+          <button class="tgl on" id="tgl-notif" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="tr">
+          <div><div style="font-size:14px;font-weight:700">🎤 Ovozli javoblar</div><div style="font-size:12px;color:var(--text2)">AI ovoz bilan javob bersin</div></div>
+          <button class="tgl" id="tgl-voice" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="tr">
+          <div><div style="font-size:14px;font-weight:700">☀️ Mavzu</div><div style="font-size:12px;color:var(--text2)">Qoramtir / Yorug'</div></div>
+          <button class="tgl" id="tgl-theme" onclick="toggleThemeFromDash(this)"></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <a href="index.html" class="ni"><span class="ms">home</span><span>Asosiy</span></a>
+  <a href="student.html" class="ni"><span class="ms">school</span><span>Fanlar</span></a>
+  <a href="chat.html" class="nc">
+    <div class="nc-btn"><span class="ms">forum</span></div>
+    <span>AI Chat</span>
+  </a>
+  <a href="yangiliklar.html" class="ni"><span class="ms">article</span><span>Yangiliklar</span></a>
+  <a href="parent.html" class="ni active"><span class="ms">person</span><span>Profil</span></a>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function initTheme(){
+  const t=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  ['theme-btn','theme-btn-l'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=t==='dark'?'☀️':'🌙'});
+  const td=document.getElementById('tgl-theme');
+  if(td)td.classList.toggle('on',t==='light');
+}
+function toggleTheme(){
+  const c=document.documentElement.getAttribute('data-theme')||'dark';
+  const n=c==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',n);
+  localStorage.setItem('theme',n);
+  ['theme-btn','theme-btn-l'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=n==='dark'?'☀️':'🌙'});
+  const td=document.getElementById('tgl-theme');
+  if(td)td.classList.toggle('on',n==='light');
+}
+function toggleThemeFromDash(btn){toggleTheme()}
+initTheme();
+
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand()}
+
+// Toggles
+function saveTgl(key,val){localStorage.setItem(key,val?'1':'0')}
+if(localStorage.getItem('night_block')==='1'){const b=document.getElementById('tgl-night');if(b)b.classList.add('on')}
+
+// SCREENS
+function show(id){
+  ['s-login','s-otp','s-dash'].forEach(s=>document.getElementById(s).classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+let phone='';
+let timerInt=null;
+
+function init(){
+  if(localStorage.getItem('parent_logged_in')){loadDash();show('s-dash')}
+  else show('s-login');
+}
+
+// LOGIN
+function doLogin(){
+  const p=document.getElementById('phone-inp').value.replace(/\D/g,'');
+  if(p.length<9){showToast("To'liq telefon raqam kiriting");return}
+  phone='+998 '+p.slice(0,2)+' '+p.slice(2,5)+' '+p.slice(5,7)+' '+p.slice(7);
+  document.getElementById('otp-phone').textContent=phone;
+  document.querySelectorAll('.otp-b').forEach(b=>b.value='');
+  show('s-otp');
+  setTimeout(()=>document.querySelector('.otp-b').focus(),300);
+  startTimer();
+}
+function goLogin(){clearInterval(timerInt);show('s-login')}
+
+// OTP
+function otpNext(el,idx){
+  if(el.value){
+    const boxes=document.querySelectorAll('.otp-b');
+    if(idx<5)boxes[idx+1].focus();
+    if(idx===5){
+      const code=Array.from(boxes).map(b=>b.value).join('');
+      if(code.length===6)setTimeout(doOtp,100);
+    }
+  }
+}
+function otpBack(e,el,idx){
+  if(e.key==='Backspace'&&!el.value&&idx>0){
+    document.querySelectorAll('.otp-b')[idx-1].focus();
+  }
+}
+function doOtp(){
+  const boxes=document.querySelectorAll('.otp-b');
+  const code=Array.from(boxes).map(b=>b.value).join('');
+  if(code.length<6){showToast("6 raqamli kod kiriting");return}
+  clearInterval(timerInt);
+  localStorage.setItem('parent_logged_in','true');
+  localStorage.setItem('parent_phone',phone);
+  loadDash();
+  show('s-dash');
+  showToast("Muvaffaqiyatli kirdingiz! ✅");
+}
+function startTimer(){
+  let sec=59;
+  clearInterval(timerInt);
+  document.getElementById('timer').textContent='00:59';
+  timerInt=setInterval(()=>{
+    sec--;
+    document.getElementById('timer').textContent=`00:${String(sec).padStart(2,'0')}`;
+    if(sec<=0){clearInterval(timerInt);document.getElementById('timer').textContent='Qayta yuborish'}
+  },1000);
+}
+
+// DASHBOARD
+function loadDash(){
+  const sv=JSON.parse(localStorage.getItem('maktab_student')||'{}');
+  const st=JSON.parse(localStorage.getItem('maktab_stats')||'{"streak":0,"tests":0,"score":0}');
+  const tgU=tg?.initDataUnsafe?.user||{};
+  const nm=sv.name||tgU.first_name||'Foydalanuvchi';
+  const ph=localStorage.getItem('parent_phone')||'+998 ** *** ** **';
+  document.getElementById('d-avatar').textContent=nm[0]?.toUpperCase()||'F';
+  document.getElementById('d-name').textContent=nm;
+  document.getElementById('d-phone').textContent=ph;
+  document.getElementById('d-tests').textContent=st.tests||0;
+  document.getElementById('d-streak').textContent=st.streak||0;
+  document.getElementById('d-score').textContent=st.score||'—';
+}
+function doLogout(){
+  if(!confirm('Chiqmoqchimisiz?'))return;
+  localStorage.removeItem('parent_logged_in');
+  show('s-login');
+  showToast("Chiqildi");
+}
+function selChild(el){document.querySelectorAll('.cc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel')}
+function addChild(){
+  const nm=prompt("Farzand ismi:");
+  if(!nm?.trim())return;
+  const gr=prompt("Sinfi (1-11):");
+  if(!gr)return;
+  const list=document.getElementById('children-list');
+  const d=document.createElement('div');
+  d.className='cc';d.onclick=function(){selChild(this)};
+  d.innerHTML=`<div style="width:46px;height:46px;background:#B2DFDB;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👦</div><div style="flex:1"><div style="font-size:15px;font-weight:700;font-family:'Montserrat',sans-serif">${nm.trim()}</div><div style="font-size:12px;color:var(--text2)">${gr}-sinf</div></div><div style="font-size:11px;color:var(--text2);font-weight:600">● Offline</div>`;
+  list.appendChild(d);
+}
+
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Yangi Guruh Yaratish — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#ECEAF5;background-image:radial-gradient(circle at 92% 88%,rgba(255,225,100,.22) 0%,transparent 45%),radial-gradient(circle at 8% 12%,rgba(200,192,255,.12) 0%,transparent 35%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+.mont{font-family:'Montserrat',sans-serif}
+.ms{font-family:'Material Symbols Outlined';font-size:22px;line-height:1;user-select:none}
+.page-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:28px;color:#3B2FCC;text-align:center;margin-bottom:6px}
+.page-sub{font-size:14px;color:#7775A0;text-align:center;margin-bottom:28px}
+.card{background:#fff;border-radius:24px;padding:36px 40px;width:100%;max-width:500px;box-shadow:0 8px 40px rgba(75,59,200,.12)}
+@media(max-width:540px){.card{padding:28px 18px}}
+.card-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:22px;color:#12183b;text-align:center;margin-bottom:6px}
+.card-sub{font-size:14px;color:#7775A0;text-align:center;margin-bottom:28px}
+
+/* Fields */
+.field{margin-bottom:20px}
+.flabel{display:block;font-size:13px;font-weight:700;color:#2D2D4E;margin-bottom:8px}
+.finput{width:100%;padding:13px 14px;border:1.5px solid #E2DFEE;border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;color:#2D2D4E;background:#fff;outline:none;transition:border-color .2s}
+.finput:focus{border-color:#4B3BFF;box-shadow:0 0 0 3px rgba(75,59,255,.07)}
+.finput::placeholder{color:#B8B5CC}
+.fselect{width:100%;padding:13px 14px;border:1.5px solid #E2DFEE;border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;color:#2D2D4E;background:#fff;outline:none;transition:border-color .2s;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239996C0' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.fselect:focus{border-color:#4B3BFF;box-shadow:0 0 0 3px rgba(75,59,255,.07)}
+.ferr{display:none;font-size:12px;color:#ba1a1a;margin-top:5px}
+.ferr.show{display:block}
+
+/* Color picker */
+.color-picker{display:flex;gap:10px;flex-wrap:wrap}
+.color-opt{width:40px;height:40px;border-radius:12px;cursor:pointer;transition:all .2s;position:relative;border:2px solid transparent}
+.color-opt.selected{border-color:#12183b;transform:scale(1.1)}
+.color-opt::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;opacity:0;transition:opacity .15s}
+.color-opt.selected::after{opacity:1}
+
+/* Preview card */
+.preview-card{border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:8px;border:1px solid #E2DFEE;transition:all .3s}
+.preview-ava{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:900;font-size:16px;color:#fff;transition:background .3s;flex-shrink:0}
+
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid #E7E9F4}
+.toggle-row:first-child{border-top:none;padding-top:0}
+.toggle-info{flex:1}
+.toggle-info div:first-child{font-size:14px;font-weight:700;color:#2D2D4E}
+.toggle-info div:last-child{font-size:12px;color:#7775A0;margin-top:2px}
+.toggle{width:48px;height:26px;border-radius:999px;background:#E2DFEE;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;border:none;outline:none}
+.toggle.on{background:#4B3BFF}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle.on::after{transform:translateX(22px)}
+
+/* Submit */
+.btn-submit{width:100%;padding:15px;background:#4B3BFF;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;border:none;border-radius:999px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px}
+.btn-submit:hover:not(:disabled){background:#2f06e9;box-shadow:0 6px 24px rgba(75,59,255,.3);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.footer-link{text-align:center;font-size:14px;color:#7775A0;margin-top:16px}
+.footer-link a{color:#4B3BFF;font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="page-title">Maktab AI</div>
+<div class="page-sub">Yangi o'quv guruhi yarating</div>
+
+<div class="card">
+  <h2 class="card-title">Yangi guruh yaratish</h2>
+  <p class="card-sub">Guruh ma'lumotlarini kiriting</p>
+
+  <!-- Not teacher warning -->
+  <div id="not-teacher-warn" style="display:none;padding:14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;margin-bottom:20px;font-size:14px;color:#92400e">
+    ⚠️ Guruh yaratish faqat ustoz hisoblari uchun mumkin. <a href="/royxat-ustoz.html" style="color:#f97316;font-weight:700">Ustoz sifatida ro'yxatdan o'ting</a>
+  </div>
+
+  <!-- Preview -->
+  <div class="field">
+    <div class="flabel">Ko'rinishi</div>
+    <div class="preview-card" id="preview-card">
+      <div class="preview-ava" id="preview-ava">G</div>
+      <div>
+        <div class="mont" style="font-weight:800;font-size:15px;color:#12183b" id="preview-name">Guruh nomi</div>
+        <div style="font-size:13px;color:#464557;margin-top:2px" id="preview-meta">Fan · Sinf</div>
+      </div>
+    </div>
+  </div>
+
+  <form onsubmit="doCreate(event)" novalidate>
+    <!-- Guruh nomi -->
+    <div class="field">
+      <label class="flabel">Guruh nomi</label>
+      <input class="finput" id="f-name" type="text" placeholder="9-A Matematika" maxlength="50" oninput="updatePreview()">
+      <p class="ferr" id="err-name">Guruh nomi kiriting</p>
+    </div>
+
+    <!-- Fan -->
+    <div class="field">
+      <label class="flabel">Fan</label>
+      <select class="fselect" id="f-subject" onchange="updatePreview()">
+        <option value="">Fan tanlang</option>
+        <option>Matematika</option>
+        <option>Fizika</option>
+        <option>Kimyo</option>
+        <option>Biologiya</option>
+        <option>Ingliz tili</option>
+        <option>Ona tili</option>
+        <option>Tarix</option>
+        <option>Geografiya</option>
+        <option>Informatika</option>
+        <option>Chizmachilik</option>
+      </select>
+      <p class="ferr" id="err-subject">Fan tanlang</p>
+    </div>
+
+    <!-- Sinf -->
+    <div class="field">
+      <label class="flabel">Sinf</label>
+      <select class="fselect" id="f-grade" onchange="updatePreview()">
+        <option value="">Sinf tanlang</option>
+        ${Array.from({length:11},(_,i)=>`<option value="${i+1}">${i+1}-sinf</option>`).join('')}
+      </select>
+      <p class="ferr" id="err-grade">Sinf tanlang</p>
+    </div>
+
+    <!-- Rang -->
+    <div class="field">
+      <label class="flabel">Guruh rangi</label>
+      <div class="color-picker" id="color-picker"></div>
+    </div>
+
+    <!-- Toggles -->
+    <div class="field" style="margin-bottom:24px">
+      <div class="flabel">Sozlamalar</div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div>Yangi a'zolarni tasdiqlash</div>
+          <div>A'zo bo'lish uchun ustoz tasdigi talab qilinadi</div>
+        </div>
+        <button type="button" class="toggle on" id="toggle-approval" onclick="toggleBtn(this)"></button>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div>Avtomatik moderatsiya</div>
+          <div>Nomaqbul so'zlar avtomatik filtrlanadi</div>
+        </div>
+        <button type="button" class="toggle on" id="toggle-moderation" onclick="toggleBtn(this)"></button>
+      </div>
+    </div>
+
+    <button class="btn-submit" type="submit" id="btn-create">
+      <span class="ms" style="font-size:20px">group_add</span>Guruh yaratish
+    </button>
+  </form>
+
+  <p class="footer-link"><a href="/guruhlar.html">← Guruhlar sahifasiga qaytish</a></p>
+</div>
+
+<script src="/js/groups.js"></script>
+<script>
+const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();}
+function getCurrentUser(){ try{return JSON.parse(localStorage.getItem('maktabai_currentUser'));}catch{return null;} }
+
+const cu=getCurrentUser();
+
+/* ── Strict teacher check ── */
+if(!cu || cu.role !== 'teacher'){
+  document.querySelector('.card-title').textContent = '🔒 Kirish taqiqlanagan';
+  document.querySelector('.card-sub').textContent = 'Bu sahifa faqat ustozlar uchun';
+  document.querySelector('form').style.display = 'none';
+  /* hide preview field (first .field before the form) */
+  document.querySelectorAll('.field').forEach(f => f.style.display = 'none');
+  const warn = document.getElementById('not-teacher-warn');
+  warn.style.display = 'block';
+  warn.innerHTML = `
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:48px;margin-bottom:12px">🔒</div>
+      <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:18px;color:#12183b;margin-bottom:8px">
+        ${!cu ? 'Avval kirish kerak' : 'Faqat ustozlar uchun'}
+      </div>
+      <p style="font-size:14px;color:#464557;line-height:1.6;margin-bottom:20px">
+        ${!cu
+          ? 'Guruh yaratish uchun hisobingizga kiring'
+          : 'Guruh yaratish faqat ustoz hisoblari uchun mavjud'}
+      </p>
+      <a href="${!cu ? '/kirish.html' : '/royxat-ustoz.html'}"
+         style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#4b3bff;color:#fff;border-radius:12px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;text-decoration:none">
+        ${!cu ? '→ Kirish' : '→ Ustoz ro\'yxati'}
+      </a>
+      <br><br>
+      <a href="/guruhlar.html" style="font-size:14px;color:#4b3bff;font-weight:600;text-decoration:none">
+        ← Guruhlar sahifasi
+      </a>
+    </div>`;
+}
+
+/* Render color picker */
+let selectedColor=GROUP_COLORS[0].v;
+const picker=document.getElementById('color-picker');
+GROUP_COLORS.forEach((c,i)=>{
+  const div=document.createElement('div');
+  div.className='color-opt'+(i===0?' selected':'');
+  div.style.background=c.v;
+  div.title=c.label;
+  div.onclick=()=>{ document.querySelectorAll('.color-opt').forEach(d=>d.classList.remove('selected')); div.classList.add('selected'); selectedColor=c.v; updatePreview(); };
+  picker.appendChild(div);
+});
+
+/* Preview */
+function updatePreview(){
+  const name=document.getElementById('f-name').value||'Guruh nomi';
+  const subject=document.getElementById('f-subject').value||'Fan';
+  const grade=document.getElementById('f-grade').value;
+  const av=document.getElementById('preview-ava');
+  av.textContent=initials(name);
+  av.style.background=selectedColor;
+  document.getElementById('preview-card').style.background=colorBg(selectedColor);
+  document.getElementById('preview-name').textContent=name;
+  document.getElementById('preview-meta').textContent=`${subject}${grade?' · '+grade+'-sinf':''}`;
+}
+updatePreview();
+
+/* Toggle */
+function toggleBtn(el){ el.classList.toggle('on'); }
+
+/* Validate & create */
+function doCreate(e){
+  e.preventDefault();
+  ['err-name','err-subject','err-grade'].forEach(id=>document.getElementById(id).classList.remove('show'));
+
+  const name=document.getElementById('f-name').value.trim();
+  const subject=document.getElementById('f-subject').value;
+  const grade=parseInt(document.getElementById('f-grade').value);
+
+  let ok=true;
+  if(!name){ document.getElementById('err-name').classList.add('show'); ok=false; }
+  if(!subject){ document.getElementById('err-subject').classList.add('show'); ok=false; }
+  if(!grade){ document.getElementById('err-grade').classList.add('show'); ok=false; }
+  if(!ok) return;
+
+  const requireApproval=document.getElementById('toggle-approval').classList.contains('on');
+  const autoModeration=document.getElementById('toggle-moderation').classList.contains('on');
+  const uid=cu?String(cu.id):'demo_teacher_01';
+  const uname=cu?cu.name:'Kamoliddin Usmonov';
+
+  const btn=document.getElementById('btn-create');
+  btn.disabled=true;
+  btn.innerHTML='<span class="ms" style="font-size:20px;animation:spin .8s linear infinite">progress_activity</span> Yaratilmoqda...';
+
+  setTimeout(()=>{
+    const group=GS.createGroup({name,subject,grade,color:selectedColor,ownerId:uid,ownerName:uname,requireApproval,autoModeration});
+    btn.innerHTML='<span class="ms" style="font-size:20px">check_circle</span> Yaratildi!';
+    setTimeout(()=>{ location.href=`/guruh-taklif.html?id=${group.id}`; },700);
+  },600);
+}
+
+const style=document.createElement('style');
+style.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

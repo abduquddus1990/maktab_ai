@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Guruhga qo'shilish — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#ECEAF5;background-image:radial-gradient(circle at 92% 88%,rgba(255,225,100,.22) 0%,transparent 45%),radial-gradient(circle at 8% 12%,rgba(200,192,255,.12) 0%,transparent 35%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+.mont{font-family:'Montserrat',sans-serif}
+.ms{font-family:'Material Symbols Outlined';font-size:22px;line-height:1;user-select:none}
+.page-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:28px;color:#3B2FCC;text-align:center;margin-bottom:6px}
+.page-sub{font-size:14px;color:#7775A0;text-align:center;margin-bottom:28px}
+.card{background:#fff;border-radius:24px;padding:32px 36px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(75,59,200,.12)}
+@media(max-width:480px){.card{padding:24px 18px}}
+/* Group hero */
+.group-hero{display:flex;flex-direction:column;align-items:center;margin-bottom:28px}
+.group-big-ava{width:72px;height:72px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:900;font-size:26px;color:#fff;margin-bottom:16px}
+.group-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:22px;color:#12183b;text-align:center;margin-bottom:8px}
+.group-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:16px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:999px;font-size:13px;font-weight:600}
+/* Divider */
+.divider{border:none;border-top:1px solid #E7E9F4;margin:20px 0}
+/* Status cards */
+.status-card{padding:14px 18px;border-radius:14px;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+/* Buttons */
+.btn-primary{width:100%;padding:15px;background:#4b3bff;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;border:none;border-radius:999px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:hover{background:#2f06e9;box-shadow:0 6px 24px rgba(75,59,255,.3);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-outline{width:100%;padding:13px;background:#fff;color:#4b3bff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;border:1.5px solid #4b3bff;border-radius:999px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;margin-top:10px}
+.btn-outline:hover{background:#f0eeff}
+.shield-note{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;font-size:13px;color:#15803d;font-weight:600;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="page-title">Maktab AI</div>
+<div class="page-sub">O'quv guruhiga qo'shilish</div>
+
+<div class="card" id="main-card">
+  <!-- Loading -->
+  <div id="state-loading" style="text-align:center;padding:32px 0;color:#c7c4da">
+    <span class="ms" style="font-size:48px;display:block;animation:spin 1s linear infinite">progress_activity</span>
+  </div>
+
+  <!-- Not found -->
+  <div id="state-notfound" style="display:none;text-align:center;padding:24px 0">
+    <span class="ms" style="font-size:56px;color:#c7c4da;display:block;margin-bottom:12px">search_off</span>
+    <div class="mont" style="font-weight:800;font-size:18px;color:#12183b;margin-bottom:8px">Guruh topilmadi</div>
+    <p style="font-size:14px;color:#464557;line-height:1.6">Taklif kodi noto'g'ri yoki muddati tugagan bo'lishi mumkin</p>
+    <a href="/guruhlar.html" class="btn-outline" style="margin-top:20px">Guruhlar sahifasiga</a>
+  </div>
+
+  <!-- Group info -->
+  <div id="state-group" style="display:none">
+    <div class="group-hero">
+      <div class="group-big-ava" id="g-avatar"></div>
+      <div class="group-title" id="g-name"></div>
+      <div class="group-badges">
+        <span class="badge" id="g-subject-badge"></span>
+        <span class="badge" style="background:#f4f3ff;color:#7775A0" id="g-grade-badge"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:14px;color:#464557">
+        <span class="ms" style="font-size:18px;color:#c7c4da">school</span>
+        <span id="g-teacher"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#464557;margin-top:6px">
+        <span class="ms" style="font-size:18px;color:#c7c4da">group</span>
+        <span id="g-members"></span>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- States -->
+    <div id="s-not-logged">
+      <div class="status-card" style="background:#fff7ed;border:1px solid #fed7aa">
+        <span class="ms" style="color:#f97316;font-size:22px">info</span>
+        <div style="font-size:14px;color:#92400e;line-height:1.5">Guruhga qo'shilish uchun avval <strong>Maktab AI</strong>ga kiring yoki ro'yxatdan o'ting</div>
+      </div>
+      <a href="/kirish.html" class="btn-primary" style="margin-top:4px;text-decoration:none"><span class="ms" style="font-size:18px">login</span>Kirish</a>
+      <a href="/royxat.html" class="btn-outline">Ro'yxatdan o'tish</a>
+    </div>
+
+    <div id="s-already-member" style="display:none">
+      <div class="status-card" style="background:#f0fdf4;border:1px solid #bbf7d0">
+        <span class="ms" style="color:#22c55e;font-size:26px">check_circle</span>
+        <div>
+          <div class="mont" style="font-weight:700;font-size:15px;color:#12183b">Siz allaqachon a'zosiz!</div>
+          <div style="font-size:13px;color:#464557;margin-top:2px">Guruhga kirib xabarlarni ko'ring</div>
+        </div>
+      </div>
+      <a href="#" id="enter-group-btn" class="btn-primary" style="margin-top:4px;text-decoration:none"><span class="ms" style="font-size:18px">arrow_forward</span>Guruhga kirish</a>
+    </div>
+
+    <div id="s-pending" style="display:none">
+      <div class="status-card" style="background:#fffbeb;border:1px solid #fde68a">
+        <span class="ms" style="color:#f59e0b;font-size:26px">schedule</span>
+        <div>
+          <div class="mont" style="font-weight:700;font-size:15px;color:#12183b">So'rovingiz kutilmoqda</div>
+          <div style="font-size:13px;color:#464557;margin-top:2px">Ustoz so'rovingizni ko'rib chiqadi</div>
+        </div>
+      </div>
+      <a href="/guruhlar.html" class="btn-outline">Guruhlar sahifasi</a>
+    </div>
+
+    <div id="s-join" style="display:none">
+      <div style="font-size:14px;color:#464557;line-height:1.6;margin-bottom:16px;padding:12px;background:#fbf8ff;border-radius:12px;border:1px solid #E7E9F4">
+        <strong>Tasdiqlash talab qilinadi.</strong> Qo'shilish so'rovingiz ustoz tomonidan ko'rib chiqiladi.
+      </div>
+      <button class="btn-primary" id="btn-request" onclick="sendJoinRequest()">
+        <span class="ms" style="font-size:18px">person_add</span>Qo'shilish so'rovini yuborish
+      </button>
+    </div>
+
+    <div class="shield-note" style="margin-top:16px">
+      <span class="ms" style="font-size:18px">shield</span>
+      Bu guruh ustoz nazoratida 🛡️
+    </div>
+  </div>
+</div>
+
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+<script src="/js/groups.js"></script>
+<script>
+const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();}
+function getCurrentUser(){ try{return JSON.parse(localStorage.getItem('maktabai_currentUser'));}catch{return null;} }
+function show(id){ ['state-loading','state-notfound','state-group'].forEach(s=>document.getElementById(s).style.display='none'); document.getElementById(id).style.display='block'; }
+function showSub(id){ ['s-not-logged','s-already-member','s-pending','s-join'].forEach(s=>document.getElementById(s).style.display='none'); document.getElementById(id).style.display='block'; }
+
+const params=new URLSearchParams(location.search);
+const code=params.get('code');
+const cu=getCurrentUser();
+
+GS.seedDemo(cu);
+
+function init(){
+  if(!code){ show('state-notfound'); return; }
+  const group=GS.getGroupByCode(code.toUpperCase());
+  if(!group){ show('state-notfound'); return; }
+
+  /* Fill group info */
+  const av=document.getElementById('g-avatar');
+  av.textContent=initials(group.name);
+  av.style.background=group.color;
+  document.getElementById('g-name').textContent=group.name;
+  const sbadge=document.getElementById('g-subject-badge');
+  sbadge.textContent=group.subject;
+  sbadge.style.background=colorBg(group.color);
+  sbadge.style.color=group.color;
+  document.getElementById('g-grade-badge').textContent=group.grade+'-sinf';
+  document.getElementById('g-teacher').textContent=group.ownerName;
+  const members=GS.getGroupMembers(group.id).filter(m=>m.status==='approved');
+  document.getElementById('g-members').textContent=members.length+' a\'zo';
+  document.getElementById('enter-group-btn').href=`/guruh-chat.html?id=${group.id}`;
+  show('state-group');
+
+  if(!cu){ showSub('s-not-logged'); return; }
+  const uid=String(cu.id);
+  const status=group.ownerId===uid?'approved':GS.getMemberStatus(group.id,uid);
+  if(status==='approved'){ showSub('s-already-member'); }
+  else if(status==='pending'){ showSub('s-pending'); }
+  else { showSub('s-join'); }
+
+  window._currentGroup=group;
+}
+
+function sendJoinRequest(){
+  const group=window._currentGroup;
+  if(!group||!cu) return;
+  const btn=document.getElementById('btn-request');
+  btn.disabled=true;
+  btn.innerHTML='<span class="ms" style="font-size:18px;animation:spin .8s linear infinite">progress_activity</span> Yuborilmoqda...';
+  GS.addMember(group.id, String(cu.id), cu.name, 'member', 'pending');
+  setTimeout(()=>{
+    btn.innerHTML='<span class="ms" style="font-size:18px">check</span> So\'rov yuborildi!';
+    setTimeout(()=>showSub('s-pending'),800);
+  },600);
+}
+
+init();
+</script>
+</body>
+</html>

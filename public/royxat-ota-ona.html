@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ota-ona ro'yxati — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:#ECEAF5;
+  background-image:
+    radial-gradient(circle at 92% 88%, rgba(255,225,100,.22) 0%, transparent 45%),
+    radial-gradient(circle at 8% 12%, rgba(200,192,255,.12) 0%, transparent 35%);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+}
+
+/* Page title (outside card) */
+.page-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:30px;color:#3B2FCC;text-align:center;margin-bottom:8px}
+.page-sub{font-size:14px;color:#7775A0;text-align:center;margin-bottom:28px}
+
+/* Card */
+.card{background:#fff;border-radius:20px;padding:36px 40px;width:100%;max-width:480px;box-shadow:0 8px 40px rgba(75,59,200,.1)}
+@media(max-width:520px){.card{padding:28px 18px}}
+
+.card-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:22px;color:#12183b;text-align:center;margin-bottom:6px}
+.card-sub{font-size:14px;color:#7775A0;text-align:center;margin-bottom:28px}
+
+/* Fields */
+.field{margin-bottom:20px}
+.flabel{display:block;font-size:13px;font-weight:600;color:#2D2D4E;margin-bottom:8px}
+
+/* Input with icon */
+.iw{position:relative}
+.iw svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#9996C0;pointer-events:none;flex-shrink:0}
+.finput{width:100%;padding:13px 14px 13px 44px;border:1.5px solid #E2DFEE;border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;color:#2D2D4E;background:#fff;outline:none;transition:border-color .2s}
+.finput.no-icon{padding-left:14px}
+.finput:focus{border-color:#4B3BFF;box-shadow:0 0 0 3px rgba(75,59,255,.07)}
+.finput::placeholder{color:#B8B5CC}
+
+/* @ prefix username */
+.prefix-wrap{display:flex;align-items:stretch;border:1.5px solid #E2DFEE;border-radius:12px;overflow:hidden;transition:border-color .2s}
+.prefix-wrap:focus-within{border-color:#4B3BFF;box-shadow:0 0 0 3px rgba(75,59,255,.07)}
+.pw-at{padding:0 8px 0 14px;font-size:15px;font-weight:600;color:#9996C0;background:#FAFAFE;border-right:1.5px solid #E2DFEE;display:flex;align-items:center;user-select:none}
+.pw-in{flex:1;padding:13px 14px;border:none;outline:none;font-size:15px;font-family:'Inter',sans-serif;color:#2D2D4E;background:transparent;min-width:0}
+.pw-in::placeholder{color:#B8B5CC}
+
+/* Errors */
+.ferr{display:none;font-size:12px;color:#ba1a1a;margin-top:5px}
+.ferr.show{display:block}
+.err-global{display:none;padding:12px 14px;background:#ffdad6;color:#93000a;border-radius:10px;font-size:13px;margin-bottom:18px}
+
+/* Submit */
+.btn-submit{width:100%;padding:15px;background:#4B3BFF;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;border:none;border-radius:999px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px}
+.btn-submit:hover:not(:disabled){background:#3020DD;box-shadow:0 6px 24px rgba(75,59,255,.3);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.65;cursor:not-allowed;transform:none}
+
+.footer-link{text-align:center;font-size:14px;color:#7775A0;margin-top:20px}
+.footer-link a{color:#4B3BFF;font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div id="nav-ph" style="display:none"></div>
+
+<!-- Page header (outside card) -->
+<h1 class="page-title">Maktab AI</h1>
+<p class="page-sub">Farzandingiz kelajagini birgalikda quramiz</p>
+
+<div class="card">
+  <h2 class="card-title">Ota-ona sifatida ro'yxatdan o'tish</h2>
+  <p class="card-sub">O'zingiz haqingizda qisqacha ma'lumot kiriting</p>
+
+  <div class="err-global" id="err-global"></div>
+
+  <form onsubmit="doRegister(event)" novalidate>
+
+    <!-- Username -->
+    <div class="field">
+      <label class="flabel">Username tanlang</label>
+      <div class="prefix-wrap">
+        <span class="pw-at">@</span>
+        <input class="pw-in" id="f-username" type="text" placeholder="ota_ona_01" autocomplete="username">
+      </div>
+      <p class="ferr" id="err-username">Username 3–20 ta belgi (harf, raqam, _)</p>
+    </div>
+
+    <!-- Ism familiya -->
+    <div class="field">
+      <label class="flabel">Ismingiz va familiyangiz</label>
+      <div class="iw">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <input class="finput" id="f-name" type="text" placeholder="Alisher Rustamov" autocomplete="name">
+      </div>
+      <p class="ferr" id="err-name">Ism familiyangizni kiriting</p>
+    </div>
+
+    <!-- Telefon -->
+    <div class="field">
+      <label class="flabel">Telefon raqamingiz</label>
+      <input class="finput no-icon" id="f-phone" type="tel" placeholder="+998 90 123 45 67" autocomplete="tel">
+      <p class="ferr" id="err-phone">To'g'ri telefon raqam kiriting</p>
+    </div>
+
+    <!-- Email -->
+    <div class="field">
+      <label class="flabel">Elektron pochta</label>
+      <div class="iw">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        <input class="finput" id="f-email" type="email" placeholder="alisher@example.com" autocomplete="email">
+      </div>
+      <p class="ferr" id="err-email">To'g'ri elektron pochta kiriting</p>
+    </div>
+
+    <!-- Parol -->
+    <div class="field">
+      <label class="flabel">Parol yarating</label>
+      <div class="iw">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <input class="finput" id="f-password" type="password" placeholder="Kamida 8 ta belgi" autocomplete="new-password">
+      </div>
+      <p class="ferr" id="err-password">Parol kamida 8 ta belgi bo'lishi kerak</p>
+    </div>
+
+    <button class="btn-submit" type="submit" id="btn-reg">
+      Ro'yxatdan o'tish
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M11 5l5 5-5 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+  </form>
+
+  <p class="footer-link">Hisobingiz bormi? <a href="/kirish.html">Kirish</a></p>
+</div>
+
+<script src="/js/components.js"></script>
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+const API = 'http://localhost:8000';
+
+function getUsers() { try { return JSON.parse(localStorage.getItem('maktabai_users')) || []; } catch { return []; } }
+function saveCurrentUser(u) { localStorage.setItem('maktabai_currentUser', JSON.stringify(u)); localStorage.setItem('maktab_user', JSON.stringify(u)); }
+function showErr(id, msg) { const e = document.getElementById(id); if (msg) e.textContent = msg; e.classList.add('show'); }
+function hideErr(id) { document.getElementById(id).classList.remove('show'); }
+function showGlobal(msg) { const e = document.getElementById('err-global'); e.textContent = msg; e.style.display = 'block'; }
+function hideGlobal() { document.getElementById('err-global').style.display = 'none'; }
+
+async function doRegister(e) {
+  e.preventDefault();
+  ['err-username','err-name','err-phone','err-email','err-password'].forEach(hideErr);
+  hideGlobal();
+
+  const username = document.getElementById('f-username').value.trim();
+  const name     = document.getElementById('f-name').value.trim();
+  const phone    = document.getElementById('f-phone').value.trim();
+  const email    = document.getElementById('f-email').value.trim().toLowerCase();
+  const password = document.getElementById('f-password').value;
+
+  let ok = true;
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) { showErr('err-username'); ok = false; }
+  if (!name)                                    { showErr('err-name'); ok = false; }
+  if (!phone || phone.replace(/\D/g,'').length < 9) { showErr('err-phone'); ok = false; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('err-email'); ok = false; }
+  if (password.length < 8)                     { showErr('err-password'); ok = false; }
+  if (!ok) return;
+
+  const btn = document.getElementById('btn-reg');
+  btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="animation:spin .8s linear infinite"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="2.5" stroke-dasharray="40" stroke-dashoffset="10"/></svg> Yuklanmoqda...';
+  btn.disabled = true;
+
+  const payload = { role: 'parent', name, username, password, phone, email };
+
+  try {
+    const res = await fetch(`${API}/api/auth/register`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      /* save partial user (not verified yet) */
+      const user = { id: data.user_id, name: data.name, username: data.username, role: 'parent', email, phone };
+      localStorage.setItem('maktabai_pendingUser', JSON.stringify(user));
+      /* dev mode: store OTP for display */
+      if (data._dev_otp) localStorage.setItem('_dev_otp', data._dev_otp);
+      location.href = `/otp-tasdiqlash.html?uid=${data.user_id}&email=${encodeURIComponent(email)}`;
+      return;
+    }
+
+    const err = await res.json().catch(() => ({}));
+    showGlobal(err.detail || "Xato yuz berdi. Qayta urinib ko'ring.");
+  } catch {
+    /* localStorage fallback (API yo'q) */
+    const users = getUsers();
+    if (users.some(u => u.username?.toLowerCase() === username.toLowerCase())) {
+      showGlobal('Bu username band. Boshqa username tanlang.'); btn.innerHTML="Ro'yxatdan o'tish →"; btn.disabled=false; return;
+    }
+    const newUser = { id: Date.now(), role: 'parent', name, username, password, phone, email, is_verified: true };
+    users.push(newUser); localStorage.setItem('maktabai_users', JSON.stringify(users));
+    saveCurrentUser(newUser);
+    btn.innerHTML = '✓ Muvaffaqiyatli!';
+    setTimeout(() => { location.href = '/ota-ona-paneli.html'; }, 700);
+    return;
+  }
+
+  btn.innerHTML = "Ro'yxatdan o'tish →";
+  btn.disabled = false;
+}
+
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

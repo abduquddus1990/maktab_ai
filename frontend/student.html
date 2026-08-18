@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Fanlar — MAKTAB AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--bg:#0A0A0F;--card:#1C1C1E;--card2:#2C2C2E;--primary:#FFC800;--text:#FFFFFF;--text2:#8A8A8E;--border:rgba(255,255,255,0.08);--shadow:0 8px 32px rgba(0,0,0,0.45)}
+[data-theme=light]{--bg:#F5F5F5;--card:#FFFFFF;--card2:#EBEBEB;--text:#1a1a1a;--text2:#666666;--border:rgba(0,0,0,0.08);--shadow:0 8px 32px rgba(0,0,0,0.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh;-webkit-tap-highlight-color:transparent;user-select:none}
+html *{transition:background-color .25s,color .25s,border-color .25s}
+.ms{font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased}
+.mont{font-family:'Montserrat',system-ui,sans-serif}
+.clay-card{background:var(--card);border-radius:24px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,0.04);border:1px solid var(--border)}
+.clay-btn-p{background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:16px;font-weight:800;color:#141414;box-shadow:0 4px 20px rgba(255,200,0,.35),0 2px 0 rgba(180,140,0,.4);border:none;cursor:pointer;font-family:'Montserrat',system-ui,sans-serif;transition:all .2s ease}
+.clay-btn-p:active{transform:scale(.95) translateY(1px)}
+.page{position:fixed;top:0;left:0;right:0;bottom:72px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page::-webkit-scrollbar{display:none}
+.bnav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:100;padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -4px 20px rgba(0,0,0,.15)}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text2);text-decoration:none;flex:1;padding:8px 4px;transition:color .2s}
+.ni .ms{font-size:22px}.ni span{font-size:11px;font-weight:600}
+.ni.active{color:var(--primary)}.ni.active .ms{font-variation-settings:'FILL' 1}
+.nc{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;padding:0 8px;flex-shrink:0}
+.nc-btn{width:52px;height:52px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,200,0,.45);margin-top:-20px}
+.nc-btn .ms{font-size:24px;color:#141414;font-variation-settings:'FILL' 1}
+.nc span{font-size:11px;font-weight:700;color:var(--primary)}
+/* Bottom sheet */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
+.ov.open{opacity:1;pointer-events:all}
+.sheet{width:100%;background:var(--card);border-radius:28px 28px 0 0;padding:20px 20px 36px;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1)}
+.ov.open .sheet{transform:translateY(0)}
+/* Grade btn */
+.gb{display:flex;align-items:center;justify-content:center;height:56px;background:var(--card2);border:2px solid transparent;border-radius:16px;font-size:20px;font-weight:900;color:var(--text);cursor:pointer;font-family:'Montserrat',system-ui,sans-serif;transition:all .15s}
+.gb.sel{background:linear-gradient(135deg,#FFD700,#FFC800);color:#141414;border-color:transparent;box-shadow:0 4px 14px rgba(255,200,0,.35)}
+.gb:active{transform:scale(.9)}
+/* Subject card */
+.sc{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:20px;padding:14px 16px;cursor:pointer;transition:transform .15s,box-shadow .15s;text-decoration:none;color:var(--text);border:1px solid var(--border)}
+.sc:active{transform:scale(.98);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+/* Toast */
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--card2);color:var(--text);padding:10px 22px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:999;border:1px solid var(--border)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <!-- HEADER -->
+  <header style="background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50">
+    <h1 style="font-size:18px;font-weight:900;font-family:'Montserrat',sans-serif">📚 Fanlar</h1>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="toggleTheme()" id="theme-btn" style="width:36px;height:36px;background:var(--card2);border:1px solid var(--border);border-radius:12px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center">🌙</button>
+      <button onclick="openSheet()" id="gbtn" style="background:rgba(255,200,0,.15);border:1.5px solid rgba(255,200,0,.3);color:var(--primary);font-size:14px;font-weight:800;padding:8px 14px;border-radius:14px;cursor:pointer;font-family:'Montserrat',sans-serif;display:flex;align-items:center;gap:6px">
+        <span id="glabel">7-sinf</span>
+        <span class="ms" style="font-size:18px">expand_more</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- SUBJECTS -->
+  <div style="padding:20px;display:flex;flex-direction:column;gap:10px" id="slist">
+    <div style="text-align:center;padding:40px;color:var(--text2)">Yuklanmoqda...</div>
+  </div>
+</div>
+
+<!-- GRADE BOTTOM SHEET -->
+<div class="ov" id="sheet-ov" onclick="closeSheet(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div style="width:44px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 20px"></div>
+    <h3 style="font-size:18px;font-weight:900;text-align:center;margin-bottom:18px;font-family:'Montserrat',sans-serif">Sinfingizni tanlang</h3>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px" id="ggrid"></div>
+    <button onclick="closeSheet()" style="width:100%;height:50px;background:var(--card2);border:1px solid var(--border);border-radius:16px;color:var(--text2);font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">Bekor qilish</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <a href="index.html" class="ni"><span class="ms">home</span><span>Asosiy</span></a>
+  <a href="student.html" class="ni active"><span class="ms">school</span><span>Fanlar</span></a>
+  <a href="chat.html" class="nc">
+    <div class="nc-btn"><span class="ms">forum</span></div>
+    <span>AI Chat</span>
+  </a>
+  <a href="yangiliklar.html" class="ni"><span class="ms">article</span><span>Yangiliklar</span></a>
+  <a href="parent.html" class="ni"><span class="ms">person</span><span>Profil</span></a>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function initTheme(){const t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);const b=document.getElementById('theme-btn');if(b)b.textContent=t==='dark'?'☀️':'🌙'}
+function toggleTheme(){const c=document.documentElement.getAttribute('data-theme')||'dark';const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);const b=document.getElementById('theme-btn');if(b)b.textContent=n==='dark'?'☀️':'🌙'}
+initTheme();
+
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand()}
+
+const fanlarBySinf={
+  1:["Ona tili","O'qish","Matematika","Atrofimizdagi olam"],
+  2:["Ona tili","O'qish","Matematika","Atrofimizdagi olam"],
+  3:["Ona tili","O'qish","Matematika","Atrofimizdagi olam"],
+  4:["Ona tili","Matematika","Tabiatshunoslik","O'qish"],
+  5:["Ona tili","Adabiyot","Matematika","Tarix","Biologiya","Geografiya"],
+  6:["Ona tili","Adabiyot","Algebra","Geometriya","Tarix","Biologiya"],
+  7:["Ona tili","Adabiyot","Algebra","Geometriya","Fizika","Kimyo","Tarix"],
+  8:["Ona tili","Adabiyot","Algebra","Geometriya","Fizika","Kimyo","Tarix"],
+  9:["Ona tili","Adabiyot","Algebra","Geometriya","Fizika","Kimyo","Biologiya"],
+  10:["Ona tili","Adabiyot","Algebra","Geometriya","Fizika","Kimyo","Biologiya"],
+  11:["Ona tili","Adabiyot","Algebra","Geometriya","Fizika","Kimyo","Biologiya"],
+};
+
+const fanIkonkalar={
+  "Ona tili":{icon:"edit_note",bg:"#FF6D00",e:"📝"},
+  "Matematika":{icon:"calculate",bg:"#1565C0",e:"📐"},
+  "Algebra":{icon:"functions",bg:"#1565C0",e:"➗"},
+  "Geometriya":{icon:"pentagon",bg:"#283593",e:"📏"},
+  "Fizika":{icon:"bolt",bg:"#F57F17",e:"⚡"},
+  "Kimyo":{icon:"science",bg:"#4A148C",e:"🧪"},
+  "Biologiya":{icon:"eco",bg:"#1B5E20",e:"🧬"},
+  "Tarix":{icon:"history_edu",bg:"#4E342E",e:"🏛️"},
+  "Geografiya":{icon:"public",bg:"#00695C",e:"🗺️"},
+  "Ingliz tili":{icon:"language",bg:"#6A1B9A",e:"🇬🇧"},
+  "Adabiyot":{icon:"auto_stories",bg:"#B71C1C",e:"📚"},
+  "O'qish":{icon:"menu_book",bg:"#C62828",e:"📖"},
+  "Tabiatshunoslik":{icon:"forest",bg:"#2E7D32",e:"🌿"},
+  "Atrofimizdagi olam":{icon:"travel_explore",bg:"#00838F",e:"🌍"},
+};
+
+const sv=JSON.parse(localStorage.getItem('maktab_student')||'{}');
+let grade=sv.grade||7;
+document.getElementById('glabel').textContent=`${grade}-sinf`;
+
+function render(){
+  const L=document.getElementById('slist');
+  L.innerHTML='';
+  const fans=fanlarBySinf[grade]||[];
+  fans.forEach(fan=>{
+    const info=fanIkonkalar[fan]||{bg:'#FFC800',e:'📖'};
+    const a=document.createElement('a');
+    a.href=`chat.html?fan=${encodeURIComponent(fan)}&sinf=${grade}`;
+    a.className='sc';
+    a.innerHTML=`<div style="width:54px;height:54px;background:${info.bg};border-radius:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:26px;box-shadow:0 4px 12px ${info.bg}44">${info.e}</div><div style="flex:1"><div style="font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif">${fan}</div><div style="font-size:12px;color:var(--text2);margin-top:3px">${grade}-sinf dasturi · AI bilan o'rgan</div></div><span class="ms" style="color:var(--text2);font-size:20px">chevron_right</span>`;
+    L.appendChild(a);
+  });
+  if(!fans.length)L.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text2)">Fan topilmadi</div>`;
+}
+
+function buildGrid(){
+  const g=document.getElementById('ggrid');
+  g.innerHTML='';
+  for(let i=1;i<=11;i++){
+    const b=document.createElement('button');
+    b.className='gb'+(i===grade?' sel':'');
+    b.textContent=i;
+    b.dataset.g=i;
+    b.onclick=()=>pick(i);
+    g.appendChild(b);
+  }
+}
+
+function openSheet(){buildGrid();document.getElementById('sheet-ov').classList.add('open')}
+function closeSheet(e){if(!e||e.target===document.getElementById('sheet-ov'))document.getElementById('sheet-ov').classList.remove('open')}
+
+function pick(g){
+  grade=g;
+  document.getElementById('glabel').textContent=`${g}-sinf`;
+  const sv2=JSON.parse(localStorage.getItem('maktab_student')||'{}');
+  sv2.grade=g;
+  localStorage.setItem('maktab_student',JSON.stringify(sv2));
+  localStorage.setItem('student_grade',g);
+  document.querySelectorAll('.gb').forEach(b=>b.classList.toggle('sel',+b.dataset.g===g));
+  setTimeout(()=>{closeSheet();render()},160);
+}
+
+render();
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+</script>
+</body>
+</html>

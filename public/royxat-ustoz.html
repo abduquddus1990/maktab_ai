@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ustoz ro'yxati — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#ECEAF5;color:#2D2D4E;min-height:100vh;display:flex;flex-direction:column}
+
+.page-center{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.card{background:#fff;border-radius:20px;padding:40px 44px;width:100%;max-width:640px;box-shadow:0 8px 40px rgba(75,59,200,.1)}
+@media(max-width:640px){.card{padding:28px 18px}}
+
+/* Card header */
+.card-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:28px;color:#3B2FCC;margin-bottom:6px;text-align:center}
+.card-sub{font-size:14px;color:#7775A0;text-align:center;margin-bottom:32px}
+
+/* Layout */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px}
+.field{margin-bottom:20px}
+.field.no-mb{margin-bottom:0}
+@media(max-width:520px){.grid-2{grid-template-columns:1fr}}
+
+/* Label */
+.flabel{display:block;font-size:13px;font-weight:600;color:#2D2D4E;margin-bottom:8px}
+
+/* Plain input */
+.finput{width:100%;padding:12px 14px;border:1.5px solid #E2DFEE;border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;color:#2D2D4E;background:#fff;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.finput:focus{border-color:#4B3BFF;box-shadow:0 0 0 3px rgba(75,59,255,.07)}
+.finput::placeholder{color:#B8B5CC}
+
+/* Prefix input (@, +998) */
+.prefix-wrap{display:flex;align-items:stretch;border:1.5px solid #E2DFEE;border-radius:10px;overflow:hidden;background:#fff;transition:border-color .2s}
+.prefix-wrap:focus-within{border-color:#4B3BFF;box-shadow:0 0 0 3px rgba(75,59,255,.07)}
+.pw-prefix{padding:0 10px 0 14px;font-size:14px;font-weight:600;color:#9996C0;background:#FAFAFE;border-right:1.5px solid #E2DFEE;display:flex;align-items:center;flex-shrink:0;user-select:none}
+.pw-input{flex:1;padding:12px 14px;border:none;outline:none;font-size:14px;font-family:'Inter',sans-serif;color:#2D2D4E;background:transparent;min-width:0}
+.pw-input::placeholder{color:#B8B5CC}
+
+/* Select */
+select.finput{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237775A0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+
+/* Gender toggle */
+.gender-row{display:flex;gap:10px}
+.gbtn{flex:1;padding:11px 14px;border:1.5px solid #E2DFEE;border-radius:10px;font-size:14px;font-weight:600;color:#9996C0;cursor:pointer;transition:all .15s;background:#fff;text-align:center;user-select:none}
+.gbtn:hover:not(.on){border-color:#B8B5E0;color:#4B3BFF}
+.gbtn.on{border-color:#4B3BFF;color:#4B3BFF;background:#F4F2FF}
+
+/* Fan chips */
+.chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.fchip{padding:8px 18px;border:1.5px solid #E2DFEE;border-radius:999px;font-size:13px;font-weight:500;color:#4D4B75;cursor:pointer;transition:all .15s;background:#fff;user-select:none;white-space:nowrap}
+.fchip:hover:not(.on){border-color:#C5C2E8;color:#4B3BFF}
+.fchip.on{background:#4B3BFF;border-color:#4B3BFF;color:#fff}
+
+/* Errors */
+.ferr{display:none;font-size:12px;color:#ba1a1a;margin-top:5px}
+.ferr.show{display:block}
+.err-global{display:none;padding:12px 14px;background:#ffdad6;color:#93000a;border-radius:10px;font-size:13px;margin-bottom:18px}
+
+/* Submit */
+.btn-submit{width:100%;padding:16px;background:#4B3BFF;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;border:none;border-radius:999px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px}
+.btn-submit:hover:not(:disabled){background:#3020DD;box-shadow:0 6px 24px rgba(75,59,255,.3);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.65;cursor:not-allowed;transform:none}
+
+/* Footer link */
+.footer-link{text-align:center;font-size:14px;color:#7775A0;margin-top:20px}
+.footer-link a{color:#4B3BFF;font-weight:700;text-decoration:none}
+.footer-link a:hover{text-decoration:underline}
+
+/* Divider */
+.divider{border:none;border-top:1px solid #EEEDF8;margin:24px 0}
+</style>
+</head>
+<body>
+
+<div id="nav-ph"></div>
+
+<div class="page-center">
+  <div class="card">
+
+    <!-- Header -->
+    <h1 class="card-title">Maktab AI</h1>
+    <p class="card-sub">Repetitorlar safiga qo'shiling</p>
+
+    <!-- Global error -->
+    <div class="err-global" id="err-global"></div>
+
+    <form onsubmit="doRegister(event)" novalidate>
+
+      <!-- Row 1: Username + Ism -->
+      <div class="grid-2">
+        <div class="field no-mb">
+          <label class="flabel" for="f-username">Foydalanuvchi nomi</label>
+          <div class="prefix-wrap">
+            <span class="pw-prefix">@</span>
+            <input class="pw-input" id="f-username" type="text" placeholder="username" autocomplete="username">
+          </div>
+          <p class="ferr" id="err-username">To'g'ri username kiriting (3–20 belgi)</p>
+        </div>
+        <div class="field no-mb">
+          <label class="flabel" for="f-name">Ism familiyangiz</label>
+          <input class="finput" id="f-name" type="text" placeholder="To'liq ism familiyangiz" autocomplete="name">
+          <p class="ferr" id="err-name">Ism familiyangizni kiriting</p>
+        </div>
+      </div>
+
+      <!-- Row 2: Telefon + Jins -->
+      <div class="grid-2">
+        <div class="field no-mb">
+          <label class="flabel" for="f-phone">Telefon raqam</label>
+          <div class="prefix-wrap">
+            <span class="pw-prefix">+998</span>
+            <input class="pw-input" id="f-phone" type="tel" placeholder="(90) 123-45-67" autocomplete="tel">
+          </div>
+          <p class="ferr" id="err-phone">To'g'ri telefon raqam kiriting</p>
+        </div>
+        <div class="field no-mb">
+          <label class="flabel">Jinsingiz</label>
+          <div class="gender-row">
+            <div class="gbtn" id="jins-e" onclick="pickJins('e')">Erkak</div>
+            <div class="gbtn" id="jins-a" onclick="pickJins('a')">Ayol</div>
+          </div>
+          <p class="ferr" id="err-jins">Jinsni tanlang</p>
+        </div>
+      </div>
+
+      <!-- Row 3: Viloyat + Tuman -->
+      <div class="grid-2">
+        <div class="field no-mb">
+          <label class="flabel" for="f-viloyat">Viloyat</label>
+          <select class="finput" id="f-viloyat" onchange="onViloyat()">
+            <option value="">Viloyatni tanlang</option>
+          </select>
+          <p class="ferr" id="err-viloyat">Viloyatni tanlang</p>
+        </div>
+        <div class="field no-mb">
+          <label class="flabel" for="f-tuman">Tuman/Shahar</label>
+          <select class="finput" id="f-tuman" disabled>
+            <option value="">Avval viloyatni tanlang</option>
+          </select>
+          <p class="ferr" id="err-tuman">Tuman yoki shaharni tanlang</p>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Fanlar chips -->
+      <div class="field">
+        <label class="flabel">Qaysi fanlardan dars berasiz?</label>
+        <div class="chip-row" id="fan-chips"></div>
+        <p class="ferr" id="err-fanlar">Kamida bitta fan tanlang</p>
+      </div>
+
+      <!-- Row 5: Sinflar text + Tajriba select -->
+      <div class="grid-2">
+        <div class="field no-mb">
+          <label class="flabel" for="f-sinflar">Qaysi sinflarga dars berasiz?</label>
+          <input class="finput" id="f-sinflar" type="text" placeholder="Masalan: 5-11 sinflar">
+          <p class="ferr" id="err-sinflar">Sinflarni kiriting</p>
+        </div>
+        <div class="field no-mb">
+          <label class="flabel" for="f-tajriba">Tajribangiz</label>
+          <select class="finput" id="f-tajriba">
+            <option value="">Tanlang</option>
+            <option value="1 yildan kam">1 yildan kam</option>
+            <option value="1–3 yil">1–3 yil</option>
+            <option value="3–5 yil">3–5 yil</option>
+            <option value="5–10 yil">5–10 yil</option>
+            <option value="10+ yil">10+ yil</option>
+          </select>
+          <p class="ferr" id="err-tajriba">Tajribani tanlang</p>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Parol -->
+      <div class="field">
+        <label class="flabel" for="f-password">Parol yarating</label>
+        <input class="finput" id="f-password" type="password" placeholder="Parol kamida 8 ta belgidan iborat bo'lishi kerak" autocomplete="new-password">
+        <p class="ferr" id="err-password">Parol kamida 8 ta belgi bo'lishi kerak</p>
+      </div>
+
+      <button class="btn-submit" type="submit" id="btn-reg">
+        Ro'yxatdan o'tish
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M11 5l5 5-5 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+    </form>
+
+    <p class="footer-link">Hisobingiz bormi? <a href="/kirish.html">Kirish</a></p>
+
+  </div>
+</div>
+
+<div id="footer-ph"></div>
+
+<script src="/js/components.js"></script>
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+const API = 'http://localhost:8000';
+
+/* ── Regions ── */
+const UZ_REGIONS = {
+  "Toshkent shahri": ["Bektemir","Chilonzor","Mirobod","Mirzo Ulug'bek","Olmazor","Sergeli","Shayxontohur","Uchtepa","Yakkasaroy","Yashnobod","Yunusobod"],
+  "Toshkent viloyati": ["Angren","Bekabad","Bo'ka","Chirchiq","Nurafshon","Ohangaron","Olmaliq","Oqqo'rg'on","Parkent","Piskent","Qibray","Yangiyo'l","Yuqorichirchiq","Zangiota"],
+  "Samarqand viloyati": ["Bulungur","Ishtixon","Jomboy","Kattaqo'rg'on","Narpay","Nurobod","Oqdaryo","Pastdarg'om","Payariq","Qo'shrabot","Samarqand","Toyloq","Urgut"],
+  "Farg'ona viloyati": ["Beshariq","Buvayda","Dang'ara","Farg'ona","Furqat","Marg'ilon","Oltiariq","Qo'qon","Quva","Rishton","Toshloq","Uchko'prik","Yozyovon"],
+  "Andijon viloyati": ["Andijon","Asaka","Baliqchi","Bo'z","Buloqboshi","Izboskan","Jalolquduq","Marhamat","Oltinko'l","Paxtaobod","Shahrixon","Ulug'nor","Xo'jaobod"],
+  "Namangan viloyati": ["Chortoq","Chust","Davlatobod","Ko'sonsoy","Mingbuloq","Namangan","Norin","Pop","To'raqo'rg'on","Uychi","Yangiqo'rg'on"],
+  "Buxoro viloyati": ["Buxoro","G'ijduvon","Jondor","Kogon","Olot","Peshku","Qorovulbozor","Romitan","Shofirkon","Vobkent"],
+  "Qashqadaryo viloyati": ["Chiroqchi","Dehqonobod","G'uzor","Kamashi","Kasbi","Kitob","Koson","Mirishkor","Muborak","Nishon","Qarshi","Shahrisabz","Yakkabog'"],
+  "Surxondaryo viloyati": ["Angor","Bandixon","Boysun","Denov","Jarqo'rg'on","Muzrabot","Oltinsoy","Qiziriq","Qumqo'rg'on","Sariosiyo","Sherobod","Sho'rchi","Termiz","Uzun"],
+  "Xorazm viloyati": ["Bog'ot","Gurlan","Xiva","Xazorasp","Qo'shko'pir","Shovot","Urganch","Yangiariq","Yangibozor"],
+  "Navoiy viloyati": ["Karmana","Konimex","Navoiy","Navbahor","Nurota","Qiziltepa","Tomdi","Uchquduq","Xatirchi","Zarafshon"],
+  "Jizzax viloyati": ["Arnasoy","Baxmal","Do'stlik","Forish","G'allaorol","Jizzax","Mirzacho'l","Paxtakor","Yangiobod","Zomin"],
+  "Sirdaryo viloyati": ["Baxt","Boyovut","Guliston","Mirzaobod","Oqoltin","Sardoba","Sayxunobod","Sirdaryo","Xovos"],
+  "Qoraqalpog'iston": ["Beruniy","Chimboy","Ellikkala","Kegeyli","Mo'ynoq","Nukus","Qanliko'l","Qo'ng'irot","Shumanay","Taxtako'pir","To'rtko'l","Xo'jayli"]
+};
+
+/* populate viloyat */
+const selV = document.getElementById('f-viloyat');
+Object.keys(UZ_REGIONS).forEach(v => {
+  const o = document.createElement('option');
+  o.value = v; o.textContent = v; selV.appendChild(o);
+});
+
+function onViloyat() {
+  const v = selV.value;
+  const selT = document.getElementById('f-tuman');
+  selT.innerHTML = '';
+  if (!v) { selT.disabled = true; selT.innerHTML = '<option value="">Avval viloyatni tanlang</option>'; return; }
+  selT.disabled = false;
+  const blank = document.createElement('option'); blank.value = ''; blank.textContent = 'Tuman/Shahar tanlang'; selT.appendChild(blank);
+  UZ_REGIONS[v].forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; selT.appendChild(o); });
+}
+
+/* fan chips */
+const FANLAR = ["Matematika","Fizika","Kimyo","Biologiya","Ingliz tili","Ona tili","Geografiya","Tarix","Informatika","Rus tili","Musiqa","Chizmachilik"];
+const selectedFanlar = new Set();
+const fanRow = document.getElementById('fan-chips');
+FANLAR.forEach(fan => {
+  const c = document.createElement('div');
+  c.className = 'fchip'; c.textContent = fan;
+  c.onclick = () => { selectedFanlar.has(fan) ? (selectedFanlar.delete(fan), c.classList.remove('on')) : (selectedFanlar.add(fan), c.classList.add('on')); };
+  fanRow.appendChild(c);
+});
+
+/* jins */
+let selectedJins = null;
+function pickJins(val) {
+  document.getElementById('jins-e').classList.remove('on');
+  document.getElementById('jins-a').classList.remove('on');
+  document.getElementById('jins-' + val).classList.add('on');
+  selectedJins = val === 'e' ? 'Erkak' : 'Ayol';
+}
+
+/* parse sinflar text "5-11" → [5,6,7,8,9,10,11], "7,8" → [7,8] */
+function parseSinflar(text) {
+  text = text.trim().replace(/sinflar?/gi,'').trim();
+  if (!text) return [];
+  const range = text.match(/^(\d+)\s*[-–]\s*(\d+)$/);
+  if (range) {
+    const a = parseInt(range[1]), b = parseInt(range[2]);
+    const res = [];
+    for (let i = Math.min(a,b); i <= Math.max(a,b); i++) if (i >= 1 && i <= 11) res.push(i);
+    return res;
+  }
+  return text.split(/[,\s]+/).map(s => parseInt(s)).filter(n => n >= 1 && n <= 11);
+}
+
+/* auth utils */
+function getUsers() { try { return JSON.parse(localStorage.getItem('maktabai_users')) || []; } catch { return []; } }
+function saveCurrentUser(u) { localStorage.setItem('maktabai_currentUser', JSON.stringify(u)); localStorage.setItem('maktab_user', JSON.stringify(u)); }
+function showErr(id, msg) { const e = document.getElementById(id); if (msg) e.textContent = msg; e.classList.add('show'); }
+function hideErr(id) { document.getElementById(id).classList.remove('show'); }
+function showGlobal(msg) { const e = document.getElementById('err-global'); e.textContent = msg; e.style.display = 'block'; }
+function hideGlobal() { document.getElementById('err-global').style.display = 'none'; }
+
+async function doRegister(e) {
+  e.preventDefault();
+  ['err-username','err-name','err-phone','err-jins','err-viloyat','err-tuman','err-fanlar','err-sinflar','err-tajriba','err-password'].forEach(hideErr);
+  hideGlobal();
+
+  const username = document.getElementById('f-username').value.trim();
+  const name     = document.getElementById('f-name').value.trim();
+  const phoneRaw = document.getElementById('f-phone').value.trim();
+  const phone    = '+998' + phoneRaw.replace(/\D/g,'');
+  const viloyat  = document.getElementById('f-viloyat').value;
+  const tuman    = document.getElementById('f-tuman').value;
+  const sinflarText = document.getElementById('f-sinflar').value;
+  const sinflar  = parseSinflar(sinflarText);
+  const tajriba  = document.getElementById('f-tajriba').value;
+  const password = document.getElementById('f-password').value;
+
+  let ok = true;
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) { showErr('err-username'); ok = false; }
+  if (!name)                              { showErr('err-name'); ok = false; }
+  if (phoneRaw.replace(/\D/g,'').length < 9) { showErr('err-phone'); ok = false; }
+  if (!selectedJins)                      { showErr('err-jins'); ok = false; }
+  if (!viloyat)                           { showErr('err-viloyat'); ok = false; }
+  if (!tuman)                             { showErr('err-tuman'); ok = false; }
+  if (selectedFanlar.size === 0)          { showErr('err-fanlar'); ok = false; }
+  if (sinflar.length === 0)              { showErr('err-sinflar', "To'g'ri sinf raqami kiriting (masalan: 5-11)"); ok = false; }
+  if (!tajriba)                           { showErr('err-tajriba'); ok = false; }
+  if (password.length < 8)              { showErr('err-password'); ok = false; }
+  if (!ok) return;
+
+  const btn = document.getElementById('btn-reg');
+  btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="animation:spin .8s linear infinite"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2.5" stroke-dasharray="40" stroke-dashoffset="10"/></svg> Yuklanmoqda...';
+  btn.disabled = true;
+
+  const payload = { role:'teacher', name, username, password, phone, jins: selectedJins, viloyat, tuman, fanlar: [...selectedFanlar], sinflar, tajriba };
+
+  try {
+    const res = await fetch(`${API}/api/auth/register`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const user = { id:data.user_id, name:data.name, username:data.username, role:'teacher', phone, jins:selectedJins, viloyat, tuman, fanlar:[...selectedFanlar], sinflar, tajriba };
+      saveCurrentUser(user);
+      const users = getUsers();
+      if (!users.some(u => u.username === username)) { users.push({...user,password}); localStorage.setItem('maktabai_users',JSON.stringify(users)); }
+      btn.innerHTML = '✓ Muvaffaqiyatli ro\'yxatdan o\'tdingiz!';
+      setTimeout(() => { location.href='/index.html'; }, 700);
+      return;
+    }
+    const err = await res.json().catch(() => ({}));
+    showGlobal(err.detail || "Xato yuz berdi. Qayta urinib ko'ring.");
+  } catch {
+    /* localStorage fallback */
+    const users = getUsers();
+    if (users.some(u => u.username?.toLowerCase() === username.toLowerCase())) {
+      showGlobal('Bu username band. Boshqa username tanlang.'); btn.innerHTML='Ro\'yxatdan o\'tish →'; btn.disabled=false; return;
+    }
+    const newUser = { id:Date.now(), role:'teacher', name, username, password, phone, jins:selectedJins, viloyat, tuman, fanlar:[...selectedFanlar], sinflar, tajriba };
+    users.push(newUser); localStorage.setItem('maktabai_users',JSON.stringify(users));
+    saveCurrentUser(newUser);
+    btn.innerHTML = '✓ Muvaffaqiyatli!';
+    setTimeout(() => { location.href='/index.html'; }, 700);
+    return;
+  }
+
+  btn.innerHTML = "Ro'yxatdan o'tish →";
+  btn.disabled = false;
+}
+
+/* spin animation */
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

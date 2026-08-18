@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="light" lang="uz">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Maktab AI - Tizimga kirish</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "tertiary-container": "#006e56",
+        "on-secondary-container": "#6e5400",
+        "on-secondary-fixed-variant": "#594400",
+        "tertiary-fixed": "#6bfbcf",
+        "surface-container-low": "#f4f2ff",
+        "on-secondary": "#ffffff",
+        "primary": "#2f06e9",
+        "on-secondary-fixed": "#241a00",
+        "error": "#ba1a1a",
+        "tertiary-fixed-dim": "#49deb4",
+        "outline": "#777588",
+        "inverse-on-surface": "#f0efff",
+        "on-primary-fixed": "#0f0069",
+        "inverse-primary": "#c3c0ff",
+        "surface-container-high": "#e5e6ff",
+        "surface-container-lowest": "#ffffff",
+        "secondary-container": "#fec700",
+        "on-primary-fixed-variant": "#2d00e5",
+        "background": "#fbf8ff",
+        "on-surface-variant": "#464557",
+        "error-container": "#ffdad6",
+        "on-tertiary": "#ffffff",
+        "tertiary": "#005340",
+        "surface-dim": "#d4d8ff",
+        "surface": "#fbf8ff",
+        "primary-fixed-dim": "#c3c0ff",
+        "outline-variant": "#c7c4da",
+        "on-error": "#ffffff",
+        "surface-container-highest": "#dee0ff",
+        "primary-fixed": "#e2dfff",
+        "on-primary": "#ffffff",
+        "surface-variant": "#dee0ff",
+        "surface-bright": "#fbf8ff",
+        "secondary": "#755b00",
+        "on-tertiary-fixed-variant": "#00513e",
+        "surface-tint": "#4838fd",
+        "secondary-fixed-dim": "#f4bf00",
+        "on-primary-container": "#dbd8ff",
+        "primary-container": "#4b3bff",
+        "on-background": "#12183b",
+        "surface-container": "#edecff",
+        "secondary-fixed": "#ffdf92",
+        "on-error-container": "#93000a",
+        "on-tertiary-container": "#64f4c9",
+        "on-surface": "#12183b",
+        "on-tertiary-fixed": "#002117",
+        "inverse-surface": "#282e52"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px",
+        "card": "20px",
+        "input": "12px"
+      },
+      "spacing": {
+        "gutter": "24px",
+        "sm": "12px",
+        "md": "24px",
+        "container-max": "1280px",
+        "base": "8px",
+        "xs": "4px",
+        "xl": "64px",
+        "lg": "40px"
+      },
+      "fontFamily": {
+        "h1": ["Montserrat"],
+        "h1-mobile": ["Montserrat"],
+        "body-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "h2": ["Montserrat"],
+        "h3": ["Montserrat"],
+        "body-sm": ["Inter"],
+        "label-bold": ["Inter"],
+        "button": ["Inter"]
+      },
+      "fontSize": {
+        "h1": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+        "h1-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "800"}],
+        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+        "h2": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+        "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}],
+        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "700"}],
+        "button": ["16px", {"lineHeight": "1", "fontWeight": "600"}]
+      },
+      boxShadow: {
+        "level-1": "0px 4px 20px rgba(20, 26, 61, 0.05)",
+        "level-2": "0px 12px 30px rgba(20, 26, 61, 0.1)"
+      }
+    }
+  }
+}
+</script>
+<style>
+body {
+  background-color: #F7F8FC;
+  background-image: radial-gradient(circle at top right, rgba(75, 59, 255, 0.05) 0%, transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(254, 199, 0, 0.05) 0%, transparent 40%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+</head>
+<body class="font-body-md text-on-surface p-md">
+<main class="w-full max-w-md mx-auto">
+
+  <!-- Header / Logo -->
+  <div class="text-center mb-lg">
+    <a href="/index.html" class="inline-flex items-center justify-center gap-base no-underline">
+      <h1 class="font-h2 text-h2 text-primary flex items-center justify-center gap-base">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 32px;">school</span>
+        Maktab AI
+      </h1>
+    </a>
+  </div>
+
+  <!-- Login Card -->
+  <div class="bg-surface-container-lowest rounded-[20px] p-lg shadow-level-1 border border-[#E7E9F4] transition-shadow duration-300 hover:shadow-level-2 hover:border-primary-fixed-dim">
+
+    <div class="mb-lg text-center">
+      <h2 class="font-h3 text-h3 text-on-surface mb-xs">Tizimga kirish</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Ma'lumotlaringizni kiriting</p>
+    </div>
+
+    <!-- Global error -->
+    <div id="err-global" style="display:none" class="mb-md p-sm rounded-[10px] bg-[#ffdad6] text-[#93000a] font-body-sm text-body-sm text-center"></div>
+
+    <form class="space-y-md" id="login-form" onsubmit="doLogin(event)">
+
+      <!-- Email/Username Input -->
+      <div>
+        <label class="block font-label-bold text-label-bold text-on-surface mb-base" for="username">Elektron pochta yoki Username</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-sm flex items-center pointer-events-none text-on-surface-variant">
+            <span class="material-symbols-outlined">mail</span>
+          </div>
+          <input class="w-full pl-[44px] pr-sm py-[16px] bg-surface rounded-[12px] border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors font-body-md text-body-md placeholder:text-on-surface-variant/50"
+            id="username" name="username" placeholder="Sizning pochtangiz" type="text" autocomplete="username"/>
+        </div>
+      </div>
+
+      <!-- Password Input -->
+      <div>
+        <div class="flex justify-between items-center mb-base">
+          <label class="block font-label-bold text-label-bold text-on-surface" for="password">Parol</label>
+          <a class="font-body-sm text-body-sm text-primary hover:text-primary-fixed-dim transition-colors hover:underline" href="#" onclick="showForgot(event)">Parolni unutdingizmi?</a>
+        </div>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-sm flex items-center pointer-events-none text-on-surface-variant">
+            <span class="material-symbols-outlined">lock</span>
+          </div>
+          <input class="w-full pl-[44px] pr-sm py-[16px] bg-surface rounded-[12px] border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors font-body-md text-body-md placeholder:text-on-surface-variant/50"
+            id="password" name="password" placeholder="Sizning parolingiz" type="password" autocomplete="current-password"/>
+        </div>
+      </div>
+
+      <!-- Primary Button -->
+      <button id="btn-submit"
+        class="w-full py-[16px] px-md bg-primary-container text-on-primary rounded-full font-button text-button hover:bg-primary transition-colors flex items-center justify-center gap-base mt-lg"
+        type="submit">
+        Kirish
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+
+    </form>
+
+    <!-- Bottom Action -->
+    <div class="mt-lg text-center font-body-sm text-body-sm text-on-surface-variant pt-md border-t border-[#E7E9F4]">
+      Hisobingiz yo'qmi?
+      <a class="font-label-bold text-label-bold text-primary hover:text-primary-fixed-dim transition-colors hover:underline ml-xs" href="/royxat.html">Ro'yxatdan o'tish</a>
+    </div>
+
+  </div>
+
+  <!-- "Parol unutilgan" placeholder modal -->
+  <div id="forgot-modal" style="display:none;position:fixed;inset:0;background:rgba(18,24,59,.45);z-index:999;display:none;align-items:center;justify-content:center">
+    <div class="bg-surface-container-lowest rounded-[20px] p-lg shadow-level-2 border border-[#E7E9F4] w-full max-w-sm mx-md text-center">
+      <div style="font-size:40px;margin-bottom:12px">🔑</div>
+      <h3 class="font-h3 text-h3 text-on-surface mb-xs">Parolni tiklash</h3>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mb-lg">Demo versiyada parol tiklash mavjud emas. Yangi hisob ochish uchun ro'yxatdan o'ting.</p>
+      <a href="/royxat.html" class="block w-full py-[14px] bg-primary-container text-on-primary rounded-full font-button text-button text-center mb-sm hover:bg-primary transition-colors">Ro'yxatdan o'tish</a>
+      <button onclick="hideForgot()" class="block w-full py-[14px] border border-outline-variant rounded-full font-button text-button text-on-surface-variant hover:border-primary hover:text-primary transition-colors bg-transparent cursor-pointer">Yopish</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+const API = 'http://localhost:8000';
+
+/* ── auth helpers ── */
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem('maktabai_users')) || []; } catch { return []; }
+}
+function saveCurrentUser(user) {
+  localStorage.setItem('maktabai_currentUser', JSON.stringify(user));
+  localStorage.setItem('maktab_user', JSON.stringify(user));
+}
+
+/* ── redirect ── */
+function redirectByRole(role) {
+  const ref = document.referrer;
+  const isLocal = ref && ref.startsWith(location.origin);
+  const notAuth = !ref.includes('/kirish') && !ref.includes('/royxat');
+  if (isLocal && notAuth) { location.href = ref; return; }
+  if (role === 'parent')  { location.href = '/ota-ona-paneli.html'; return; }
+  if (role === 'student') { location.href = '/ai-chat.html'; return; }
+  location.href = '/index.html';
+}
+
+/* ── login ── */
+async function doLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const errEl    = document.getElementById('err-global');
+  const btn      = document.getElementById('btn-submit');
+
+  errEl.style.display = 'none';
+  if (!username) {
+    errEl.textContent = 'Username kiriting';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.innerHTML = '<span class="material-symbols-outlined" style="animation:spin .8s linear infinite">progress_activity</span>';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const user = { id: data.user_id, name: data.name, username: data.username, role: data.role, viloyat: data.viloyat, tuman: data.tuman };
+      saveCurrentUser(user);
+      setTimeout(() => redirectByRole(user.role), 350);
+      return;
+    }
+
+    const err = await res.json().catch(() => ({}));
+    errEl.textContent = err.detail || "Foydalanuvchi topilmadi yoki parol noto'g'ri";
+    errEl.style.display = 'block';
+  } catch {
+    /* API ulanmagan — localStorage ga fallback */
+    const users = getUsers();
+    const user  = users.find(u => u.username?.toLowerCase() === username.toLowerCase());
+    if (user && (!user.password || user.password === password)) {
+      saveCurrentUser(user);
+      setTimeout(() => redirectByRole(user.role), 350);
+      return;
+    }
+    errEl.textContent = "Foydalanuvchi topilmadi yoki parol noto'g'ri";
+    errEl.style.display = 'block';
+  }
+
+  btn.innerHTML = 'Kirish <span class="material-symbols-outlined">arrow_forward</span>';
+  btn.disabled = false;
+}
+
+/* ── forgot modal ── */
+function showForgot(e) {
+  e.preventDefault();
+  const m = document.getElementById('forgot-modal');
+  m.style.display = 'flex';
+}
+function hideForgot() {
+  document.getElementById('forgot-modal').style.display = 'none';
+}
+document.getElementById('forgot-modal').addEventListener('click', function(e) {
+  if (e.target === this) hideForgot();
+});
+
+/* already logged in → skip */
+try {
+  const cu = JSON.parse(localStorage.getItem('maktabai_currentUser'));
+  if (cu?.name) redirectByRole(cu.role);
+} catch {}
+</script>
+</body>
+</html>

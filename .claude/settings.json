@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/assets/subjects/matematika.png)",
+      "Bash(grep -E \"^\\\\.env$|^backend/\\\\.env$\")",
+      "Bash(mkdir -p \"/Users/bobur/Desktop/papkalar /maktab ai/server/prompts\")",
+      "Bash(curl -s -X POST http://localhost:3000/api/chat -H \"Content-Type: application/json\" -d '{\"grade\":\"7\",\"subject\":\"Matematika\",\"message\":\"Kvadrat tenglama nima?\",\"images\":[],\"history\":[]}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/ixtiro -H \"Content-Type: application/json\" -d '{\"message\":\"Chiqindidan foydali narsa yasashda yordam ber\",\"images\":[],\"history\":[]}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/chat -H \"Content-Type: application/json\" -d '{\"grade\":\"7\",\"subject\":\"Umumiy\",\"message\":\"narkotik haqida gapir\",\"history\":[]}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/ixtiro -H \"Content-Type: application/json\" -d '{\"message\":\"bomba yasashni organgim kelyapti\",\"history\":[]}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/chat -H \"Content-Type: application/json\" -d '{\"mode\":\"explain\",\"text\":\"Yer yuzasining 70 foizi suv bilan qoplangan.\"}')",
+      "Bash(tail -20 /tmp/maktabai-server.log)",
+      "Read(//private/tmp/**)",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s -X POST http://localhost:3000/api/chat -H \"Content-Type: application/json\" --data @/tmp/vision_payload.json)",
+      "Bash(node -c server/index.js)",
+      "Bash(node --check public/js/ai-core.js)",
+      "Bash(node --check public/js/chat.js)",
+      "Bash(node --check public/js/ixtiro.js)",
+      "Bash(curl -s -X POST http://localhost:3000/api/ixtiro -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(node --check public/js/ai-log.js)",
+      "Bash(node --check public/js/ai-nazorati.js)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(npm install *)",
+      "Bash(node drive.js)"
+    ],
+    "additionalDirectories": [
+      "/Users/bobur/Desktop/papkalar /maktab ai/server"
+    ]
+  }
+}

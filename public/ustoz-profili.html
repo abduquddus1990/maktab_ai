@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ustoz Profili — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#fbf8ff;color:#12183b}
+.mont{font-family:'Montserrat',sans-serif}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+.card{background:#fff;border-radius:20px;border:1px solid #E7E9F4;box-shadow:0 4px 20px rgba(20,26,61,.05)}
+.tab-btn{padding:10px 22px;border-radius:10px;border:none;background:transparent;font-family:'Inter',sans-serif;font-weight:600;font-size:15px;color:#464557;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:#f0eeff;color:#4b3bff}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.star{color:#fec700}
+.modal{display:none;position:fixed;inset:0;background:rgba(18,24,59,.5);z-index:300;align-items:center;justify-content:center;padding:24px}
+.modal.open{display:flex}
+.modal-box{background:#fff;border-radius:20px;padding:32px;max-width:400px;width:100%;text-align:center}
+</style>
+</head>
+<body>
+
+<div id="nav-ph"></div>
+
+<div style="padding:40px 0 80px">
+  <div class="container">
+    <div style="display:flex;gap:32px;align-items:flex-start" id="main-layout">
+
+      <!-- LEFT CONTENT -->
+      <div style="flex:1;min-width:0">
+
+        <!-- Profile header -->
+        <div class="card" style="padding:28px;margin-bottom:24px" id="profile-header">
+          <!-- filled by JS -->
+        </div>
+
+        <!-- Stats row -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px" id="stats-row"></div>
+
+        <!-- Tabs -->
+        <div class="card" style="padding:28px">
+          <div style="display:flex;gap:6px;margin-bottom:24px;background:#f8f8fc;border-radius:12px;padding:4px">
+            <button class="tab-btn active" onclick="openTab(this,'tab-haqida')">Haqida</button>
+            <button class="tab-btn" onclick="openTab(this,'tab-kurs')">Kurs dasturi</button>
+            <button class="tab-btn" onclick="openTab(this,'tab-izoh')">Izohlar</button>
+          </div>
+
+          <div class="tab-content active" id="tab-haqida">
+            <p style="font-size:15px;color:#464557;line-height:1.8;margin-bottom:20px" id="bio-text"></p>
+            <div style="display:flex;flex-wrap:wrap;gap:10px" id="bio-tags"></div>
+          </div>
+
+          <div class="tab-content" id="tab-kurs">
+            <div id="kurs-list"></div>
+          </div>
+
+          <div class="tab-content" id="tab-izoh">
+            <!-- Izoh forma -->
+            <div style="background:#f8f8fc;border-radius:16px;padding:20px;margin-bottom:24px">
+              <div class="mont" style="font-weight:700;font-size:15px;margin-bottom:12px">Izoh qoldiring</div>
+              <div style="display:flex;gap:4px;margin-bottom:12px" id="star-input">
+                ${[1,2,3,4,5].map(i=>`<span onclick="setStar(${i})" style="font-size:28px;cursor:pointer;transition:transform .1s" class="star-opt">☆</span>`).join('')}
+              </div>
+              <textarea id="izoh-text" placeholder="Ustoz haqida fikringizni yozing..." style="width:100%;padding:12px;border:1.5px solid #E7E9F4;border-radius:12px;font-size:14px;font-family:'Inter',sans-serif;resize:none;height:90px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='#4b3bff'" onblur="this.style.borderColor='#E7E9F4'"></textarea>
+              <button onclick="submitIzoh()" style="margin-top:10px;background:#4b3bff;color:#fff;border:none;padding:11px 24px;border-radius:10px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#2f06e9'" onmouseout="this.style.background='#4b3bff'">Yuborish</button>
+            </div>
+            <div id="izohlar-list"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: sticky payment card -->
+      <div style="width:300px;flex-shrink:0;position:sticky;top:90px" id="pay-card">
+
+        <!-- Teacher's groups (visible only to the teacher themselves) -->
+        <div class="card" style="padding:20px;margin-bottom:16px" id="my-groups-card" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-family:'Material Symbols Outlined';font-size:20px;color:#4b3bff">group</span>
+              <span class="mont" style="font-weight:800;font-size:14px;color:#12183b">Mening guruhlarim</span>
+            </div>
+            <a href="/guruh-yaratish.html" style="font-size:12px;font-weight:700;color:#4b3bff;text-decoration:none;background:#f0eeff;padding:4px 10px;border-radius:8px">+ Yangi</a>
+          </div>
+          <div id="my-groups-list"></div>
+          <a href="/ustoz-guruh.html" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:10px;border:1.5px solid #E7E9F4;border-radius:10px;text-decoration:none;color:#464557;font-size:13px;font-weight:600;transition:all .2s" onmouseover="this.style.borderColor='#4b3bff';this.style.color='#4b3bff'" onmouseout="this.style.borderColor='#E7E9F4';this.style.color='#464557'">
+            <span style="font-family:'Material Symbols Outlined';font-size:16px">admin_panel_settings</span>Boshqarish paneli
+          </a>
+        </div>
+        <div class="card" style="padding:24px">
+          <div class="mont" style="font-weight:900;font-size:26px;color:#12183b;margin-bottom:4px" id="pay-price">360 000 so'm</div>
+          <div style="font-size:13px;color:#464557;margin-bottom:20px">oyiga · 8 ta dars</div>
+
+          <button onclick="payModal('obuna')" style="width:100%;padding:14px;background:#4b3bff;color:#fff;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;cursor:pointer;margin-bottom:10px;transition:background .2s" onmouseover="this.style.background='#2f06e9'" onmouseout="this.style.background='#4b3bff'">Obuna bo'lish</button>
+          <button onclick="payModal('jonli')" style="width:100%;padding:14px;background:#fff;color:#4b3bff;border:2px solid #4b3bff;border-radius:12px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;cursor:pointer;margin-bottom:20px;transition:all .2s" onmouseover="this.style.background='#f0eeff'" onmouseout="this.style.background='#fff'">Jonli darsga yozilish</button>
+
+          <div class="mont" style="font-weight:700;font-size:13px;color:#464557;margin-bottom:12px">To'lov usullari</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button onclick="payModal('payme')" style="display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid #E7E9F4;border-radius:10px;background:#fff;cursor:pointer;transition:all .2s;font-size:14px;font-weight:600;color:#12183b" onmouseover="this.style.borderColor='#4b3bff'" onmouseout="this.style.borderColor='#E7E9F4'">
+              <span style="font-size:20px">💳</span> Payme
+            </button>
+            <button onclick="payModal('click')" style="display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid #E7E9F4;border-radius:10px;background:#fff;cursor:pointer;transition:all .2s;font-size:14px;font-weight:600;color:#12183b" onmouseover="this.style.borderColor='#4b3bff'" onmouseout="this.style.borderColor='#E7E9F4'">
+              <span style="font-size:20px">🔵</span> Click
+            </button>
+            <button onclick="payModal('uzum')" style="display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid #E7E9F4;border-radius:10px;background:#fff;cursor:pointer;transition:all .2s;font-size:14px;font-weight:600;color:#12183b" onmouseover="this.style.borderColor='#4b3bff'" onmouseout="this.style.borderColor='#E7E9F4'">
+              <span style="font-size:20px">🍇</span> Uzum Bank
+            </button>
+          </div>
+
+          <div style="margin-top:16px;padding:12px;background:#f0fdf4;border-radius:10px;font-size:13px;color:#16a34a;display:flex;align-items:center;gap:6px">
+            ✓ Birinchi dars — Bepul sinov
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Payment modal -->
+<div class="modal" id="pay-modal">
+  <div class="modal-box">
+    <div style="font-size:48px;margin-bottom:16px">🚀</div>
+    <div class="mont" style="font-weight:900;font-size:20px;color:#12183b;margin-bottom:10px">Tez kunda!</div>
+    <p style="color:#464557;font-size:15px;line-height:1.7;margin-bottom:24px">To'lov tizimi tez kunda ulanadi. Hozircha ustoz bilan to'g'ridan-to'g'ri bog'laning.</p>
+    <button onclick="closeModal()" style="background:#4b3bff;color:#fff;border:none;padding:12px 32px;border-radius:10px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;cursor:pointer">OK</button>
+  </div>
+</div>
+
+<div id="footer-ph"></div>
+
+<script src="/js/components.js"></script>
+<script src="/js/marketplace.js"></script>
+<script src="/js/groups.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const id = parseInt(params.get('id')) || 1;
+const u = window.USTOZLAR.find(x => x.id === id) || window.USTOZLAR[0];
+
+// Profile header
+document.getElementById('profile-header').innerHTML = `
+  <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+    <div style="width:80px;height:80px;background:${u.gradient};border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:900;font-size:30px;color:#fff;flex-shrink:0">${u.avatar}</div>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+        <div class="mont" style="font-weight:900;font-size:24px">${u.ism}</div>
+        ${u.jonli ? '<div style="font-size:13px;font-weight:700;color:#22c55e;background:#f0fdf4;padding:5px 14px;border-radius:999px">🟢 Hozir jonli</div>' : ''}
+      </div>
+      <div style="font-size:15px;color:#464557;margin-bottom:10px">${u.fan} muallimi · ${u.sinflar} · ${u.tajriba} tajriba</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        ${'⭐'.repeat(Math.floor(u.reyting))}
+        <span class="mont" style="font-weight:800;font-size:16px;color:#12183b">${u.reyting}</span>
+        <span style="font-size:14px;color:#464557">(${u.izohlar} ta izoh)</span>
+      </div>
+    </div>
+  </div>`;
+
+// Stats
+document.getElementById('stats-row').innerHTML = [
+  {label:"O'quvchilar",val:u.izohlar*4+'+'}, {label:"Tajriba",val:u.tajriba}, {label:"Dars narxi",val:u.narx}, {label:"Reyting",val:u.reyting+'/5'}
+].map(s=>`<div style="background:#fff;border:1px solid #E7E9F4;border-radius:14px;padding:16px;text-align:center"><div class="mont" style="font-weight:800;font-size:18px;color:#4b3bff">${s.val}</div><div style="font-size:12px;color:#464557;margin-top:4px">${s.label}</div></div>`).join('');
+
+// Bio
+document.getElementById('bio-text').textContent = `${u.ism} — ${u.fan} fani bo'yicha ${u.tajriba} tajribaga ega mutaxassis. ${u.sinflar} o'quvchilariga onlayn va oflayn shaklda dars berib kelmoqda. Har bir o'quvchiga individual yondashuv, O'zbekiston maktab dasturiga asoslangan darslar, natijaga yo'naltirilgan metod.`;
+
+const tags = [u.fan,'Individual yondashuv','O\'zbek dasturi','Online darslar',u.sinflar];
+document.getElementById('bio-tags').innerHTML = tags.map(t=>`<span style="display:inline-block;padding:6px 16px;background:#f0eeff;color:#4b3bff;border-radius:999px;font-size:13px;font-weight:600">${t}</span>`).join('');
+
+// Kurs dasturi
+document.getElementById('kurs-list').innerHTML = [
+  {n:'1-modul',t:'Asosiy tushunchalar',d:'O\'quv dasturining asosiy mavzulari bilan tanishuv'},
+  {n:'2-modul',t:'Amaliy mashqlar',d:'Testlar va masalalar yechish ko\'nikmalari'},
+  {n:'3-modul',t:'Chuqur bilim',d:'DTM va olimpiada darajasidagi savollar'},
+  {n:'4-modul',t:'Yakuniy tayyor',d:'Imtihon oldidan mustahkamlash darslari'},
+].map((m,i)=>`
+  <div style="display:flex;gap:16px;padding:16px 0;border-bottom:1px solid #E7E9F4;${i===3?'border-bottom:none':''}">
+    <div style="width:36px;height:36px;background:#f0eeff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;color:#4b3bff;flex-shrink:0">${i+1}</div>
+    <div><div class="mont" style="font-weight:700;font-size:15px;margin-bottom:4px">${m.t}</div><div style="font-size:13px;color:#464557">${m.d}</div></div>
+  </div>`).join('');
+
+// Izohlar
+const sampleIzohlar = [
+  {ism:'Kamola S.',baho:5,matn:`${u.fan} fanidan juda yaxshi tushuntirib beradi! Farzandim bilimi sezilarli oshdi.`,sana:'2 kun oldin'},
+  {ism:'Alisher T.',baho:5,matn:'Professional ustoz, vaqtida keladi. Tavsiya qilaman!',sana:'1 hafta oldin'},
+];
+renderIzohlar(sampleIzohlar);
+
+function renderIzohlar(list) {
+  document.getElementById('izohlar-list').innerHTML = list.map(iz=>`
+    <div style="padding:16px;border-bottom:1px solid #E7E9F4">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="mont" style="font-weight:700;font-size:14px">${iz.ism}</div>
+        <div style="font-size:12px;color:#c7c4da">${iz.sana}</div>
+      </div>
+      <div style="margin-bottom:6px">${'⭐'.repeat(iz.baho)}</div>
+      <p style="font-size:14px;color:#464557;line-height:1.6">${iz.matn}</p>
+    </div>`).join('');
+}
+
+let selectedStar = 0;
+function setStar(n) {
+  selectedStar = n;
+  document.querySelectorAll('.star-opt').forEach((s,i)=>{ s.textContent = i < n ? '⭐' : '☆'; });
+}
+function submitIzoh() {
+  const txt = document.getElementById('izoh-text').value.trim();
+  if (!selectedStar || !txt) { alert('Baho va izoh kiriting!'); return; }
+  const user = (() => { try { return JSON.parse(localStorage.getItem('maktab_user')); } catch { return null; } })();
+  sampleIzohlar.unshift({ ism: user?.name || 'Mehmon', baho: selectedStar, matn: txt, sana: 'Hozir' });
+  renderIzohlar(sampleIzohlar);
+  document.getElementById('izoh-text').value = '';
+  selectedStar = 0;
+  document.querySelectorAll('.star-opt').forEach(s => s.textContent = '☆');
+}
+
+function openTab(btn, id) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+function payModal(type) { document.getElementById('pay-modal').classList.add('open'); }
+function closeModal() { document.getElementById('pay-modal').classList.remove('open'); }
+
+document.getElementById('pay-price').textContent = u.narx;
+
+/* ── My groups (groups.js auto-loaded above) ── */
+(function(){
+  try{
+    const cu = JSON.parse(localStorage.getItem('maktabai_currentUser')||'null');
+    if(!cu || cu.role !== 'teacher') return;
+    const card = document.getElementById('my-groups-card');
+    card.style.display = 'block';
+    const myGroups = GS.getTeacherGroups(String(cu.id));
+    const el = document.getElementById('my-groups-list');
+    if(!myGroups.length){
+      el.innerHTML = '<div style="font-size:13px;color:#c7c4da;text-align:center;padding:12px">Hali guruh yo\'q</div>';
+      return;
+    }
+    el.innerHTML = myGroups.slice(0,4).map(g=>{
+      const members = GS.getGroupMembers(g.id).filter(m=>m.status==='approved').length;
+      const pending = GS.getPending(g.id).length;
+      return `<a href="/guruh-chat.html?id=${g.id}" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;text-decoration:none;color:#12183b;transition:background .15s;margin-bottom:6px" onmouseover="this.style.background='#f8f8fc'" onmouseout="this.style.background=''">
+        <div style="width:36px;height:36px;border-radius:10px;background:${g.color};display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;color:#fff;flex-shrink:0">${initials(g.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${g.name}</div>
+          <div style="font-size:11px;color:#464557">${members} a'zo${pending?' · <span style="color:#f97316">'+pending+' so\'rov</span>':''}</div>
+        </div>
+        <span style="font-family:'Material Symbols Outlined';font-size:16px;color:#c7c4da">chevron_right</span>
+      </a>`;
+    }).join('');
+  }catch(e){ console.error('ustoz groups:', e); }
+})();
+
+// Mobile layout fix
+if (window.innerWidth < 768) {
+  const layout = document.getElementById('main-layout');
+  const payCard = document.getElementById('pay-card');
+  layout.style.flexDirection = 'column';
+  payCard.style.width = '100%';
+  payCard.style.position = 'static';
+}
+
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+</script>
+</body>
+</html>

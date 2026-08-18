@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ro'yxatdan o'tish — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#fbf8ff;color:#12183b;min-height:100vh;display:flex;flex-direction:column}
+.mont{font-family:'Montserrat',sans-serif}
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px}
+/* ── role cards ── */
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:680px;width:100%}
+.role-card{background:#fff;border:2px solid #E7E9F4;border-radius:20px;padding:32px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;user-select:none}
+.role-card:hover{border-color:#c7c4da;transform:translateY(-3px);box-shadow:0 12px 30px rgba(20,26,61,.08)}
+.role-card.selected{border-color:#4b3bff;background:#f0eeff;box-shadow:0 8px 24px rgba(75,59,255,.15)}
+.role-card .check{position:absolute;top:14px;right:14px;width:24px;height:24px;background:#4b3bff;border-radius:50%;display:none;align-items:center;justify-content:center;color:#fff;font-size:14px}
+.role-card.selected .check{display:flex}
+.role-icon{font-size:44px;margin-bottom:16px}
+.role-name{font-family:'Montserrat',sans-serif;font-weight:800;font-size:17px;color:#12183b;margin-bottom:8px}
+.role-desc{font-size:13px;color:#464557;line-height:1.6}
+.btn-continue{width:100%;max-width:320px;padding:16px;background:#c7c4da;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;border:none;border-radius:12px;cursor:not-allowed;transition:all .3s;margin-top:28px}
+.btn-continue.active{background:#4b3bff;cursor:pointer;box-shadow:0 4px 20px rgba(75,59,255,.3)}
+.btn-continue.active:hover{background:#2f06e9;transform:translateY(-1px);box-shadow:0 8px 28px rgba(75,59,255,.4)}
+@media(max-width:600px){.roles{grid-template-columns:1fr}}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+</head>
+<body>
+
+<div id="nav-ph"></div>
+
+<main id="step1">
+  <div style="width:100%;max-width:760px">
+    <div style="text-align:center;margin-bottom:40px">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:#f0eeff;color:#4b3bff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;border-radius:999px;margin-bottom:18px">👋 Xush kelibsiz!</div>
+      <h1 class="mont" style="font-size:clamp(26px,4vw,38px);font-weight:900;color:#12183b;margin-bottom:12px">Siz kim sifatida kirasiz?</h1>
+      <p style="font-size:16px;color:#464557">Rolingizni tanlang — biz sizga mos tajriba taqdim etamiz</p>
+    </div>
+
+    <div class="roles" style="margin:0 auto">
+      <div class="role-card" data-role="student" onclick="selectRole(this)">
+        <div class="check">✓</div>
+        <div class="role-icon">👨‍🎓</div>
+        <div class="role-name">O'quvchi</div>
+        <div class="role-desc">AI repetitor bilan o'qing, test ishlang va ustozlardan dars oling</div>
+      </div>
+      <div class="role-card" data-role="parent" onclick="selectRole(this)">
+        <div class="check">✓</div>
+        <div class="role-icon">👨‍👩‍👦</div>
+        <div class="role-name">Ota-ona</div>
+        <div class="role-desc">Farzandingizning o'qishini kuzating va hisobotlarni ko'ring</div>
+      </div>
+      <div class="role-card" data-role="teacher" onclick="selectRole(this)">
+        <div class="check">✓</div>
+        <div class="role-icon">👩‍🏫</div>
+        <div class="role-name">Ustoz</div>
+        <div class="role-desc">O'quvchilarga dars bering va daromad qiling</div>
+      </div>
+    </div>
+
+    <div style="text-align:center">
+      <button class="btn-continue" id="btn-continue" disabled onclick="goNext()">Davom etish →</button>
+    </div>
+
+    <p style="text-align:center;margin-top:20px;font-size:14px;color:#464557">
+      Allaqachon ro'yxatdan o'tganmisiz? <a href="/kirish.html" style="color:#4b3bff;font-weight:600;text-decoration:none">Kirish</a>
+    </p>
+  </div>
+</main>
+
+<div id="footer-ph"></div>
+
+<script src="/js/components.js"></script>
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+let selected = null;
+
+function selectRole(card) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selected = card.dataset.role;
+  const btn = document.getElementById('btn-continue');
+  btn.disabled = false;
+  btn.classList.add('active');
+}
+
+function goNext() {
+  if (!selected) return;
+  localStorage.setItem('maktabai_pendingRole', selected);
+  const pages = {
+    student: '/royxat-oquvchi.html',
+    parent:  '/royxat-ota-ona.html',
+    teacher: '/royxat-ustoz.html'
+  };
+  location.href = pages[selected];
+}
+</script>
+</body>
+</html>

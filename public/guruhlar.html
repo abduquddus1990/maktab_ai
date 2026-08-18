@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Guruhlar — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#fbf8ff;color:#12183b;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.mont{font-family:'Montserrat',sans-serif}
+.ms{font-family:'Material Symbols Outlined';font-size:22px;line-height:1;user-select:none}
+.app{display:flex;flex:1;overflow:hidden;height:calc(100dvh - 56px)}
+.sidebar{width:260px;background:#fff;border-right:1px solid #E7E9F4;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar-logo{padding:24px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #E7E9F4}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:12px;font-size:14px;font-weight:600;color:#464557;cursor:pointer;transition:all .2s;text-decoration:none;margin:0 8px 2px}
+.nav-item:hover{background:#f4f3ff;color:#4b3bff}
+.nav-item.active{background:#f0eeff;color:#4b3bff;font-weight:700}
+.nav-item .ms{font-size:20px}
+.sidebar-footer{margin-top:auto;padding:16px}
+.main{flex:1;overflow-y:auto;padding:28px 32px;scrollbar-width:thin;scrollbar-color:#E7E9F4 transparent}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-thumb{background:#E7E9F4;border-radius:2px}
+/* Group cards */
+.groups-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
+.group-card{background:#fff;border:1px solid #E7E9F4;border-radius:20px;padding:0;overflow:hidden;box-shadow:0 2px 12px rgba(20,26,61,.04);transition:all .2s;text-decoration:none;color:#12183b;display:flex;flex-direction:column}
+.group-card:hover{box-shadow:0 8px 24px rgba(20,26,61,.1);transform:translateY(-2px)}
+.group-card-top{padding:20px 20px 16px;display:flex;align-items:flex-start;gap:14px;position:relative}
+.group-avatar{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;color:#fff;flex-shrink:0}
+.group-info{flex:1;min-width:0}
+.group-name{font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.group-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.group-card-bottom{padding:12px 20px;border-top:1px solid #F0EFF8;display:flex;align-items:center;justify-content:space-between}
+.group-footer-meta{font-size:12px;color:#464557;display:flex;align-items:center;gap:12px}
+.btn-enter{display:inline-flex;align-items:center;gap:4px;padding:7px 16px;background:#4b3bff;color:#fff;border-radius:999px;font-size:13px;font-weight:700;font-family:'Montserrat',sans-serif;text-decoration:none;transition:background .2s}
+.btn-enter:hover{background:#2f06e9}
+/* Header */
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.page-hdr-btns{display:flex;gap:10px}
+.btn-join{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:1.5px solid #4b3bff;color:#4b3bff;border-radius:12px;font-size:14px;font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;background:#fff;transition:all .2s}
+.btn-join:hover{background:#f0eeff}
+.btn-new{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:#4b3bff;color:#fff;border-radius:12px;font-size:14px;font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;border:none;text-decoration:none;transition:background .2s}
+.btn-new:hover{background:#2f06e9}
+/* Empty state */
+.empty{text-align:center;padding:64px 20px;color:#464557}
+.empty .ms{font-size:64px;color:#c7c4da;margin-bottom:16px}
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(18,24,59,.35);z-index:300;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(18,24,59,.2)}
+.modal h3{font-family:'Montserrat',sans-serif;font-weight:800;font-size:20px;margin-bottom:8px;color:#12183b}
+.modal p{font-size:14px;color:#464557;margin-bottom:24px;line-height:1.6}
+.code-input{width:100%;padding:14px;border:1.5px solid #E7E9F4;border-radius:12px;font-size:18px;font-weight:700;font-family:'Montserrat',sans-serif;text-align:center;letter-spacing:3px;outline:none;text-transform:uppercase;margin-bottom:12px;color:#12183b}
+.code-input:focus{border-color:#4b3bff;box-shadow:0 0 0 3px rgba(75,59,255,.07)}
+.btn-modal-cancel{flex:1;padding:13px;border:1.5px solid #E7E9F4;border-radius:12px;font-size:15px;font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;background:#fff;color:#464557}
+.btn-modal-ok{flex:1;padding:13px;background:#4b3bff;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;transition:background .2s}
+.btn-modal-ok:hover{background:#2f06e9}
+.mob-sidebar-btn{display:none;background:none;border:none;cursor:pointer;padding:4px;color:#464557}
+@media(max-width:1100px){.groups-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){
+  .sidebar{display:none;position:fixed;left:0;top:0;bottom:0;z-index:200;box-shadow:4px 0 20px rgba(0,0,0,.12)}
+  .sidebar.open{display:flex}
+  .mob-sidebar-btn{display:flex}
+  .groups-grid{grid-template-columns:1fr}
+  .main{padding:20px 16px}
+}
+</style>
+</head>
+<body>
+<!-- TOP NAV -->
+<div style="background:#fff;border-bottom:1px solid #E7E9F4;height:56px;display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;z-index:50">
+  <button class="mob-sidebar-btn" onclick="toggleSidebar()"><span class="ms" style="font-size:24px">menu</span></button>
+  <a href="/index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <img src="/logo.png" alt="Maktab AI" style="height:30px;object-fit:contain">
+    <span class="mont" style="font-weight:800;font-size:16px;color:#4b3bff">Maktab AI</span>
+  </a>
+  <div style="flex:1"></div>
+  <div style="width:36px;height:36px;background:linear-gradient(135deg,#4b3bff,#7c5cbf);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;color:#fff" id="nav-avatar">?</div>
+  <span style="font-size:14px;font-weight:600;color:#12183b" id="nav-name">Yuklanmoqda...</span>
+</div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:36px;height:36px;background:linear-gradient(135deg,#4b3bff,#7c5cbf);border-radius:10px;display:flex;align-items:center;justify-content:center">
+        <span class="ms" style="color:#fff;font-size:18px">group</span>
+      </div>
+      <div>
+        <div class="mont" style="font-weight:800;font-size:14px;color:#12183b">Guruhlar</div>
+        <div style="font-size:11px;color:#22c55e;font-weight:600" id="sb-member-count">● Faol</div>
+      </div>
+    </div>
+    <nav style="padding:12px 8px;flex:1">
+      <div style="font-size:11px;font-weight:700;color:#c7c4da;letter-spacing:.5px;text-transform:uppercase;padding:0 12px;margin-bottom:8px">Menyu</div>
+      <a href="/ai-chat.html" class="nav-item"><span class="ms">home</span>Dashboard</a>
+      <a href="/ai-chat.html" class="nav-item"><span class="ms">smart_toy</span>AI Repetitor</a>
+      <div class="nav-item active"><span class="ms">group</span>Guruhlar</div>
+      <a href="/repetitorlar.html" class="nav-item"><span class="ms">school</span>Repetitorlar</a>
+      <a href="/yangiliklar.html" class="nav-item"><span class="ms">article</span>Yangiliklar</a>
+      <a href="/ota-ona-paneli.html" class="nav-item"><span class="ms">family_restroom</span>Ota-ona paneli</a>
+      <div id="teacher-nav" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:#c7c4da;letter-spacing:.5px;text-transform:uppercase;padding:0 12px;margin:16px 0 8px">Ustoz</div>
+        <a href="/ustoz-guruh.html" class="nav-item"><span class="ms">admin_panel_settings</span>Guruh boshqaruvi</a>
+        <a href="/guruh-yaratish.html" class="nav-item"><span class="ms">add_circle</span>Yangi guruh</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/index.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#464557;text-decoration:none;font-size:14px;font-weight:600;transition:all .2s" onmouseover="this.style.background='#f8f8fc'" onmouseout="this.style.background=''">
+        <span class="ms" style="font-size:20px">logout</span> Chiqish
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Page header -->
+    <div class="page-hdr">
+      <div>
+        <h1 class="mont" style="font-size:24px;font-weight:900;color:#12183b">Guruhlarim</h1>
+        <p style="font-size:14px;color:#464557;margin-top:4px">Siz a'zo bo'lgan o'quv guruhlari</p>
+      </div>
+      <div class="page-hdr-btns">
+        <button class="btn-join" onclick="openJoinModal()"><span class="ms" style="font-size:18px">login</span>Guruhga qo'shilish</button>
+        <a href="/guruh-yaratish.html" class="btn-new" id="btn-create-group" style="display:none"><span class="ms" style="font-size:18px">add</span>Yangi guruh</a>
+      </div>
+    </div>
+
+    <!-- Teacher: quick manage link -->
+    <div id="teacher-banner" style="display:none;margin-top:16px;padding:14px 20px;background:linear-gradient(135deg,#f0eeff,#e8e4ff);border-radius:14px;border:1px solid #d4cfff;align-items:center;gap:12px">
+      <span class="ms" style="color:#4b3bff;font-size:24px">admin_panel_settings</span>
+      <div style="flex:1"><div class="mont" style="font-weight:700;font-size:14px;color:#12183b">Ustoz sifatida guruhlarni boshqarish</div><div style="font-size:13px;color:#464557">So'rovlar, a'zolar va moderatsiya</div></div>
+      <a href="/ustoz-guruh.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#4b3bff;color:#fff;border-radius:10px;font-size:13px;font-weight:700;font-family:'Montserrat',sans-serif;text-decoration:none">Boshqarish →</a>
+    </div>
+
+    <!-- Groups grid -->
+    <div class="groups-grid" id="groups-grid"></div>
+
+    <!-- Empty state -->
+    <div class="empty" id="empty-state" style="display:none">
+      <div class="ms">group_off</div>
+      <div class="mont" style="font-size:20px;font-weight:800;color:#12183b;margin-bottom:8px">Hali guruhingiz yo'q</div>
+      <p style="max-width:320px;margin:0 auto;line-height:1.6">Ustoz tomonidan yuborilgan taklif kodi bilan guruhga qo'shiling</p>
+      <button class="btn-join" style="margin-top:20px" onclick="openJoinModal()"><span class="ms" style="font-size:18px">login</span>Guruhga qo'shilish</button>
+    </div>
+  </main>
+</div>
+
+<!-- JOIN MODAL -->
+<div class="modal-bg" id="join-modal">
+  <div class="modal">
+    <h3>Guruhga qo'shilish</h3>
+    <p>Ustoz bergan taklif kodini kiriting</p>
+    <input class="code-input" id="join-code-input" type="text" maxlength="7" placeholder="ABC1234" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+    <div id="join-error" style="display:none;font-size:13px;color:#ba1a1a;margin-bottom:12px;padding:10px;background:#ffdad6;border-radius:8px"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-modal-cancel" onclick="closeJoinModal()">Bekor qilish</button>
+      <button class="btn-modal-ok" onclick="doJoin()">Qo'shilish</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/groups.js"></script>
+<script>
+const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();}
+
+function getCurrentUser(){ try{return JSON.parse(localStorage.getItem('maktabai_currentUser'));}catch{return null;} }
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+const cu = getCurrentUser();
+
+/* Nav */
+if(cu){
+  const av=document.getElementById('nav-avatar');
+  av.textContent=initials(cu.name);
+  av.style.background=`linear-gradient(135deg,${cu.role==='teacher'?'#f97316,#fec700':'#4b3bff,#7c5cbf'})`;
+  document.getElementById('nav-name').textContent=cu.name;
+  if(cu.role==='teacher'){
+    document.getElementById('teacher-nav').style.display='block';
+    document.getElementById('btn-create-group').style.display='flex';
+    document.getElementById('teacher-banner').style.display='flex';
+  }
+}
+
+/* Seed demo data */
+GS.seedDemo(cu);
+
+/* Render groups */
+function render(){
+  const uid = cu ? String(cu.id) : null;
+  let groups = [];
+
+  if(cu && cu.role === 'teacher'){
+    groups = GS.getTeacherGroups(String(cu.id));
+    // also groups where teacher is a member
+    const memberGroups = GS.getUserGroups(String(cu.id));
+    const teacherGroups = GS.getTeacherGroups(String(cu.id));
+    const allIds = new Set(teacherGroups.map(g=>g.id));
+    groups = [...teacherGroups, ...memberGroups.filter(g=>!allIds.has(g.id))];
+  } else if(cu){
+    groups = GS.getUserGroups(String(cu.id));
+  } else {
+    groups = GS.getUserGroups('s1'); // demo
+  }
+
+  const grid = document.getElementById('groups-grid');
+  const empty = document.getElementById('empty-state');
+
+  if(groups.length === 0){ grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  const memberCounts = {};
+  GS.getGroupMembers && GS.getMembers().forEach(m=>{ if(!memberCounts[m.groupId]) memberCounts[m.groupId]=0; if(m.status==='approved') memberCounts[m.groupId]++; });
+
+  grid.innerHTML = groups.map(g=>{
+    const bg = colorBg(g.color);
+    const count = memberCounts[g.id]||1;
+    const role = cu && g.ownerId === String(cu.id) ? 'teacher' : (GS.getMemberRole(g.id, cu?String(cu.id):'s1')||'member');
+    return `
+    <a class="group-card" href="/guruh-chat.html?id=${g.id}">
+      <div class="group-card-top">
+        <div class="group-avatar" style="background:${g.color}">${initials(g.name)}</div>
+        <div class="group-info">
+          <div class="group-name">${g.name}</div>
+          <div style="font-size:13px;color:#464557;margin-top:2px">👨‍🏫 ${g.ownerName}</div>
+          <div class="group-meta">
+            <span class="tag" style="background:${bg};color:${g.color}">${g.subject}</span>
+            <span class="tag" style="background:#f4f3ff;color:#7775A0">${g.grade}-sinf</span>
+            ${role==='teacher'?'<span class="tag" style="background:#fff7ed;color:#f97316">Ustoz</span>':''}
+          </div>
+        </div>
+      </div>
+      <div class="group-card-bottom">
+        <div class="group-footer-meta">
+          <span style="display:flex;align-items:center;gap:5px"><span class="ms" style="font-size:16px;color:#c7c4da">group</span>${count} a'zo</span>
+          <span style="display:flex;align-items:center;gap:5px"><span class="ms" style="font-size:16px;color:#c7c4da">shield</span>Nazoratda</span>
+        </div>
+        <span class="btn-enter">Kirish <span class="ms" style="font-size:16px">arrow_forward</span></span>
+      </div>
+    </a>`;
+  }).join('');
+
+  document.getElementById('sb-member-count').textContent = `● ${groups.length} guruh`;
+}
+
+render();
+
+/* Join modal */
+function openJoinModal(){
+  if(!cu){ alert('Guruhga qo\'shilish uchun avval kirish kerak.'); location.href='/kirish.html'; return; }
+  document.getElementById('join-code-input').value='';
+  document.getElementById('join-error').style.display='none';
+  document.getElementById('join-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('join-code-input').focus(),100);
+}
+function closeJoinModal(){ document.getElementById('join-modal').classList.remove('open'); }
+
+function doJoin(){
+  const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+  const errEl = document.getElementById('join-error');
+  errEl.style.display='none';
+
+  if(code.length < 4){ errEl.textContent='Kod kamida 4 ta belgi bo\'lishi kerak'; errEl.style.display='block'; return; }
+  const group = GS.getGroupByCode(code);
+  if(!group){ errEl.textContent='Bunday kod topilmadi. To\'g\'ri kodni kiriting.'; errEl.style.display='block'; return; }
+
+  const uid = String(cu.id);
+  const status = GS.getMemberStatus(group.id, uid);
+  if(status === 'approved'){ closeJoinModal(); location.href=`/guruh-chat.html?id=${group.id}`; return; }
+  if(status === 'pending'){ errEl.textContent='So\'rovingiz allaqachon yuborilgan. Ustoz tasdiqlashini kuting.'; errEl.style.display='block'; return; }
+
+  location.href = `/guruh-qoshilish.html?code=${code}`;
+}
+
+/* Close modal on backdrop click */
+document.getElementById('join-modal').addEventListener('click', function(e){ if(e.target===this) closeJoinModal(); });
+document.getElementById('join-code-input').addEventListener('keydown', e=>{ if(e.key==='Enter') doJoin(); });
+</script>
+</body>
+</html>

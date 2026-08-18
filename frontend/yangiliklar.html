@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Yangiliklar — MAKTAB AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--bg:#0A0A0F;--card:#1C1C1E;--card2:#2C2C2E;--primary:#FFC800;--text:#FFFFFF;--text2:#8A8A8E;--border:rgba(255,255,255,0.08);--shadow:0 8px 32px rgba(0,0,0,0.45)}
+[data-theme=light]{--bg:#F5F5F5;--card:#FFFFFF;--card2:#EBEBEB;--text:#1a1a1a;--text2:#666666;--border:rgba(0,0,0,0.08);--shadow:0 8px 32px rgba(0,0,0,0.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh;-webkit-tap-highlight-color:transparent;user-select:none}
+html *{transition:background-color .25s,color .25s,border-color .25s}
+.ms{font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased}
+.mont{font-family:'Montserrat',system-ui,sans-serif}
+.clay-card{background:var(--card);border-radius:24px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,0.04);border:1px solid var(--border)}
+.clay-btn-p{background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:16px;font-weight:800;color:#141414;box-shadow:0 4px 20px rgba(255,200,0,.35),0 2px 0 rgba(180,140,0,.4);border:none;cursor:pointer;font-family:'Montserrat',system-ui,sans-serif;transition:all .2s ease}
+.clay-btn-p:active{transform:scale(.95) translateY(1px)}
+.page{position:fixed;top:0;left:0;right:0;bottom:72px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page::-webkit-scrollbar{display:none}
+.bnav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:100;padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -4px 20px rgba(0,0,0,.15)}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text2);text-decoration:none;flex:1;padding:8px 4px;transition:color .2s}
+.ni .ms{font-size:22px}.ni span{font-size:11px;font-weight:600}
+.ni.active{color:var(--primary)}.ni.active .ms{font-variation-settings:'FILL' 1}
+.nc{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;padding:0 8px;flex-shrink:0}
+.nc-btn{width:52px;height:52px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,200,0,.45);margin-top:-20px}
+.nc-btn .ms{font-size:24px;color:#141414;font-variation-settings:'FILL' 1}
+.nc span{font-size:11px;font-weight:700;color:var(--primary)}
+.mcard{background:var(--card);border-radius:20px;padding:16px;cursor:pointer;transition:transform .15s,box-shadow .15s;border:1px solid var(--border)}
+.mcard:active{transform:scale(.98);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;font-family:'Montserrat',sans-serif}
+.tag-blue{background:rgba(59,130,246,.18);color:#60A5FA}
+.tag-yellow{background:rgba(255,200,0,.18);color:#FFC800}
+.tag-green{background:rgba(34,197,94,.18);color:#4ADE80}
+.tag-red{background:rgba(239,68,68,.18);color:#F87171}
+.tag-purple{background:rgba(168,85,247,.18);color:#C084FC}
+.tag-orange{background:rgba(249,115,22,.18);color:#FB923C}
+.fbtn{padding:7px 16px;border-radius:999px;font-size:13px;font-weight:700;border:1.5px solid var(--border);color:var(--text2);background:transparent;cursor:pointer;font-family:'Montserrat',sans-serif;white-space:nowrap;transition:all .2s}
+.fbtn.active{background:var(--primary);color:#141414;border-color:var(--primary)}
+.sov{position:fixed;inset:0;background:var(--bg);z-index:300;display:flex;flex-direction:column;transform:translateY(-100%);transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.sov.open{transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <!-- HEADER -->
+  <header style="background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50">
+    <h1 style="font-size:18px;font-weight:900;font-family:'Montserrat',sans-serif">📰 Yangiliklar</h1>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="toggleTheme()" id="theme-btn" style="width:36px;height:36px;background:var(--card2);border:1px solid var(--border);border-radius:12px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center">🌙</button>
+      <button onclick="openSearch()" style="width:36px;height:36px;background:var(--card2);border:1px solid var(--border);border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center">
+        <span class="ms" style="font-size:20px;color:var(--text2)">search</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- FILTER TABS -->
+  <div style="padding:12px 20px 0;overflow-x:auto;display:flex;-webkit-overflow-scrolling:touch">
+    <div style="display:flex;gap:8px;padding-bottom:8px" id="filterRow">
+      <button class="fbtn active" data-cat="all" onclick="filterBy('all',this)">Barchasi</button>
+      <button class="fbtn" data-cat="Olimpiada" onclick="filterBy('Olimpiada',this)">🏆 Olimpiada</button>
+      <button class="fbtn" data-cat="Vazirlik" onclick="filterBy('Vazirlik',this)">🏛️ Vazirlik</button>
+      <button class="fbtn" data-cat="Imtihon" onclick="filterBy('Imtihon',this)">📝 Imtihon</button>
+      <button class="fbtn" data-cat="Texnologiya" onclick="filterBy('Texnologiya',this)">💡 Texnologiya</button>
+      <button class="fbtn" data-cat="Yutuq" onclick="filterBy('Yutuq',this)">⭐ Yutuq</button>
+      <button class="fbtn" data-cat="Xabar" onclick="filterBy('Xabar',this)">📢 Xabar</button>
+    </div>
+  </div>
+
+  <!-- ARTICLES LIST -->
+  <div style="padding:12px 20px 20px;display:flex;flex-direction:column;gap:12px" id="mlist"></div>
+</div>
+
+<!-- SEARCH OVERLAY -->
+<div class="sov" id="searchOv">
+  <div style="padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);background:var(--card)">
+    <button onclick="closeSearch()" style="width:36px;height:36px;background:var(--card2);border:1px solid var(--border);border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span class="ms" style="font-size:20px;color:var(--text2)">arrow_back</span>
+    </button>
+    <input type="text" id="searchInput" placeholder="Yangilik qidirish..." oninput="doSearch(this.value)"
+      style="flex:1;height:40px;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:0 14px;font-size:15px;color:var(--text);font-family:'Inter',sans-serif;outline:none"/>
+  </div>
+  <div style="padding:16px 20px;overflow-y:auto;flex:1" id="searchResults">
+    <div style="text-align:center;padding:40px;color:var(--text2)">Qidirish uchun yozing...</div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <a href="index.html" class="ni"><span class="ms">home</span><span>Asosiy</span></a>
+  <a href="student.html" class="ni"><span class="ms">school</span><span>Fanlar</span></a>
+  <a href="chat.html" class="nc">
+    <div class="nc-btn"><span class="ms">forum</span></div>
+    <span>AI Chat</span>
+  </a>
+  <a href="yangiliklar.html" class="ni active"><span class="ms">article</span><span>Yangiliklar</span></a>
+  <a href="parent.html" class="ni"><span class="ms">person</span><span>Profil</span></a>
+</nav>
+
+<script>
+function initTheme(){const t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);const b=document.getElementById('theme-btn');if(b)b.textContent=t==='dark'?'☀️':'🌙'}
+function toggleTheme(){const c=document.documentElement.getAttribute('data-theme')||'dark';const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);const b=document.getElementById('theme-btn');if(b)b.textContent=n==='dark'?'☀️':'🌙'}
+initTheme();
+
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand()}
+
+const maqolalar=[
+  {id:1,sarlavha:"Yangi o'quv yili 2026 boshlandi",tag:"Vazirlik",tagRang:"blue",vaqt:"5 min",sana:"15 May 2026",tavsif:"O'zbekiston maktablarida yangi o'quv yili rasman boshlandi. Bu yil bir qator muhim o'zgarishlar amalga oshiriladi..."},
+  {id:2,sarlavha:"Matematika olimpiadasi g'oliblari",tag:"Olimpiada",tagRang:"yellow",vaqt:"3 min",sana:"14 May 2026",tavsif:"Respublika matematika olimpiadasining g'oliblari e'lon qilindi. Bu yil 500 dan ortiq o'quvchi ishtirok etdi..."},
+  {id:3,sarlavha:"Yangi darsliklar tarqatildi",tag:"Xabar",tagRang:"green",vaqt:"4 min",sana:"13 May 2026",tavsif:"Xalq ta'limi vazirligi tomonidan yangi avlod darsliklari maktablarga tarqatildi..."},
+  {id:4,sarlavha:"DTM imtihon jadvali",tag:"Imtihon",tagRang:"red",vaqt:"6 min",sana:"12 May 2026",tavsif:"Davlat test markazi 2026 yil uchun imtihon jadvalini rasman e'lon qildi..."},
+  {id:5,sarlavha:"AI ta'limda yangi imkoniyatlar",tag:"Texnologiya",tagRang:"purple",vaqt:"7 min",sana:"11 May 2026",tavsif:"Sun'iy intellekt texnologiyalari O'zbekiston maktablarida keng joriy etilmoqda..."},
+  {id:6,sarlavha:"Eng yaxshi o'quvchilar taqdirlandi",tag:"Yutuq",tagRang:"orange",vaqt:"4 min",sana:"10 May 2026",tavsif:"Yil davomida ajoyib natijalar ko'rsatgan o'quvchilar davlat mukofotlari bilan taqdirlandi..."},
+  {id:7,sarlavha:"Ta'lim tizimi yangiliklari",tag:"Xabar",tagRang:"blue",vaqt:"5 min",sana:"9 May 2026",tavsif:"O'zbekiston ta'lim tizimida amalga oshirilayotgan islohotlar haqida batafsil ma'lumot..."},
+  {id:8,sarlavha:"Fan olimpiadasi natijalari",tag:"Olimpiada",tagRang:"green",vaqt:"3 min",sana:"8 May 2026",tavsif:"Barcha fanlar bo'yicha o'tkazilgan olimpiadalar yakunlandi va natijalar e'lon qilindi..."}
+];
+
+let currentCat='all';
+
+function cardHTML(m){
+  return `<div class="mcard" onclick="location.href='maqola.html?id=${m.id}'">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span class="tag tag-${m.tagRang}">${m.tag}</span>
+      <span style="font-size:12px;color:var(--text2)">${m.vaqt} o'qish · ${m.sana}</span>
+    </div>
+    <h3 style="font-size:15px;font-weight:800;font-family:'Montserrat',sans-serif;margin-bottom:6px;line-height:1.4">${m.sarlavha}</h3>
+    <p style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">${m.tavsif}</p>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <button onclick="event.stopPropagation();location.href='maqola.html?id=${m.id}&ai=true'" class="clay-btn-p" style="padding:8px 14px;font-size:13px;border-radius:12px;display:flex;align-items:center;gap:6px">
+        <span style="font-size:15px">🤖</span> AI tushuntiradi
+      </button>
+      <span class="ms" style="font-size:20px;color:var(--text2)">chevron_right</span>
+    </div>
+  </div>`;
+}
+
+function render(list){
+  const L=document.getElementById('mlist');
+  if(!list.length){L.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text2)">Yangilik topilmadi</div>`;return}
+  L.innerHTML=list.map(cardHTML).join('');
+}
+
+function filterBy(cat,btn){
+  currentCat=cat;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const list=cat==='all'?maqolalar:maqolalar.filter(m=>m.tag===cat);
+  render(list);
+}
+
+function openSearch(){
+  document.getElementById('searchOv').classList.add('open');
+  setTimeout(()=>document.getElementById('searchInput').focus(),350);
+}
+function closeSearch(){
+  document.getElementById('searchOv').classList.remove('open');
+  document.getElementById('searchInput').value='';
+}
+
+function doSearch(q){
+  const R=document.getElementById('searchResults');
+  if(!q.trim()){R.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text2)">Qidirish uchun yozing...</div>`;return}
+  const res=maqolalar.filter(m=>m.sarlavha.toLowerCase().includes(q.toLowerCase())||m.tavsif.toLowerCase().includes(q.toLowerCase())||m.tag.toLowerCase().includes(q.toLowerCase()));
+  if(!res.length){R.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text2)">Hech narsa topilmadi</div>`;return}
+  R.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">${res.map(cardHTML).join('')}</div>`;
+}
+
+render(maqolalar);
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Yangiliklar — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#fbf8ff;color:#12183b}
+.mont{font-family:'Montserrat',sans-serif}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:999px;font-size:14px;font-weight:600;border:1.5px solid #E7E9F4;background:#fff;color:#464557;cursor:pointer;transition:all .2s;white-space:nowrap}
+.chip:hover,.chip.active{background:#4b3bff;border-color:#4b3bff;color:#fff}
+.chip-row{display:flex;gap:10px;flex-wrap:wrap}
+.news-card{background:#fff;border-radius:20px;border:1px solid #E7E9F4;overflow:hidden;cursor:pointer;transition:all .2s;text-decoration:none;color:#12183b;display:block}
+.news-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(20,26,61,.1)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.modal{display:none;position:fixed;inset:0;background:rgba(18,24,59,.6);z-index:300;align-items:flex-end;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-box{background:#fff;border-radius:20px 20px 0 0;padding:28px 24px 40px;width:100%;max-width:600px;max-height:80vh;overflow-y:auto}
+@media(min-width:640px){.modal{align-items:center}.modal-box{border-radius:20px;max-height:70vh}}
+</style>
+</head>
+<body>
+
+<div id="nav-ph"></div>
+
+<!-- HEADER -->
+<section style="background:linear-gradient(135deg,#4b3bff,#7c5cbf);padding:56px 0 40px">
+  <div class="container" style="text-align:center">
+    <h1 class="mont" style="font-size:clamp(28px,4vw,44px);font-weight:900;color:#fff;margin-bottom:12px">Ta'lim yangiliklari</h1>
+    <p style="font-size:17px;color:rgba(255,255,255,.8)">O'zbekiston ta'lim tizimidagi so'nggi voqealar</p>
+  </div>
+</section>
+
+<div style="padding:40px 0 80px">
+  <div class="container">
+
+    <!-- FILTERS -->
+    <div class="chip-row" style="margin-bottom:32px">
+      <div class="chip active" onclick="filterNews(this,'')">Barchasi</div>
+      <div class="chip" onclick="filterNews(this,'E\'lon')">📢 E'lonlar</div>
+      <div class="chip" onclick="filterNews(this,'Musobaqa')">🏆 Musobaqalar</div>
+      <div class="chip" onclick="filterNews(this,'Imtihon')">📋 Imtihonlar</div>
+      <div class="chip" onclick="filterNews(this,'Texnologiya')">🤖 Texnologiya</div>
+      <div class="chip" onclick="filterNews(this,'Tahlil')">📊 Tahlil</div>
+    </div>
+
+    <!-- FEATURED -->
+    <div id="featured-wrap" style="margin-bottom:32px"></div>
+
+    <!-- GRID -->
+    <div class="mont" style="font-weight:800;font-size:18px;color:#12183b;margin-bottom:20px">Barcha yangiliklar</div>
+    <div class="grid" id="news-grid"></div>
+
+  </div>
+</div>
+
+<!-- Article modal -->
+<div class="modal" id="art-modal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <span id="m-kat" style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:#f0eeff;color:#4b3bff"></span>
+      <button onclick="closeModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#464557">✕</button>
+    </div>
+    <h2 class="mont" id="m-title" style="font-weight:900;font-size:22px;color:#12183b;margin-bottom:12px"></h2>
+    <div style="font-size:13px;color:#c7c4da;margin-bottom:20px" id="m-date"></div>
+    <p id="m-matn" style="font-size:15px;color:#464557;line-height:1.8;margin-bottom:24px"></p>
+    <button onclick="aiExplain()" id="ai-btn" style="display:flex;align-items:center;gap:8px;background:#f0eeff;color:#4b3bff;border:none;padding:12px 20px;border-radius:10px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#4b3bff';this.style.color='#fff'" onmouseout="this.style.background='#f0eeff';this.style.color='#4b3bff'">
+      🤖 AI tushuntirish
+    </button>
+    <div id="ai-explain-box" style="display:none;margin-top:16px;background:#fbf8ff;border-radius:14px;padding:16px;border:1px solid #E7E9F4">
+      <div class="mont" style="font-weight:700;font-size:13px;color:#4b3bff;margin-bottom:8px">🤖 AI tushuntirishi</div>
+      <p id="ai-explain-txt" style="font-size:14px;color:#464557;line-height:1.7"></p>
+    </div>
+  </div>
+</div>
+
+<div id="footer-ph"></div>
+
+<script src="/js/components.js"></script>
+<script src="/js/news.js"></script>
+<script>
+let activeKat = '';
+let currentArticle = null;
+
+function renderFeatured(news) {
+  const f = news.find(n => n.featured);
+  const wrap = document.getElementById('featured-wrap');
+  if (!f) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <div onclick="openArticle(${f.id})" style="background:#fff;border-radius:20px;border:1px solid #E7E9F4;overflow:hidden;cursor:pointer;transition:all .2s;display:flex;flex-wrap:wrap" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 30px rgba(20,26,61,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <div style="width:100%;max-width:400px;min-height:200px;background:linear-gradient(135deg,${f.rang}22,${f.rang}44);display:flex;align-items:center;justify-content:center;font-size:64px">${f.emoji}</div>
+      <div style="flex:1;padding:28px;min-width:240px">
+        <div style="display:inline-block;background:${f.rang};color:#fff;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:14px">${f.kategoriya}</div>
+        <h2 class="mont" style="font-size:clamp(18px,2.5vw,24px);font-weight:900;color:#12183b;margin-bottom:12px;line-height:1.4">${f.sarlavha}</h2>
+        <p style="font-size:14px;color:#464557;line-height:1.7;margin-bottom:16px">${f.qisqa}</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#c7c4da">
+          <span>${f.sana}</span>
+          <span>${f.vaqt} o'qiladi</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderGrid(news) {
+  const grid = document.getElementById('news-grid');
+  const filtered = activeKat ? news.filter(n => n.kategoriya === activeKat) : news;
+  if (!filtered.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#464557">Yangilik topilmadi</div>'; return; }
+  grid.innerHTML = filtered.map(n => `
+    <div onclick="openArticle(${n.id})" class="news-card">
+      <div style="height:120px;background:linear-gradient(135deg,${n.rang}22,${n.rang}44);display:flex;align-items:center;justify-content:center;font-size:48px">${n.emoji}</div>
+      <div style="padding:18px">
+        <div style="display:inline-block;background:${n.rang};color:#fff;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:10px">${n.kategoriya}</div>
+        <div class="mont" style="font-weight:700;font-size:15px;line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${n.sarlavha}</div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#c7c4da;margin-bottom:10px">
+          <span>${n.sana}</span><span>${n.vaqt} o'qiladi</span>
+        </div>
+        <button style="width:100%;padding:9px;background:#f0eeff;color:#4b3bff;border:none;border-radius:10px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s" onclick="event.stopPropagation();aiExplainDirect(${n.id})" onmouseover="this.style.background='#4b3bff';this.style.color='#fff'" onmouseout="this.style.background='#f0eeff';this.style.color='#4b3bff'">
+          🤖 AI tushuntirish
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+function filterNews(el, kat) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeKat = kat;
+  renderGrid(window.YANGILIKLAR);
+  const fw = document.getElementById('featured-wrap');
+  fw.style.display = kat ? 'none' : 'block';
+}
+
+function openArticle(id) {
+  currentArticle = window.YANGILIKLAR.find(n => n.id === id);
+  if (!currentArticle) return;
+  document.getElementById('m-kat').textContent = currentArticle.kategoriya;
+  document.getElementById('m-title').textContent = currentArticle.sarlavha;
+  document.getElementById('m-date').textContent = currentArticle.sana + ' · ' + currentArticle.vaqt + ' o\'qiladi';
+  document.getElementById('m-matn').textContent = currentArticle.matn;
+  document.getElementById('ai-explain-box').style.display = 'none';
+  document.getElementById('art-modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('art-modal').classList.remove('open'); }
+
+async function aiExplain() {
+  if (!currentArticle) return;
+  const btn = document.getElementById('ai-btn');
+  btn.textContent = '⏳ AI tahlil qilmoqda...';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/chat', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'explain', text: currentArticle.matn })
+    });
+    const d = await r.json();
+    document.getElementById('ai-explain-txt').textContent = d.reply;
+    document.getElementById('ai-explain-box').style.display = 'block';
+  } catch {
+    document.getElementById('ai-explain-txt').textContent = "Kechirasiz, xato yuz berdi.";
+    document.getElementById('ai-explain-box').style.display = 'block';
+  }
+  btn.innerHTML = '🤖 AI tushuntirish';
+  btn.disabled = false;
+}
+
+async function aiExplainDirect(id) {
+  openArticle(id);
+  setTimeout(aiExplain, 200);
+}
+
+renderFeatured(window.YANGILIKLAR);
+renderGrid(window.YANGILIKLAR);
+
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+</script>
+</body>
+</html>

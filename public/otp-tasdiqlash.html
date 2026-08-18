@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Elektron pochtani tasdiqlash — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:#ECEAF5;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+}
+
+/* Icon circle */
+.mail-icon-wrap{width:72px;height:72px;background:#EEEDF8;border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 28px}
+.mail-icon-wrap svg{width:36px;height:36px;color:#4B3BFF}
+
+/* Text */
+.page-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:26px;color:#12183b;text-align:center;margin-bottom:12px;line-height:1.3}
+.page-sub{font-size:14px;color:#7775A0;text-align:center;line-height:1.6;max-width:340px;margin:0 auto 32px}
+.page-sub strong{color:#2D2D4E;font-weight:600}
+
+/* OTP card */
+.otp-card{background:#fff;border-radius:20px;padding:36px 32px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(75,59,200,.1)}
+@media(max-width:460px){.otp-card{padding:28px 18px}}
+
+/* 6 boxes */
+.otp-row{display:flex;gap:10px;justify-content:center;margin-bottom:32px}
+.otp-box{
+  width:52px;height:58px;
+  border:1.5px solid #E2DFEE;border-radius:12px;
+  text-align:center;font-size:22px;font-weight:700;
+  font-family:'Montserrat',sans-serif;color:#2D2D4E;
+  outline:none;background:#fff;
+  transition:border-color .15s;
+  -moz-appearance:textfield;
+}
+.otp-box::-webkit-outer-spin-button,
+.otp-box::-webkit-inner-spin-button{-webkit-appearance:none}
+.otp-box:focus{border-color:#4B3BFF;box-shadow:0 0 0 3px rgba(75,59,255,.07);background:#FAFAFE}
+.otp-box.filled{border-color:#4B3BFF}
+@media(max-width:380px){.otp-box{width:42px;height:50px;font-size:18px;gap:6px}}
+
+/* Error */
+.otp-err{display:none;font-size:13px;color:#ba1a1a;text-align:center;margin-bottom:16px;padding:10px;background:#ffdad6;border-radius:8px}
+.otp-err.show{display:block}
+
+/* Buttons */
+.btn-verify{width:100%;padding:15px;background:#4B3BFF;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;border:none;border-radius:999px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-verify:hover:not(:disabled){background:#3020DD;box-shadow:0 6px 24px rgba(75,59,255,.3);transform:translateY(-1px)}
+.btn-verify:disabled{opacity:.65;cursor:not-allowed;transform:none}
+
+.resend-row{text-align:center;margin-top:18px}
+.btn-resend{background:none;border:none;font-size:14px;color:#4B3BFF;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:0;font-family:'Inter',sans-serif}
+.btn-resend:disabled{color:#9996C0;cursor:not-allowed}
+
+/* Back */
+.back-row{text-align:center;margin-top:28px}
+.btn-back{background:none;border:none;font-size:14px;color:#7775A0;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-weight:500}
+.btn-back:hover{color:#4B3BFF}
+
+/* Dev badge */
+.dev-badge{display:none;background:#f0eeff;border:1.5px solid #c7c4ff;border-radius:10px;padding:10px 14px;margin-bottom:20px;font-size:13px;color:#4B3BFF;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- Mail icon -->
+<div class="mail-icon-wrap">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <path d="M2 7l10 7 10-7"/>
+    <path d="M15 14l2 2 4-4" stroke-width="2"/>
+  </svg>
+</div>
+
+<h1 class="page-title">Elektron pochtani<br>tasdiqlang</h1>
+<p class="page-sub">Biz <strong id="email-display">sizning pochtangiz</strong>ga 6 xonali tasdiqlash kodini yubordik. Uni pastga kiriting.</p>
+
+<div class="otp-card">
+
+  <!-- Dev mode helper -->
+  <div class="dev-badge" id="dev-badge">🛠 Dev rejim: <strong id="dev-otp-show"></strong></div>
+
+  <div class="otp-err" id="otp-err"></div>
+
+  <div class="otp-row" id="otp-row">
+    <input class="otp-box" type="number" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input class="otp-box" type="number" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input class="otp-box" type="number" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input class="otp-box" type="number" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input class="otp-box" type="number" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input class="otp-box" type="number" maxlength="1" inputmode="numeric" pattern="[0-9]">
+  </div>
+
+  <button class="btn-verify" id="btn-verify" onclick="doVerify()">
+    Tasdiqlash va kirish
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M11 5l5 5-5 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <div class="resend-row">
+    <button class="btn-resend" id="btn-resend" disabled onclick="resendCode()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Kodni qayta yuborish (<span id="timer-count">59</span>s)
+    </button>
+  </div>
+
+</div>
+
+<div class="back-row">
+  <button class="btn-back" onclick="goBack()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>
+    Orqaga qaytish
+  </button>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+const API = 'http://localhost:8000';
+
+/* ── URL params ── */
+const params = new URLSearchParams(location.search);
+const userId = parseInt(params.get('uid') || '0');
+const email  = decodeURIComponent(params.get('email') || '');
+
+if (email) {
+  const masked = email.replace(/(.{2})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(Math.min(b.length, 4)) + c);
+  document.getElementById('email-display').textContent = masked;
+}
+
+/* Dev mode: show OTP code */
+const devOtp = localStorage.getItem('_dev_otp');
+if (devOtp) {
+  const badge = document.getElementById('dev-badge');
+  badge.style.display = 'block';
+  document.getElementById('dev-otp-show').textContent = devOtp;
+  /* auto-fill boxes */
+  setTimeout(() => {
+    const boxes = document.querySelectorAll('.otp-box');
+    devOtp.split('').forEach((ch, i) => { if (boxes[i]) { boxes[i].value = ch; boxes[i].classList.add('filled'); } });
+  }, 400);
+}
+
+/* ── OTP boxes behaviour ── */
+const boxes = document.querySelectorAll('.otp-box');
+boxes.forEach((box, i) => {
+  box.addEventListener('input', () => {
+    /* keep only 1 digit */
+    box.value = box.value.toString().slice(-1).replace(/\D/g,'');
+    box.classList.toggle('filled', box.value !== '');
+    if (box.value && i < boxes.length - 1) boxes[i + 1].focus();
+  });
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !box.value && i > 0) { boxes[i - 1].focus(); boxes[i - 1].value = ''; boxes[i-1].classList.remove('filled'); }
+    if (e.key === 'ArrowLeft' && i > 0) boxes[i - 1].focus();
+    if (e.key === 'ArrowRight' && i < boxes.length - 1) boxes[i + 1].focus();
+  });
+  box.addEventListener('paste', e => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text').replace(/\D/g,'').slice(0, 6);
+    text.split('').forEach((ch, j) => { if (boxes[j]) { boxes[j].value = ch; boxes[j].classList.add('filled'); } });
+    const last = Math.min(text.length, boxes.length - 1);
+    boxes[last].focus();
+  });
+  box.addEventListener('focus', () => { box.select(); });
+});
+
+/* auto-focus first */
+boxes[0].focus();
+
+/* ── Countdown timer ── */
+let seconds = 59;
+const timerEl = document.getElementById('timer-count');
+const resendBtn = document.getElementById('btn-resend');
+
+const timer = setInterval(() => {
+  seconds--;
+  timerEl.textContent = seconds;
+  if (seconds <= 0) {
+    clearInterval(timer);
+    resendBtn.disabled = false;
+    resendBtn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Kodni qayta yuborish`;
+  }
+}, 1000);
+
+/* ── Auth utils ── */
+function getUsers() { try { return JSON.parse(localStorage.getItem('maktabai_users')) || []; } catch { return []; } }
+function saveCurrentUser(u) { localStorage.setItem('maktabai_currentUser', JSON.stringify(u)); localStorage.setItem('maktab_user', JSON.stringify(u)); }
+function showOtpErr(msg) { const e = document.getElementById('otp-err'); e.textContent = msg; e.classList.add('show'); }
+function hideOtpErr() { document.getElementById('otp-err').classList.remove('show'); }
+
+/* ── Verify ── */
+async function doVerify() {
+  hideOtpErr();
+  const code = [...boxes].map(b => b.value).join('');
+  if (code.length < 6) { showOtpErr('6 ta raqamni to\'liq kiriting'); return; }
+
+  const btn = document.getElementById('btn-verify');
+  btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="animation:spin .8s linear infinite"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="2.5" stroke-dasharray="40" stroke-dashoffset="10"/></svg> Tekshirilmoqda...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/api/auth/verify-otp`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, otp_code: code })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.removeItem('_dev_otp');
+
+      /* merge with pending user */
+      const pending = JSON.parse(localStorage.getItem('maktabai_pendingUser') || '{}');
+      const user = { ...pending, id: data.user_id, name: data.name, username: data.username, role: 'parent', is_verified: true };
+      localStorage.removeItem('maktabai_pendingUser');
+
+      /* also add to local users array */
+      const users = getUsers();
+      if (!users.some(u => u.id === user.id || u.username === user.username)) users.push(user);
+      localStorage.setItem('maktabai_users', JSON.stringify(users));
+      saveCurrentUser(user);
+
+      btn.innerHTML = '✓ Tasdiqlandi!';
+      setTimeout(() => { location.href = '/ota-ona-paneli.html'; }, 600);
+      return;
+    }
+
+    const err = await res.json().catch(() => ({}));
+    showOtpErr(err.detail || 'Kod noto\'g\'ri. Qayta tekshiring.');
+  } catch {
+    /* API yo'q — local fallback */
+    localStorage.removeItem('_dev_otp');
+    const pending = JSON.parse(localStorage.getItem('maktabai_pendingUser') || '{}');
+    if (pending.id) {
+      pending.is_verified = true;
+      localStorage.removeItem('maktabai_pendingUser');
+      const users = getUsers();
+      if (!users.some(u => u.username === pending.username)) users.push(pending);
+      localStorage.setItem('maktabai_users', JSON.stringify(users));
+      saveCurrentUser(pending);
+      btn.innerHTML = '✓ Tasdiqlandi!';
+      setTimeout(() => { location.href = '/ota-ona-paneli.html'; }, 600);
+      return;
+    }
+    showOtpErr('Serverga ulanib bo\'lmadi. Qayta urinib ko\'ring.');
+  }
+
+  btn.innerHTML = 'Tasdiqlash va kirish →';
+  btn.disabled = false;
+}
+
+/* ── Resend ── */
+async function resendCode() {
+  resendBtn.disabled = true;
+  try {
+    const res = await fetch(`${API}/api/auth/resend-otp`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId })
+    });
+    const data = await res.json();
+    if (data._dev_otp) {
+      localStorage.setItem('_dev_otp', data._dev_otp);
+      document.getElementById('dev-badge').style.display = 'block';
+      document.getElementById('dev-otp-show').textContent = data._dev_otp;
+    }
+  } catch { /* ignore */ }
+
+  /* restart countdown */
+  seconds = 59;
+  timerEl.textContent = seconds;
+  resendBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Kodni qayta yuborish (<span id="timer-count">59</span>s)`;
+
+  const t2 = setInterval(() => {
+    seconds--;
+    const el = document.getElementById('timer-count');
+    if (el) el.textContent = seconds;
+    if (seconds <= 0) {
+      clearInterval(t2);
+      resendBtn.disabled = false;
+      resendBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Kodni qayta yuborish`;
+    }
+  }, 1000);
+}
+
+function goBack() { history.back(); }
+
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

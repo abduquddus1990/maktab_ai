@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>AI Chat — MAKTAB AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0A0A0F;--card:#1C1C1E;--card2:#2C2C2E;--primary:#FFC800;--text:#FFFFFF;--text2:#8A8A8E;--border:rgba(255,255,255,0.08)}
+[data-theme=light]{--bg:#F5F5F5;--card:#FFFFFF;--card2:#EBEBEB;--text:#1a1a1a;--text2:#666666;--border:rgba(0,0,0,0.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh;-webkit-tap-highlight-color:transparent;user-select:none}
+html *{transition:background-color .25s,color .25s,border-color .25s}
+.ms{font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased}
+.layout{display:flex;flex-direction:column;height:calc(100dvh - 72px)}
+.head{background:var(--card);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;-webkit-overflow-scrolling:touch}
+.msgs::-webkit-scrollbar{display:none}
+.inp-area{flex-shrink:0;background:var(--card);border-top:1px solid var(--border);padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0))}
+/* Messages */
+.msg-ai{display:flex;flex-direction:column;align-items:flex-start;max-width:85%}
+.msg-me{display:flex;flex-direction:column;align-items:flex-end;max-width:85%;align-self:flex-end}
+.bub-ai{background:var(--card);border-radius:6px 20px 20px 20px;padding:12px 14px;font-size:14px;line-height:1.65;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.bub-me{background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:20px 6px 20px 20px;padding:12px 14px;font-size:14px;line-height:1.5;color:#141414;font-weight:600;box-shadow:0 4px 12px rgba(255,200,0,.25)}
+.ai-lbl{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.ai-dot{width:24px;height:24px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ai-dot .ms{font-size:14px;color:#141414;font-variation-settings:'FILL' 1}
+/* Typing */
+.typing-row{display:flex;flex-direction:column;align-items:flex-start;max-width:85%}
+.typing-bub{background:var(--card);border-radius:6px 20px 20px 20px;padding:12px 16px;border:1px solid var(--border);display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;background:var(--text2);border-radius:50%;animation:bounce 1s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.msg-in{animation:msgIn .2s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* Input row */
+.inp-row{display:flex;align-items:flex-end;gap:8px}
+.inp-icons{display:flex;gap:4px;align-items:flex-end;flex-shrink:0}
+.ico{width:38px;height:38px;border-radius:12px;background:var(--card2);border:1px solid var(--border);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.ico:active{transform:scale(.88);background:var(--border)}
+.ico.rec{background:rgba(239,68,68,.15);color:#EF4444;border-color:rgba(239,68,68,.3)}
+.tinput{flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:18px;padding:10px 14px;color:var(--text);font-size:15px;font-family:'Inter',system-ui,sans-serif;resize:none;min-height:44px;max-height:100px;outline:none;transition:border-color .2s;line-height:1.5}
+.tinput:focus{border-color:rgba(255,200,0,.4)}
+.send-btn{width:44px;height:44px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:14px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(255,200,0,.3);transition:all .2s}
+.send-btn:active{transform:scale(.9)}
+.send-btn .ms{font-size:22px;color:#141414;font-variation-settings:'FILL' 1}
+/* Test */
+.test-box{background:var(--card);border-radius:20px;padding:16px;margin:0 16px 8px;border:1px solid var(--border);flex-shrink:0;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.opt{width:100%;padding:12px 14px;background:var(--card2);border:2px solid transparent;border-radius:14px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;font-family:'Inter',system-ui,sans-serif;transition:all .15s;margin-bottom:8px}
+.opt:active{transform:scale(.98)}
+.opt.ok{background:rgba(76,175,80,.15);border-color:#4CAF50;color:#81C784}
+.opt.err{background:rgba(244,67,54,.15);border-color:#F44336;color:#E57373}
+/* File preview */
+.fp{background:var(--card2);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;border:1px solid var(--border)}
+/* Rec status */
+.rec-st{text-align:center;margin-top:6px;font-size:12px;color:#EF4444;font-weight:600;display:none;align-items:center;justify-content:center;gap:6px}
+.rec-pulse{width:8px;height:8px;background:#EF4444;border-radius:50%;animation:pulse 1s infinite;display:inline-block}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+/* Loading overlay */
+.lov{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:500}
+.spin{width:44px;height:44px;border:4px solid rgba(255,200,0,.2);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Bottom nav */
+.bnav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:100;padding-bottom:env(safe-area-inset-bottom,0)}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text2);text-decoration:none;flex:1;padding:8px 4px}
+.ni .ms{font-size:22px}.ni span{font-size:11px;font-weight:600}
+.ni.active{color:var(--primary)}.ni.active .ms{font-variation-settings:'FILL' 1}
+.nc{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;padding:0 8px;flex-shrink:0}
+.nc-btn{width:52px;height:52px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,200,0,.45);margin-top:-20px}
+.nc-btn .ms{font-size:24px;color:#141414;font-variation-settings:'FILL' 1}
+.nc span{font-size:11px;font-weight:700;color:var(--primary)}
+/* Toast */
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--card2);color:var(--text);padding:10px 22px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:999;border:1px solid var(--border)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- HEADER -->
+  <div class="head">
+    <a href="student.html" style="color:var(--text2);text-decoration:none;flex-shrink:0;display:flex;align-items:center">
+      <span class="ms" style="font-size:26px">arrow_back</span>
+    </a>
+    <div style="width:40px;height:40px;background:linear-gradient(135deg,#FFD700,#FFC800);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span class="ms" style="font-size:22px;color:#141414;font-variation-settings:'FILL' 1">smart_toy</span>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:16px;font-weight:800;font-family:'Montserrat',sans-serif;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" id="hfan">AI Chat</div>
+      <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px">
+        <span style="width:6px;height:6px;background:#4CAF50;border-radius:50%;display:inline-block"></span>
+        <span id="hsinf">Online</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button onclick="toggleTheme()" id="theme-btn" style="width:34px;height:34px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">🌙</button>
+      <button onclick="clearHistory()" style="width:34px;height:34px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Tozalash">
+        <span class="ms" style="font-size:18px;color:var(--text2)">delete</span>
+      </button>
+      <button onclick="startTest()" id="test-btn" style="background:rgba(255,200,0,.15);border:1px solid rgba(255,200,0,.3);color:var(--primary);font-size:13px;font-weight:700;padding:7px 12px;border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap">📝 Test</button>
+    </div>
+  </div>
+
+  <!-- TEST AREA -->
+  <div class="test-box" id="test-area" style="display:none"></div>
+
+  <!-- MESSAGES -->
+  <div class="msgs" id="msgs">
+    <div class="msg-ai msg-in">
+      <div class="ai-lbl">
+        <div class="ai-dot"><span class="ms">smart_toy</span></div>
+        <span style="font-size:12px;color:var(--text2);font-weight:600">MAKTAB AI</span>
+      </div>
+      <div class="bub-ai" id="welcome-msg">Salom! 👋 Savolingizni bering, men tushuntirib beraman! 😊</div>
+    </div>
+  </div>
+
+  <!-- INPUT AREA -->
+  <div class="inp-area">
+    <div id="fp-area"></div>
+    <div class="inp-row">
+      <div class="inp-icons">
+        <button class="ico" onclick="pickPDF()" title="PDF yuborish"><span class="ms" style="font-size:19px">picture_as_pdf</span></button>
+        <button class="ico" onclick="pickImg()" title="Rasm yuborish"><span class="ms" style="font-size:19px">image</span></button>
+        <button class="ico" onclick="pickLink()" title="Havola yuborish"><span class="ms" style="font-size:19px">link</span></button>
+      </div>
+      <textarea class="tinput" id="tinput" rows="1" placeholder="Savol yozing..." onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+      <button class="ico" id="mic-btn" onclick="toggleVoice()" title="Ovoz">
+        <span class="ms" id="mic-icon" style="font-size:19px">mic</span>
+      </button>
+      <button class="send-btn" onclick="doSend()"><span class="ms">send</span></button>
+    </div>
+    <div class="rec-st" id="rec-st"><span class="rec-pulse"></span> Yozib olinmoqda...</div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <a href="index.html" class="ni"><span class="ms">home</span><span>Asosiy</span></a>
+  <a href="student.html" class="ni"><span class="ms">school</span><span>Fanlar</span></a>
+  <a href="chat.html" class="nc">
+    <div class="nc-btn"><span class="ms">forum</span></div>
+    <span>AI Chat</span>
+  </a>
+  <a href="yangiliklar.html" class="ni"><span class="ms">article</span><span>Yangiliklar</span></a>
+  <a href="parent.html" class="ni"><span class="ms">person</span><span>Profil</span></a>
+</nav>
+
+<!-- Loading -->
+<div class="lov" id="lov" style="display:none">
+  <div class="spin"></div>
+  <div style="color:rgba(255,255,255,.8);font-size:15px;font-weight:600;font-family:'Montserrat',sans-serif">AI fikrlamoqda...</div>
+</div>
+
+<!-- File inputs -->
+<input type="file" id="pdf-in" accept=".pdf" style="display:none" onchange="handleFile(event,'pdf')"/>
+<input type="file" id="img-in" accept="image/*" style="display:none" onchange="handleFile(event,'img')"/>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function initTheme(){const t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);const b=document.getElementById('theme-btn');if(b)b.textContent=t==='dark'?'☀️':'🌙'}
+function toggleTheme(){const c=document.documentElement.getAttribute('data-theme')||'dark';const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);const b=document.getElementById('theme-btn');if(b)b.textContent=n==='dark'?'☀️':'🌙'}
+initTheme();
+
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand()}
+
+// URL PARAMS
+const params=new URLSearchParams(location.search);
+const fan=params.get('fan')||'Umumiy';
+const sinf=params.get('sinf')||localStorage.getItem('student_grade')||'4';
+const sv=JSON.parse(localStorage.getItem('maktab_student')||'{}');
+const NAME=sv.name||(tg?.initDataUnsafe?.user?.first_name)||"O'quvchi";
+
+document.getElementById('hfan').textContent=fan;
+document.getElementById('hsinf').textContent=`${sinf}-sinf · Online`;
+document.getElementById('welcome-msg').innerHTML=`Salom, <strong>${NAME}</strong>! 👋<br><strong>${fan}</strong> fanidan savolingizni bering! 😊`;
+
+// GEMINI
+const GKEY='AIzaSyD2nOTfeR0M_Hp-K4goY4d5v4eexby01Ps';
+const GURL=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GKEY}`;
+
+const systemPrompt=`Sen MAKTAB AI — O'zbekiston ${sinf}-sinf ${fan} fani bo'yicha AI mentorisan.
+
+QOIDALAR:
+- Faqat O'zbek tilida (lotin alifbosi) javob ber
+- ${sinf}-sinf o'quvchisiga mos sodda til ishlatish kerak
+- Faqat ${sinf}-sinf ${fan} darsligidan ma'lumot ber
+- Javobni to'g'ridan berma — bosqichma-bosqich yetakla
+- Har doim real hayotdan misollar keltir
+- Javobdan keyin "Tushundingizmi? Test qilamizmi?" de
+- Testda 3 ta savol ber — bittadan
+- "Zo'r!", "To'g'ri!", "Ajoyib!" so'zlarini ishlat
+- Javob maksimum 5 jumladan oshmasin
+
+CHEKLOVLAR:
+- Pornografik mavzu → "Bu mavzuda javob bera olmayman."
+- Din → "Din mavzusida javob bera olmayman."
+- Siyosat → "Siyosiy mavzularda javob bera olmayman."
+- Boshqa sinf materiali → "Bu ${sinf}-sinf dasturida yo'q."`;
+
+// CHAT HISTORY (localStorage)
+const HIST_KEY=`chat_${fan}_${sinf}`;
+let chatHistory=[];
+
+function loadHistory(){
+  try{
+    const h=JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
+    chatHistory=h;
+    h.forEach(m=>{
+      if(m.role==='user')addMsgUI('me',m.parts[0].text);
+      else addMsgUI('ai',m.parts[0].text);
+    });
+  }catch(e){chatHistory=[]}
+}
+
+function saveHistory(){
+  try{localStorage.setItem(HIST_KEY,JSON.stringify(chatHistory.slice(-40)))}catch(e){}
+}
+
+function clearHistory(){
+  if(!confirm('Suhbatni tozalashni xohlaysizmi?'))return;
+  chatHistory=[];
+  localStorage.removeItem(HIST_KEY);
+  const msgs=document.getElementById('msgs');
+  msgs.innerHTML=`<div class="msg-ai msg-in"><div class="ai-lbl"><div class="ai-dot"><span class="ms">smart_toy</span></div><span style="font-size:12px;color:var(--text2);font-weight:600">MAKTAB AI</span></div><div class="bub-ai">Salom, <strong>${NAME}</strong>! 👋<br><strong>${fan}</strong> fanidan savolingizni bering! 😊</div></div>`;
+  showToast("Suhbat tozalandi ✓");
+}
+
+// SEND
+async function sendMessage(userText,fileData=null){
+  const parts=[];
+  if(fileData){
+    if(fileData.type==='img'||fileData.type==='pdf')
+      parts.push({inline_data:{mime_type:fileData.mime,data:fileData.b64}});
+    else if(fileData.type==='link')
+      parts.push({text:`Havola: ${fileData.url}\n\n${userText}`});
+  }
+  parts.push({text:userText||'Tushuntir'});
+
+  chatHistory.push({role:'user',parts});
+
+  try{
+    const res=await fetch(GURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      system_instruction:{parts:[{text:systemPrompt}]},
+      contents:chatHistory,
+      generationConfig:{maxOutputTokens:600,temperature:.4}
+    })});
+    const d=await res.json();
+    const reply=d.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(!reply)throw new Error('no reply');
+    chatHistory.push({role:'model',parts:[{text:reply}]});
+    saveHistory();
+    return reply;
+  }catch(e){
+    chatHistory.pop();
+    return "Kechirasiz, xato yuz berdi. Qayta urinib ko'ring.";
+  }
+}
+
+let pendingFile=null;
+let testState=null;
+let recognizing=false;
+let recognition=null;
+
+async function doSend(){
+  const inp=document.getElementById('tinput');
+  const txt=inp.value.trim();
+  if(!txt&&!pendingFile)return;
+  inp.value='';inp.style.height='auto';
+  if(tg?.HapticFeedback)tg.HapticFeedback.impactOccurred('light');
+
+  const fRef=pendingFile;
+  pendingFile=null;
+  document.getElementById('fp-area').innerHTML='';
+
+  let uText=txt;
+  if(fRef&&fRef.type==='link')uText=`Havola tahlil qil: ${fRef.url}${txt?' — '+txt:''}`;
+  else if(fRef&&fRef.type==='img')uText=`[Rasm yuborildi] ${txt||'Bu rasmni tushuntir'}`;
+  else if(fRef&&fRef.type==='pdf')uText=`[PDF yuborildi] ${txt||'Bu hujjatni tushuntir'}`;
+
+  addMsgUI('me',uText);
+  const typing=addTyping();
+  const reply=await sendMessage(uText,fRef);
+  typing.remove();
+  addMsgUI('ai',reply);
+  speakText(reply);
+  scrollBottom();
+}
+
+function addMsgUI(who,text){
+  const area=document.getElementById('msgs');
+  const d=document.createElement('div');
+  const fmt=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+  if(who==='ai'){
+    d.className='msg-ai msg-in';
+    d.innerHTML=`<div class="ai-lbl"><div class="ai-dot"><span class="ms">smart_toy</span></div><span style="font-size:12px;color:var(--text2);font-weight:600">MAKTAB AI</span></div><div class="bub-ai">${fmt}</div>`;
+  }else{
+    d.className='msg-me msg-in';
+    d.innerHTML=`<div class="bub-me">${esc(text)}</div>`;
+  }
+  area.appendChild(d);
+  scrollBottom();
+  return d;
+}
+
+function addTyping(){
+  const area=document.getElementById('msgs');
+  const d=document.createElement('div');
+  d.className='typing-row msg-in';
+  d.innerHTML=`<div class="ai-lbl"><div class="ai-dot"><span class="ms">smart_toy</span></div><span style="font-size:12px;color:var(--text2);font-weight:600">Maktab AI yozmoqda...</span></div><div class="typing-bub"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  area.appendChild(d);
+  scrollBottom();
+  return d;
+}
+
+function scrollBottom(){const a=document.getElementById('msgs');setTimeout(()=>a.scrollTop=a.scrollHeight,50)}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function resize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px'}
+function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend()}}
+
+// FILE UPLOAD
+function pickPDF(){document.getElementById('pdf-in').click()}
+function pickImg(){document.getElementById('img-in').click()}
+function pickLink(){
+  const url=prompt('Havolani kiriting (URL):');
+  if(!url?.trim())return;
+  pendingFile={type:'link',url:url.trim()};
+  showFP('🔗 '+url.trim(),'link');
+}
+
+function handleFile(e,type){
+  const file=e.target.files[0];
+  if(!file)return;
+  const MAX=15*1024*1024; // 15MB
+  if(file.size>MAX){showToast('Fayl hajmi 15MB dan oshmasligi kerak');return}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const b64=ev.target.result.split(',')[1];
+    pendingFile={type,mime:file.type,b64,name:file.name};
+    showFP((type==='pdf'?'📄 ':'🖼️ ')+file.name,type);
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+}
+
+function showFP(name,type){
+  document.getElementById('fp-area').innerHTML=`<div class="fp"><span style="font-size:18px">${type==='pdf'?'📄':type==='img'?'🖼️':'🔗'}</span><span style="font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span><button onclick="clearFP()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;flex-shrink:0">✕</button></div>`;
+}
+function clearFP(){pendingFile=null;document.getElementById('fp-area').innerHTML=''}
+
+// VOICE
+function toggleVoice(){
+  if(recognizing){stopVoice();return}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showToast("Ovoz qo'llab-quvvatlanmaydi");return}
+  recognition=new SR();
+  recognition.lang='uz-UZ';
+  recognition.continuous=false;
+  recognition.interimResults=false;
+  recognition.onresult=e=>{
+    const t=e.results[0][0].transcript;
+    document.getElementById('tinput').value=t;
+    resize(document.getElementById('tinput'));
+    stopVoice();
+    doSend();
+  };
+  recognition.onerror=()=>stopVoice();
+  recognition.onend=()=>stopVoice();
+  recognition.start();
+  recognizing=true;
+  document.getElementById('mic-btn').classList.add('rec');
+  document.getElementById('mic-icon').textContent='stop';
+  const rs=document.getElementById('rec-st');
+  rs.style.display='flex';
+}
+
+function stopVoice(){
+  recognizing=false;
+  recognition?.stop();
+  document.getElementById('mic-btn').classList.remove('rec');
+  document.getElementById('mic-icon').textContent='mic';
+  document.getElementById('rec-st').style.display='none';
+}
+
+// TTS
+function speakText(text){
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const plain=text.replace(/[*_`#<>]/g,'').slice(0,300);
+  const utt=new SpeechSynthesisUtterance(plain);
+  utt.lang='uz-UZ';utt.rate=1;utt.pitch=1;
+  const voices=speechSynthesis.getVoices();
+  const uz=voices.find(v=>v.lang.startsWith('uz'))||voices.find(v=>v.lang.startsWith('tr'))||null;
+  if(uz)utt.voice=uz;
+  speechSynthesis.speak(utt);
+}
+
+// TEST MODE
+async function startTest(){
+  if(tg?.HapticFeedback)tg.HapticFeedback.impactOccurred('medium');
+  document.getElementById('lov').style.display='flex';
+  const p=`O'zbekiston ${sinf}-sinf "${fan}" darsligidan 5 ta test savoli tuz. FAQAT JSON:\n{"questions":[{"q":"savol","options":["A","B","C","D"],"correct":0}]}\nBoshqa hech narsa yozma.`;
+  try{
+    const r=await fetch(GURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:p}]}],generationConfig:{maxOutputTokens:1500,temperature:.3}})});
+    const d=await r.json();
+    let txt=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
+    if(s>=0&&e>s)txt=txt.slice(s,e);
+    const data=JSON.parse(txt);
+    document.getElementById('lov').style.display='none';
+    if(data.questions?.length){
+      testState={q:data.questions,cur:0,score:0};
+      document.getElementById('msgs').style.display='none';
+      document.getElementById('test-area').style.display='block';
+      document.getElementById('test-btn').textContent='❌ Yopish';
+      document.getElementById('test-btn').onclick=endTest;
+      renderQ();
+    }else showToast("Test yaratilmadi");
+  }catch(e){document.getElementById('lov').style.display='none';showToast("Xato yuz berdi")}
+}
+
+function renderQ(){
+  const{q,cur}=testState;
+  if(cur>=q.length){finishTest();return}
+  const item=q[cur];
+  const L=['A','B','C','D'];
+  const box=document.getElementById('test-area');
+  box.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:13px;font-weight:700;color:var(--primary);font-family:'Montserrat',sans-serif">📝 Test</span><span style="font-size:13px;color:var(--text2)">${cur+1}/${q.length}</span></div><div style="background:var(--card2);border-radius:10px;height:4px;margin-bottom:14px"><div style="background:var(--primary);height:100%;border-radius:10px;width:${(cur/q.length)*100}%"></div></div><p style="font-size:15px;font-weight:700;margin-bottom:14px;line-height:1.5;font-family:'Montserrat',sans-serif">${item.q}</p><div id="opts"></div>`;
+  const opts=document.getElementById('opts');
+  item.options.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.textContent=`${L[i]}) ${o}`;
+    b.onclick=()=>answer(i,item.correct,opts);
+    opts.appendChild(b);
+  });
+}
+
+function answer(chosen,correct,opts){
+  if(tg?.HapticFeedback)tg.HapticFeedback.impactOccurred(chosen===correct?'medium':'heavy');
+  opts.querySelectorAll('.opt').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===correct)b.classList.add('ok');
+    if(i===chosen&&chosen!==correct)b.classList.add('err');
+  });
+  if(chosen===correct)testState.score++;
+  setTimeout(()=>{testState.cur++;renderQ()},900);
+}
+
+function finishTest(){
+  const{score,q}=testState;
+  const pct=Math.round(score/q.length*100);
+  const em=pct>=80?'🏆':pct>=60?'👍':'💪';
+  document.getElementById('test-area').innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:52px;margin-bottom:12px">${em}</div><div style="font-size:24px;font-weight:900;margin-bottom:6px;font-family:'Montserrat',sans-serif">${score}/${q.length} to'g'ri</div><div style="font-size:14px;color:var(--text2);margin-bottom:20px">${pct}% — ${pct>=80?"A'lo!":pct>=60?'Yaxshi!':'Yana urining!'}</div><button onclick="endTest()" class="clay-btn-p" style="width:100%;height:50px;font-size:16px;font-family:'Montserrat',sans-serif">Davom etish</button></div>`;
+  const st=JSON.parse(localStorage.getItem('maktab_stats')||'{"streak":0,"tests":0,"score":0}');
+  st.tests=(st.tests||0)+1;
+  st.score=Math.round(((st.score||0)*(st.tests-1)+pct)/st.tests);
+  localStorage.setItem('maktab_stats',JSON.stringify(st));
+}
+
+function endTest(){
+  testState=null;
+  document.getElementById('msgs').style.display='flex';
+  document.getElementById('test-area').style.display='none';
+  document.getElementById('test-btn').textContent='📝 Test';
+  document.getElementById('test-btn').onclick=startTest;
+}
+
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+// BOOT
+loadHistory();
+</script>
+</body>
+</html>

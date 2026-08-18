@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>O'quvchi ro'yxati — Maktab AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#fbf8ff;color:#12183b;min-height:100vh}
+.mont{font-family:'Montserrat',sans-serif}
+.page-wrap{max-width:600px;margin:0 auto;padding:32px 24px 80px}
+@media(max-width:600px){.page-wrap{padding:20px 16px 60px}}
+
+.btn-back{display:inline-flex;align-items:center;gap:6px;background:none;border:1.5px solid #c7c4da;color:#464557;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;padding:9px 16px;border-radius:10px;cursor:pointer;transition:all .2s;text-decoration:none;margin-bottom:28px}
+.btn-back:hover{border-color:#4b3bff;color:#4b3bff}
+
+.form-card{background:#fff;border:1px solid #E7E9F4;border-radius:20px;padding:36px 40px;box-shadow:0 4px 20px rgba(20,26,61,.05)}
+@media(max-width:600px){.form-card{padding:24px 18px}}
+
+.form-group{margin-bottom:20px}
+.form-label{display:block;font-size:14px;font-weight:700;color:#12183b;margin-bottom:8px}
+.form-hint{font-size:12px;color:#464557;margin-top:5px}
+.input-wrap{position:relative}
+.input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#464557;font-family:'Material Symbols Outlined';font-size:20px;pointer-events:none;line-height:1;font-style:normal}
+.form-input{width:100%;padding:14px 16px 14px 44px;border:1.5px solid #c7c4da;border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;color:#12183b;background:#fbf8ff;outline:none;transition:border-color .2s}
+.form-input.no-icon{padding-left:16px}
+.form-input:focus{border-color:#4b3bff;background:#fff;box-shadow:0 0 0 3px rgba(75,59,255,.08)}
+select.form-input{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23464557' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.form-err{display:none;font-size:12px;color:#ba1a1a;margin-top:5px}
+.form-err.show{display:block}
+
+.chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 16px;border:1.5px solid #c7c4da;border-radius:999px;font-size:13px;font-weight:600;color:#464557;cursor:pointer;transition:all .15s;background:#fff;user-select:none}
+.chip:hover{border-color:#4b3bff;color:#4b3bff}
+.chip.on{background:#4b3bff;border-color:#4b3bff;color:#fff}
+.chip.sm{padding:6px 12px;font-size:12px}
+
+.radio-row{display:flex;gap:10px}
+.radio-btn{flex:1;padding:11px 16px;border:1.5px solid #c7c4da;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;background:#fff;text-align:center;user-select:none}
+.radio-btn:hover{border-color:#4b3bff;color:#4b3bff}
+.radio-btn.on{border-color:#4b3bff;background:#f0eeff;color:#4b3bff}
+
+.err-global{display:none;padding:12px 16px;background:#ffdad6;color:#93000a;border-radius:10px;font-size:14px;margin-bottom:20px}
+
+.btn-submit{width:100%;padding:16px;background:#4b3bff;color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;border:none;border-radius:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
+.btn-submit:hover:not(:disabled){background:#2f06e9;transform:translateY(-1px);box-shadow:0 8px 28px rgba(75,59,255,.4)}
+.btn-submit:disabled{opacity:.65;cursor:not-allowed}
+
+.form-link{text-align:center;margin-top:24px;font-size:14px;color:#464557}
+.form-link a{color:#4b3bff;font-weight:700;text-decoration:none}
+hr.sep{border:none;border-top:1px solid #E7E9F4;margin:24px 0}
+</style>
+</head>
+<body>
+
+<div id="nav-ph"></div>
+
+<div class="page-wrap">
+  <a href="/royxat.html" class="btn-back">
+    <span style="font-family:'Material Symbols Outlined';font-size:18px">arrow_back</span>
+    Orqaga
+  </a>
+
+  <div style="margin-bottom:28px">
+    <div style="display:inline-flex;align-items:center;gap:6px;background:#f0eeff;color:#4b3bff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;border-radius:999px;margin-bottom:14px">👨‍🎓 O'quvchi</div>
+    <h1 class="mont" style="font-size:clamp(22px,4vw,30px);font-weight:900;color:#12183b;margin-bottom:8px">Hisob yaratish</h1>
+    <p style="font-size:15px;color:#464557">Ma'lumotlaringizni to'liq va to'g'ri kiriting</p>
+  </div>
+
+  <div class="form-card">
+    <div class="err-global" id="err-global"></div>
+    <form onsubmit="doRegister(event)">
+
+      <!-- Ism -->
+      <div class="form-group">
+        <label class="form-label" for="f-name">To'liq ism familiya</label>
+        <div class="input-wrap">
+          <span class="input-icon">person</span>
+          <input class="form-input" id="f-name" type="text" placeholder="Ism Familiya" autocomplete="name">
+        </div>
+        <p class="form-err" id="err-name">Ism familiyangizni kiriting</p>
+      </div>
+
+      <!-- Username -->
+      <div class="form-group">
+        <label class="form-label" for="f-username">Username</label>
+        <div class="input-wrap">
+          <span class="input-icon">alternate_email</span>
+          <input class="form-input" id="f-username" type="text" placeholder="masalan: aziz_99" autocomplete="username">
+        </div>
+        <p class="form-hint">Faqat lotin harflari, raqamlar va _ belgisi. 3–20 belgi.</p>
+        <p class="form-err" id="err-username">To'g'ri username kiriting (3–20 belgi)</p>
+      </div>
+
+      <!-- Ota-onaning username -->
+      <div class="form-group">
+        <label class="form-label" for="f-parent">Ota-onaning username <span style="font-weight:400;color:#464557">(ixtiyoriy)</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">family_restroom</span>
+          <input class="form-input" id="f-parent" type="text" placeholder="@ota_yoki_ona_username">
+        </div>
+        <p class="form-hint">Ota-ona ilovaga ulangan bo'lsa, hisoblar bog'lanadi</p>
+      </div>
+
+      <hr class="sep">
+
+      <!-- Viloyat -->
+      <div class="form-group">
+        <label class="form-label" for="f-viloyat">Viloyat</label>
+        <div class="input-wrap">
+          <span class="input-icon">location_on</span>
+          <select class="form-input" id="f-viloyat" onchange="onViloyat()">
+            <option value="">Viloyatni tanlang</option>
+          </select>
+        </div>
+        <p class="form-err" id="err-viloyat">Viloyatni tanlang</p>
+      </div>
+
+      <!-- Shahar/tuman -->
+      <div class="form-group">
+        <label class="form-label" for="f-tuman">Shahar / tuman</label>
+        <div class="input-wrap">
+          <span class="input-icon">location_city</span>
+          <select class="form-input" id="f-tuman" disabled>
+            <option value="">Avval viloyat tanlang</option>
+          </select>
+        </div>
+        <p class="form-err" id="err-tuman">Shahar yoki tumanni tanlang</p>
+      </div>
+
+      <hr class="sep">
+
+      <!-- Jins -->
+      <div class="form-group">
+        <label class="form-label">Jins</label>
+        <div class="radio-row">
+          <div class="radio-btn" id="jins-o" onclick="pickJins('o')">🧒 O'g'il bola</div>
+          <div class="radio-btn" id="jins-q" onclick="pickJins('q')">👧 Qiz bola</div>
+        </div>
+        <p class="form-err" id="err-jins">Jinsni tanlang</p>
+      </div>
+
+      <!-- Sinf -->
+      <div class="form-group">
+        <label class="form-label">Sinf</label>
+        <div class="chip-row" id="sinf-chips">
+          <!-- rendered by JS -->
+        </div>
+        <p class="form-err" id="err-sinf">Sinfni tanlang</p>
+      </div>
+
+      <hr class="sep">
+
+      <!-- Parol -->
+      <div class="form-group">
+        <label class="form-label" for="f-password">Parol yarating</label>
+        <div class="input-wrap">
+          <span class="input-icon">lock</span>
+          <input class="form-input" id="f-password" type="password" placeholder="Kamida 6 ta belgi" autocomplete="new-password">
+        </div>
+        <p class="form-err" id="err-password">Parol kamida 6 ta belgi bo'lishi kerak</p>
+      </div>
+
+      <button class="btn-submit" type="submit" id="btn-reg">
+        Ro'yxatdan o'tish
+        <span style="font-family:'Material Symbols Outlined';font-size:20px">arrow_forward</span>
+      </button>
+    </form>
+  </div>
+
+  <p class="form-link">Hisobingiz bormi? <a href="/kirish.html">Kirish</a></p>
+</div>
+
+<div id="footer-ph"></div>
+
+<script src="/js/components.js"></script>
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+/* ── Regions data ── */
+const UZ_REGIONS = {
+  "Toshkent shahri": ["Bektemir","Chilonzor","Mirobod","Mirzo Ulug'bek","Olmazor","Sergeli","Shayxontohur","Uchtepa","Yakkasaroy","Yashnobod","Yunusobod"],
+  "Toshkent viloyati": ["Angren","Bekabad","Bo'ka","Chirchiq","Nurafshon","Ohangaron","Olmaliq","Oqqo'rg'on","Parkent","Piskent","Qibray","Yangiyo'l","Yuqorichirchiq","Zangiota"],
+  "Samarqand viloyati": ["Bulungur","Ishtixon","Jomboy","Kattaqo'rg'on","Narpay","Nurobod","Oqdaryo","Pastdarg'om","Payariq","Qo'shrabot","Samarqand","Toyloq","Urgut"],
+  "Farg'ona viloyati": ["Beshariq","Buvayda","Dang'ara","Farg'ona","Furqat","Marg'ilon","Oltiariq","Qo'qon","Quva","Rishton","Toshloq","Uchko'prik","Yozyovon"],
+  "Andijon viloyati": ["Andijon","Asaka","Baliqchi","Bo'z","Buloqboshi","Izboskan","Jalolquduq","Marhamat","Oltinko'l","Paxtaobod","Shahrixon","Ulug'nor","Xo'jaobod"],
+  "Namangan viloyati": ["Chortoq","Chust","Davlatobod","Ko'sonsoy","Mingbuloq","Namangan","Norin","Pop","To'raqo'rg'on","Uychi","Yangiqo'rg'on"],
+  "Buxoro viloyati": ["Buxoro","G'ijduvon","Jondor","Kogon","Olot","Peshku","Qorovulbozor","Romitan","Shofirkon","Vobkent"],
+  "Qashqadaryo viloyati": ["Chiroqchi","Dehqonobod","G'uzor","Kamashi","Kasbi","Kitob","Koson","Mirishkor","Muborak","Nishon","Qarshi","Shahrisabz","Yakkabog'"],
+  "Surxondaryo viloyati": ["Angor","Bandixon","Boysun","Denov","Jarqo'rg'on","Muzrabot","Oltinsoy","Qiziriq","Qumqo'rg'on","Sariosiyo","Sherobod","Sho'rchi","Termiz","Uzun"],
+  "Xorazm viloyati": ["Bog'ot","Gurlan","Xiva","Xazorasp","Qo'shko'pir","Shovot","Urganch","Yangiariq","Yangibozor"],
+  "Navoiy viloyati": ["Karmana","Konimex","Navoiy","Navbahor","Nurota","Qiziltepa","Tomdi","Uchquduq","Xatirchi","Zarafshon"],
+  "Jizzax viloyati": ["Arnasoy","Baxmal","Do'stlik","Forish","G'allaorol","Jizzax","Mirzacho'l","Paxtakor","Yangiobod","Zomin"],
+  "Sirdaryo viloyati": ["Baxt","Boyovut","Guliston","Mirzaobod","Oqoltin","Sardoba","Sayxunobod","Sirdaryo","Xovos"],
+  "Qoraqalpog'iston": ["Beruniy","Chimboy","Ellikkala","Kegeyli","Mo'ynoq","Nukus","Qanliko'l","Qo'ng'irot","Shumanay","Taxtako'pir","To'rtko'l","Xo'jayli"]
+};
+
+/* populate viloyat select */
+const selV = document.getElementById('f-viloyat');
+Object.keys(UZ_REGIONS).forEach(v => {
+  const o = document.createElement('option');
+  o.value = v; o.textContent = v;
+  selV.appendChild(o);
+});
+
+function onViloyat() {
+  const v = selV.value;
+  const selT = document.getElementById('f-tuman');
+  selT.innerHTML = '';
+  if (!v) { selT.disabled = true; selT.innerHTML = '<option value="">Avval viloyat tanlang</option>'; return; }
+  selT.disabled = false;
+  const blank = document.createElement('option');
+  blank.value = ''; blank.textContent = 'Shahar / tumanni tanlang';
+  selT.appendChild(blank);
+  UZ_REGIONS[v].forEach(t => {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    selT.appendChild(o);
+  });
+}
+
+/* sinf chips */
+let selectedSinf = null;
+const sinfRow = document.getElementById('sinf-chips');
+for (let i = 1; i <= 11; i++) {
+  const c = document.createElement('div');
+  c.className = 'chip sm';
+  c.textContent = i + '-sinf';
+  c.dataset.val = String(i);
+  c.onclick = function() {
+    document.querySelectorAll('#sinf-chips .chip').forEach(x => x.classList.remove('on'));
+    c.classList.add('on');
+    selectedSinf = String(i);
+  };
+  sinfRow.appendChild(c);
+}
+
+/* jins */
+let selectedJins = null;
+function pickJins(val) {
+  document.getElementById('jins-o').classList.remove('on');
+  document.getElementById('jins-q').classList.remove('on');
+  document.getElementById('jins-' + val).classList.add('on');
+  selectedJins = val === 'o' ? "O'g'il bola" : 'Qiz bola';
+}
+
+/* auth utils */
+function getUsers() { try { return JSON.parse(localStorage.getItem('maktabai_users')) || []; } catch { return []; } }
+function saveCurrentUser(u) {
+  localStorage.setItem('maktabai_currentUser', JSON.stringify(u));
+  localStorage.setItem('maktab_user', JSON.stringify(u));
+}
+function showErr(id, msg) { const e = document.getElementById(id); if (msg) e.textContent = msg; e.classList.add('show'); }
+function hideErr(id) { document.getElementById(id).classList.remove('show'); }
+function showGlobal(msg) { const e = document.getElementById('err-global'); e.textContent = msg; e.style.display = 'block'; }
+function hideGlobal() { document.getElementById('err-global').style.display = 'none'; }
+
+const API = 'http://localhost:8000';
+
+async function doRegister(e) {
+  e.preventDefault();
+  ['err-name','err-username','err-viloyat','err-tuman','err-jins','err-sinf','err-password'].forEach(hideErr);
+  hideGlobal();
+
+  const name     = document.getElementById('f-name').value.trim();
+  const username = document.getElementById('f-username').value.trim();
+  const viloyat  = document.getElementById('f-viloyat').value;
+  const tuman    = document.getElementById('f-tuman').value;
+  const password = document.getElementById('f-password').value;
+  const parentU  = document.getElementById('f-parent').value.trim().replace(/^@/,'');
+
+  let ok = true;
+  if (!name)                              { showErr('err-name'); ok = false; }
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) { showErr('err-username'); ok = false; }
+  if (!viloyat)                           { showErr('err-viloyat'); ok = false; }
+  if (!tuman)                             { showErr('err-tuman'); ok = false; }
+  if (!selectedJins)                      { showErr('err-jins'); ok = false; }
+  if (!selectedSinf)                      { showErr('err-sinf'); ok = false; }
+  if (password.length < 6)              { showErr('err-password'); ok = false; }
+  if (!ok) return;
+
+  const btn = document.getElementById('btn-reg');
+  btn.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-size:20px;animation:spin .8s linear infinite">progress_activity</span> Yuklanmoqda...';
+  btn.disabled = true;
+
+  const payload = {
+    role: 'student', name, username, password,
+    viloyat, tuman, jins: selectedJins,
+    grade: parseInt(selectedSinf),
+    parent_username: parentU || null
+  };
+
+  try {
+    const res = await fetch(`${API}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const user = { id: data.user_id, name: data.name, username: data.username, role: 'student', viloyat, tuman, jins: selectedJins, grade: selectedSinf };
+      saveCurrentUser(user);
+      /* also keep localStorage copy */
+      const users = getUsers();
+      if (!users.some(u => u.username === username)) { users.push({...user, password}); localStorage.setItem('maktabai_users', JSON.stringify(users)); }
+      localStorage.setItem('student_grade', selectedSinf);
+      btn.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-size:20px">check_circle</span> Muvaffaqiyatli!';
+      setTimeout(() => { location.href = '/ai-chat.html'; }, 600);
+      return;
+    }
+
+    const err = await res.json().catch(() => ({}));
+    showGlobal(err.detail || "Xato yuz berdi. Qayta urinib ko'ring.");
+  } catch {
+    /* API ulanmagan — localStorage ga saqlash */
+    const users = getUsers();
+    if (users.some(u => u.username?.toLowerCase() === username.toLowerCase())) {
+      showGlobal('Bu username band. Boshqa username tanlang.');
+      btn.innerHTML = "Ro'yxatdan o'tish <span style=\"font-family:'Material Symbols Outlined';font-size:20px\">arrow_forward</span>";
+      btn.disabled = false;
+      return;
+    }
+    const newUser = { id: Date.now(), role: 'student', name, username, password, viloyat, tuman, jins: selectedJins, grade: selectedSinf, parentUsername: parentU || null };
+    users.push(newUser);
+    localStorage.setItem('maktabai_users', JSON.stringify(users));
+    localStorage.setItem('student_grade', selectedSinf);
+    saveCurrentUser(newUser);
+    btn.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-size:20px">check_circle</span> Muvaffaqiyatli!';
+    setTimeout(() => { location.href = '/ai-chat.html'; }, 600);
+    return;
+  }
+
+  btn.innerHTML = "Ro'yxatdan o'tish <span style=\"font-family:'Material Symbols Outlined';font-size:20px\">arrow_forward</span>";
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
