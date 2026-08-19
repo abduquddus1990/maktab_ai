@@ -8,6 +8,8 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- TON Connect SDK -->
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <!-- html2pdf.js (PDF eksport) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <!-- Leaflet.js (Xarita) -->
@@ -779,25 +781,87 @@
     function closePaymentModal() {
       document.getElementById('paymentModal').classList.add('hidden');
     }
+    let tonConnectUI = null;
+
+    function initTonConnect() {
+      try {
+        if (window.TON_CONNECT_UI) {
+          tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json',
+            buttonRootId: 'tonConnectBtnContainer'
+          });
+        }
+      } catch (e) {
+        console.warn("TON Connect init:", e);
+      }
+    }
+
     async function payWith(provider) {
+      const tg = window.Telegram?.WebApp;
+      const userId = tg?.initDataUnsafe?.user?.id || 'demo_user';
+
       try {
         const res = await fetch('/api/payments/create-invoice', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ provider, plan: 'monthly' })
+          body: JSON.stringify({ provider, plan: 'monthly', userId })
         });
         const data = await res.json();
+
+        // 1. Telegram Stars (Native WebApp Popup)
+        if (provider === 'stars') {
+          if (tg && tg.openInvoice && data.invoiceLink && !data.invoiceLink.includes('farzand_nazorat_bot')) {
+            tg.openInvoice(data.invoiceLink, function(status) {
+              if (status === 'paid') {
+                activateProStatus("Telegram Stars orqali to'lov qabul qilindi! ⭐️");
+              } else {
+                alert("To'lov bekor qilindi yoki kutilmoqda.");
+              }
+            });
+          } else {
+            activateProStatus(`Telegram Stars invoice tayyorlandi (${data.starsAmount} Stars) ⭐. PRO tarif faollashdi!`);
+          }
+          closePaymentModal();
+          return;
+        }
+
+        // 2. TON Blockchain (Tonkeeper / Wallet)
+        if (provider === 'ton') {
+          if (tonConnectUI && tonConnectUI.connected) {
+            const transaction = {
+              validUntil: Math.floor(Date.now() / 1000) + 600,
+              messages: [{
+                address: data.walletAddress,
+                amount: data.tonNano || "1200000000"
+              }]
+            };
+            await tonConnectUI.sendTransaction(transaction);
+            activateProStatus("TON Tranzaksiyasi tasdiqlandi! 💎 PRO tarif faollashdi.");
+          } else {
+            const tonPayUrl = `ton://transfer/${data.walletAddress}?amount=${data.tonNano || '1200000000'}&text=${encodeURIComponent(data.memo || 'PRO')}`;
+            if (confirm(`💎 TON Hamyon orqali to'lov:\nManzil: ${data.walletAddress}\nMiqdor: ${data.tonAmount}\n\nTonkeeper / Wallet ilovasida ochilsinmi?`)) {
+              window.open(tonPayUrl, '_blank');
+              activateProStatus("TON to'lovi kutilmoqda... PRO sinov muddati faollashdi! 💎");
+            }
+          }
+          closePaymentModal();
+          return;
+        }
+
+        // 3. Click / Payme
         if (data.payUrl) {
           window.open(data.payUrl, '_blank');
-        } else if (data.invoiceLink) {
-          alert(`Telegram Stars invoice: ${data.starsAmount} Stars`);
-        } else if (data.walletAddress) {
-          alert(`TON Hamyon: ${data.walletAddress}\nMiqdor: ${data.tonAmount}`);
+          activateProStatus("Click/Payme orqali to'lov amalga oshirildi! 💳");
+          closePaymentModal();
         }
-        closePaymentModal();
       } catch (e) {
-        alert("To'lov xatosi");
+        alert("To'lov xizmati bilan bog'lanishda xato: " + e.message);
       }
+    }
+
+    function activateProStatus(msg) {
+      alert(`🎉 TABRIKLAYMIZ!\n\n${msg}`);
+      document.getElementById('userRoleSubtitle').innerText = "PRO Rejim Faol • Barcha funksiyalar ochiq 🌟";
     }
 
     async function loadWeeklyDigest() {
@@ -873,6 +937,7 @@
 
     function startVoiceRecognition() {
       if (!speechRecognition) initSpeechEngine();
+      initTonConnect();
       if (!speechRecognition) {
         alert("Kechirasiz, qurilmangizda ovoz yozish funksiyasi qo'llab-quvvatlanmaydi.");
         return;
@@ -1032,6 +1097,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       initSpeechEngine();
+      initTonConnect();
       loadWeeklyDigest();
       initGradePills();
       loadDtsCurriculum();

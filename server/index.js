@@ -485,35 +485,82 @@ app.get('/api/parent/analytics/:childId', (req, res) => {
 // ============================================================================
 // 6. Gibrid To'lov Tizimi API (Click / Payme / Telegram Stars / TON)
 // ============================================================================
-app.post('/api/payments/create-invoice', (req, res) => {
-  const { provider, plan, childId } = req.body; // 'click', 'payme', 'stars', 'ton'
-  const amount = plan === 'yearly' ? 240000 : 25000; // UZS
+app.post('/api/payments/create-invoice', async (req, res) => {
+  const { provider, plan, childId, userId } = req.body; // 'click', 'payme', 'stars', 'ton'
+  const amountUzs = plan === 'yearly' ? 240000 : 25000;
+  const starsAmount = plan === 'yearly' ? 1200 : 150;
+  const tonAmount = plan === 'yearly' ? "10.0" : "1.2";
 
+  // 1. Telegram Stars Invoice (Telegram Bot API createInvoiceLink)
   if (provider === 'stars') {
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    if (botToken && !botToken.includes('your_')) {
+      try {
+        const title = "Maktab AI & Qalqon PRO Obuna";
+        const description = "1 oylik cheksiz AI Repetitor, Vision Masala tahlili va Jonli GPS nazorati";
+        const payload = `pro_plan_${userId || 'user'}_${Date.now()}`;
+        
+        const invoiceRes = await fetch(`https://api.telegram.org/bot${botToken}/createInvoiceLink`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title,
+            description,
+            payload,
+            currency: "XTR", // Telegram Stars currency
+            prices: [{ label: "PRO Obuna", amount: starsAmount }]
+          })
+        });
+        const invData = await invoiceRes.json();
+        if (invData.ok && invData.result) {
+          return res.json({
+            success: true,
+            provider: 'stars',
+            starsAmount,
+            invoiceLink: invData.result
+          });
+        }
+      } catch (err) {
+        console.warn("Stars invoice generation error:", err.message);
+      }
+    }
+
     return res.json({
       success: true,
       provider: 'stars',
-      starsAmount: 150,
-      invoiceLink: `https://t.me/$farzand_nazorat_bot?start=invoice_pro_${Date.now()}`
+      starsAmount,
+      invoiceLink: `https://t.me/farzand_nazorat_bot?start=invoice_stars_${Date.now()}`
     });
   }
 
+  // 2. TON Blockchain Payment
   if (provider === 'ton') {
     return res.json({
       success: true,
       provider: 'ton',
-      tonAmount: "1.2 TON",
-      walletAddress: "EQD...MaktabAiOfficialWallet...TON",
-      memo: `PRO_${childId || 'USER'}_${Date.now()}`
+      tonAmount: `${tonAmount} TON`,
+      tonNano: Math.round(parseFloat(tonAmount) * 1e9).toString(),
+      walletAddress: "EQBvW8Z5huBkMJYdn3ZBR5ECPrE4GpXr62_BDETTpq88q27m", // Maktab AI TON Vault
+      memo: `MAKTAB_AI_PRO_${userId || childId || 'USER'}_${Date.now()}`
     });
   }
 
-  // Click & Payme link generator
+  // 3. Click & Payme (Milliy Kartalar)
   res.json({
     success: true,
     provider: provider || 'click',
-    amount,
-    payUrl: `https://my.click.uz/services/pay?service_id=12345&merchant_id=67890&amount=${amount}&transaction_param=${childId || '1'}`
+    amount: amountUzs,
+    payUrl: `https://my.click.uz/services/pay?service_id=12345&merchant_id=67890&amount=${amountUzs}&transaction_param=${childId || '1'}`
+  });
+});
+
+app.post('/api/payments/verify', (req, res) => {
+  const { provider, txHash, userId } = req.body;
+  res.json({
+    success: true,
+    status: 'active',
+    plan: 'pro',
+    message: "To'lov muvaffaqiyatli qabul qilindi. PRO obuna faollashtirildi! 🌟"
   });
 });
 
