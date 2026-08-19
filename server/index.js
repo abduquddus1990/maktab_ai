@@ -1,4 +1,4 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -362,6 +362,25 @@ app.get('/api/parent/location/:childId', (req, res) => {
     location: child.location,
     history: child.locationHistory
   });
+});
+
+app.post('/api/telemetry/activities', (req, res) => {
+  const { childId, appPackage, topic, timestamp } = req.body;
+  const targetId = childId || 'child_1';
+  if (!telemetryStore.children[targetId]) return res.json({ success: false });
+
+  const child = telemetryStore.children[targetId];
+  if (topic) {
+    const lower = topic.toLowerCase();
+    if (lower.includes('dars') || lower.includes('matem') || lower.includes('fizika') || lower.includes('python') || lower.includes('english') || lower.includes('til')) {
+      child.reelsTopics.education = Math.min(80, (child.reelsTopics.education || 45) + 2);
+    } else if (lower.includes('tajriba') || lower.includes('ilm') || lower.includes('robot') || lower.includes('mantiq')) {
+      child.reelsTopics.science = Math.min(50, (child.reelsTopics.science || 25) + 2);
+    } else {
+      child.reelsTopics.entertainment = Math.min(60, (child.reelsTopics.entertainment || 30) + 1);
+    }
+  }
+  res.json({ success: true, reelsTopics: child.reelsTopics });
 });
 
 app.get('/api/parent/analytics/:childId', (req, res) => {
