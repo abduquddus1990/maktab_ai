@@ -748,6 +748,15 @@
           <input type="text" id="newChildNameInput" placeholder="Masalan: Madinaxon" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
         </div>
 
+        <div>
+          <label class="text-[11px] font-bold text-slate-300">Farzandning Telegram Username'i (Bog'lash uchun):</label>
+          <div class="flex items-center gap-1.5 mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2">
+            <span class="text-cyan-400 font-bold">@</span>
+            <input type="text" id="newChildTgUsernameInput" placeholder="madinaxon_2016" class="flex-1 bg-transparent text-xs text-white placeholder-slate-600 focus:outline-none">
+          </div>
+          <p class="text-[9px] text-slate-400 mt-0.5">Farzand o'z Telegramida kirganda ushbu username bilan avtomatik tasdiqlanadi.</p>
+        </div>
+
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="text-[11px] font-bold text-slate-300">Sinfi:</label>
@@ -981,6 +990,23 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(profileData)
         });
+
+        // Agar o'quvchi bo'lsa, 6 xonali oila kodi orqali ota-onaga bog'lash
+        if (tempRole === 'student') {
+          const bindRes = await fetch('/api/auth/bind-child', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              childTgUsername: tgUsername,
+              familyCode,
+              childFullName: fullName
+            })
+          });
+          const bindData = await bindRes.json();
+          if (bindData.success) {
+            console.log("Ota-onaga bog'landi:", bindData.message);
+          }
+        }
       } catch(e) {}
 
       userProfile = profileData;
@@ -1563,6 +1589,8 @@
       const grade = document.getElementById('newChildGradeSelect').value;
       const school = document.getElementById('newChildSchoolInput').value.trim() || '12-maktab';
       const emaktab = document.getElementById('newChildEmaktabInput').value.trim();
+      const childTgUsername = document.getElementById('newChildTgUsernameInput').value.trim();
+      const parentTgUsername = userProfile?.tgUsername || '@ota_ona';
 
       if (!name) return alert("Iltimos, farzand ismini kiriting!");
 
@@ -1570,7 +1598,7 @@
         const res = await fetch('/api/parent/add-child', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, grade, school, emaktabLogin: emaktab })
+          body: JSON.stringify({ name, grade, school, emaktabLogin: emaktab, childTgUsername, parentTgUsername })
         });
         const data = await res.json();
         alert(`🎉 ${data.message}`);

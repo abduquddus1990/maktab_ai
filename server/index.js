@@ -499,7 +499,7 @@ app.get('/api/parent/children', (req, res) => {
 });
 
 app.post('/api/parent/add-child', (req, res) => {
-  const { name, grade, school, emaktabLogin } = req.body;
+  const { name, grade, school, emaktabLogin, childTgUsername, parentTgUsername } = req.body;
   const newId = 'child_' + (Object.keys(telemetryStore.children).length + 1);
   const randomCode = `${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`;
 
@@ -508,6 +508,8 @@ app.post('/api/parent/add-child', (req, res) => {
     name: name || "Yangi Farzand",
     grade: Number(grade) || 1,
     school: school || "12-maktab",
+    childTgUsername: childTgUsername ? (childTgUsername.startsWith('@') ? childTgUsername : '@' + childTgUsername) : "@farzand_user",
+    parentTgUsername: parentTgUsername || "@ota_ona",
     avatar: Number(grade) % 2 === 0 ? "👧" : "👦",
     familyCode: randomCode,
     location: {
