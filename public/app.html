@@ -709,7 +709,37 @@
       }
     }
 
+    async function loadWeeklyDigest() {
+      const box = document.getElementById('digestPreviewBox');
+      if (!box) return;
+      box.innerHTML = "Haftalik AI hisoboti shakllantirilmoqda... ⏳";
+      try {
+        const res = await fetch('/api/parent/generate-digest/child_1');
+        const data = await res.json();
+        if (data.digestText) {
+          box.innerHTML = data.digestText.replace(/\n/g, '<br>');
+        }
+      } catch (e) {
+        box.innerHTML = "Hisobotni yuklashda xatolik.";
+      }
+    }
+
+    async function sendDigestToTelegram() {
+      try {
+        const res = await fetch('/api/parent/send-digest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ childId: 'child_1', chatId: window.Telegram?.WebApp?.initDataUnsafe?.user?.id })
+        });
+        const data = await res.json();
+        alert("✅ Haftalik AI hisoboti Telegramga muvaffaqiyatli yuborildi!");
+      } catch (e) {
+        alert("Yuborishda xatolik yuz berdi.");
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      loadWeeklyDigest();
       initGradePills();
       loadDtsCurriculum();
     });

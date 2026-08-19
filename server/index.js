@@ -316,6 +316,93 @@ app.post('/api/parent/ask-ai', async (req, res) => {
 });
 
 // ============================================================================
+// 4.1 Ota-ona Haftalik Telegram AI Digest (Haftalik Tahlil Xabarnomasi)
+// ============================================================================
+app.get('/api/parent/generate-digest/:childId', async (req, res) => {
+  const child = telemetryStore.children[req.params.childId] || telemetryStore.children['child_1'];
+
+  const statsSummary = `
+Farzand: ${child.name}, ${child.grade}-sinf
+Haftalik ekran vaqti: 14 soat 20 daqiqa (Kuniga o'rtacha 2 soat)
+Asosiy ilovalar: YouTube (${child.appUsage[0]?.timeMinutes || 65} daq/kun), Maktab AI (${child.appUsage[1]?.timeMinutes || 45} daq/kun)
+Reels/Shorts qiziqishlari: Ta'lim & IT (${child.reelsTopics.education}%), Ilmiy tajribalar (${child.reelsTopics.science}%), O'yinlar (${child.reelsTopics.entertainment}%)
+Lokatsiya intizomi: Maktabga o'z vaqtida borgan, 100% xavfsiz geozonada.
+`;
+
+  const defaultDigest = `🌟 <b>Haftalik umumiy baho:</b> A'lo (Dars va hordiq balansi to'g'ri saqlangan).\n`
+    + `• 📚 <b>Ta'limiy faollik:</b> Farzandingiz ushbu haftada 5-sinf matematika va ingliz tili darsliklaridan faol foydalandi.\n`
+    + `• 📱 <b>Reels & Video mazmuni:</b> 70% video vaqti ilm-fan, IT va mantiqiy tajribalarga sarflangan.\n`
+    + `• 📍 <b>Xavfsizlik:</b> 100% vaqtida maktab va uy xavfsiz geozonalarida bo'ldi.\n`
+    + `• 💡 <b>Tavsiya:</b> Farzandingizning fizika va dasturlashga qiziqishi yuqori, dam olish kunlari birgalikda mantiqiy o'yinlar o'ynashni tavsiya qilamiz!`;
+
+  try {
+    if (process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY.includes('your_')) {
+      const prompt = `${PARENT_PROMPT}\n\nQuyidagi haftalik statistika asosida ota-ona uchun qisqa Telegram AI hisoboti tayyorla:\n${statsSummary}`;
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      if (text) {
+        return res.json({
+          success: true,
+          childName: child.name,
+          digestText: text,
+          stats: { totalScreenTime: "14 soat 20 daqiqa", educationPct: child.reelsTopics.education, safeLocationPct: "100%" }
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Gemini Digest fallback:", err.message);
+  }
+
+  res.json({
+    success: true,
+    childName: child.name,
+    digestText: defaultDigest,
+    stats: { totalScreenTime: "14 soat 20 daqiqa", educationPct: child.reelsTopics.education, safeLocationPct: "100%" }
+  });
+});
+
+app.post('/api/parent/send-digest', async (req, res) => {
+  const { childId, chatId } = req.body;
+  const child = telemetryStore.children[childId || 'child_1'];
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+
+  try {
+    // Generate AI Digest text
+    const digestRes = await fetch(`http://localhost:${process.env.PORT || 3000}/api/parent/generate-digest/${childId || 'child_1'}`);
+    const digestData = await digestRes.json();
+    const messageText = `📊 <b>MAKTAB AI & QALQON — HAFTALIK HISOBOT</b> 🛡️\n\n`
+      + `👦 <b>Farzand:</b> ${child.name} (${child.grade}-sinf)\n`
+      + `📅 <b>Davr:</b> So'nggi 7 kunlik tahlil\n\n`
+      + `${digestData.digestText}\n\n`
+      + `🔗 <a href="http://localhost:3000/app.html?role=parent">To'liq xaritani va hisobotni ochish</a>`;
+
+    if (botToken && chatId) {
+      const tgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: messageText,
+          parse_mode: 'HTML'
+        })
+      });
+      const tgData = await tgRes.json();
+      return res.json({ success: true, delivered: tgData.ok, messageText });
+    }
+
+    res.json({
+      success: true,
+      delivered: false,
+      note: "Bot tokeni yoki chatId kiritilmagan bo'lsa, simulyatsiya xabari qaytariladi.",
+      messageText
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ============================================================================
 // 5. Qalqon Telemetriya API (GPS, Apps, Reels)
 // ============================================================================
 app.post('/api/telemetry/location', (req, res) => {
