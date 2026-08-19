@@ -5,18 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Maktab AI & Qalqon — Milliy Ta'lim va Xavfsizlik Ekotizimi</title>
   
-  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Leaflet.js (Xarita) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- TON Connect SDK -->
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  <!-- html2pdf.js (PDF eksport) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <!-- Google Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
@@ -42,8 +36,6 @@
   <style>
     * { -webkit-tap-highlight-color: transparent; }
     body { background-color: #0b0f19; color: #f8fafc; overflow-x: hidden; }
-    
-    /* Mavzular (Themes) */
     body.theme-wolf { background-color: #0d1117; color: #f0f6fc; }
     body.theme-cyber { background-color: #050b14; color: #e0f2fe; }
     body.theme-matrix { background-color: #021209; color: #dcfce7; }
@@ -57,7 +49,7 @@
       border-radius: 1.25rem;
     }
     .glass-nav {
-      background: rgba(11, 15, 25, 0.92);
+      background: rgba(11, 15, 25, 0.94);
       backdrop-filter: blur(16px);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
@@ -69,109 +61,196 @@
 <body class="min-h-screen pb-24 font-sans select-none antialiased theme-wolf">
 
   <!-- ==================================================================== -->
-  <!-- 🚪 1. KIRISH VA RO'YXATDAN O'TISH ONBOARDING OVERLAY                 -->
+  <!-- 🚪 4-BOSQICHLI MUKAMMAL ONBOARDING & RO'YXATDAN O'TISH OVERLAY        -->
   <!-- ==================================================================== -->
   <div id="authOverlay" class="fixed inset-0 z-[10000] bg-[#0b0f19] flex flex-col justify-between p-5 overflow-y-auto hidden">
-    <!-- Yuqori Logo va Brend -->
-    <div class="space-y-4 pt-4 text-center">
-      <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-3xl shadow-xl shadow-brand-500/25">
+    <!-- Header -->
+    <div class="space-y-4 pt-2 text-center">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-2xl shadow-xl shadow-brand-500/25">
         🛡️
       </div>
       <div>
-        <h1 class="text-xl font-black tracking-tight text-white">MAKTAB AI & QALQON</h1>
-        <p class="text-xs text-slate-400 mt-1">Milliy Ta'lim va Xavfsizlik Ekotizimi</p>
+        <h1 class="text-base font-black tracking-tight text-white">MAKTAB AI & QALQON</h1>
+        <p class="text-[11px] text-slate-400">Yagona Milliy Ta'lim va Xavfsizlik Tizimi</p>
       </div>
 
-      <!-- Step 1: Rol Tanlash -->
-      <div id="authStepRole" class="glass-card p-5 space-y-3.5 bg-slate-900/90 border-slate-700/80 text-left">
-        <h3 class="text-xs font-black text-white text-center">Kim sifatida kirmoqchisiz?</h3>
-        <div class="space-y-2 pt-1">
-          <!-- O'quvchi -->
-          <button onclick="selectAuthRole('student')" class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-indigo-950/60 to-slate-900 border border-brand-500/40 hover:border-brand-400 flex items-center justify-between transition">
-            <div class="flex items-center gap-3">
-              <span class="text-2xl">🎓</span>
-              <div>
-                <p class="text-xs font-black text-white">O'quvchi (1–11 Sinf)</p>
-                <p class="text-[10px] text-slate-400">AI repetitor, darsliklar, ixtiro va testlar</p>
-              </div>
-            </div>
-            <span class="material-symbols-outlined text-brand-400 text-sm">arrow_forward</span>
-          </button>
+      <!-- Step Indicator (1 / 4) -->
+      <div class="flex items-center justify-center gap-1.5 pt-1">
+        <div id="stepDot1" class="w-6 h-1.5 rounded-full bg-brand-500 transition-all"></div>
+        <div id="stepDot2" class="w-2 h-1.5 rounded-full bg-slate-700 transition-all"></div>
+        <div id="stepDot3" class="w-2 h-1.5 rounded-full bg-slate-700 transition-all"></div>
+        <div id="stepDot4" class="w-2 h-1.5 rounded-full bg-slate-700 transition-all"></div>
+      </div>
 
+      <!-- ─── 1-QADAM: TELEGRAM PROFIL VA TELEFON ─── -->
+      <div id="onboardStep1" class="glass-card p-5 space-y-3.5 bg-slate-900/90 border-slate-700/80 text-left">
+        <div class="border-b border-slate-800 pb-2">
+          <h3 class="text-xs font-black text-white">1-Qadam: Shaxsiy Ma'lumotlar</h3>
+          <p class="text-[10px] text-slate-400">Telegram va telefon raqamingizni tasdiqlang</p>
+        </div>
+
+        <div class="space-y-3 pt-1">
+          <div>
+            <label class="text-[11px] font-bold text-slate-300">Telegram Username:</label>
+            <div class="flex items-center gap-2 mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2">
+              <span class="text-cyan-400 font-bold">@</span>
+              <input type="text" id="obTgUsername" placeholder="username" class="flex-1 bg-transparent text-xs text-white placeholder-slate-600 focus:outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-slate-300">Ism va Familiyangiz:</label>
+            <input type="text" id="obFullName" placeholder="Masalan: Aliyorbek Rustamov" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500">
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-slate-300">Telefon Raqamingiz:</label>
+            <input type="tel" id="obPhone" placeholder="+998 (90) 123-45-67" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono placeholder-slate-600 focus:outline-none focus:border-brand-500">
+          </div>
+        </div>
+
+        <button onclick="goToOnboardStep(2)" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1 shadow-md shadow-brand-600/30">
+          <span>Keyingi bosqich</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </button>
+      </div>
+
+      <!-- ─── 2-QADAM: ROL VA OILAVIY MAQOM ─── -->
+      <div id="onboardStep2" class="hidden glass-card p-5 space-y-3.5 bg-slate-900/90 border-slate-700/80 text-left">
+        <div class="border-b border-slate-800 pb-2">
+          <h3 class="text-xs font-black text-white">2-Qadam: Sizning Rolingiz</h3>
+          <p class="text-[10px] text-slate-400">Ilovadan qaysi maqsadda foydalanasiz?</p>
+        </div>
+
+        <div class="space-y-2 pt-1">
           <!-- Ota-ona -->
-          <button onclick="selectAuthRole('parent')" class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/60 to-slate-900 border border-cyan-500/40 hover:border-cyan-400 flex items-center justify-between transition">
+          <div onclick="selectOnboardRole('parent')" id="obRoleParentCard" class="cursor-pointer p-3 rounded-2xl bg-cyan-950/40 border-2 border-cyan-500/80 flex items-center justify-between transition">
             <div class="flex items-center gap-3">
               <span class="text-2xl">🛡️</span>
               <div>
                 <p class="text-xs font-black text-white">Ota-ona (Qalqon Nazorat)</p>
-                <p class="text-[10px] text-slate-400">GPS xarita, Reels tahlili va haftalik hisobot</p>
+                <p class="text-[10px] text-slate-400">GPS lokatsiya, Reels tahlil, Haftalik Digest</p>
               </div>
             </div>
-            <span class="material-symbols-outlined text-cyan-400 text-sm">arrow_forward</span>
-          </button>
+            <span id="obRoleParentCheck" class="text-cyan-400 font-black">✓</span>
+          </div>
+
+          <!-- Ota / Ona Tanlash Pills (agar Ota-ona tanlansa) -->
+          <div id="obParentRelRow" class="grid grid-cols-2 gap-2 pl-2">
+            <button onclick="setObParentRel('father')" id="obRelFatherBtn" class="py-1.5 rounded-xl text-[11px] font-bold bg-cyan-500/30 border border-cyan-400 text-cyan-200">👨 Otasi</button>
+            <button onclick="setObParentRel('mother')" id="obRelMotherBtn" class="py-1.5 rounded-xl text-[11px] font-bold bg-slate-800 border border-slate-700 text-slate-400">👩 Onasi</button>
+          </div>
+
+          <!-- O'quvchi -->
+          <div onclick="selectOnboardRole('student')" id="obRoleStudentCard" class="cursor-pointer p-3 rounded-2xl bg-slate-950 border border-slate-700 flex items-center justify-between transition">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🎓</span>
+              <div>
+                <p class="text-xs font-black text-white">O'quvchi (1–11 Sinf)</p>
+                <p class="text-[10px] text-slate-400">DTS darslik repetitori, Vision masala, Viktorina</p>
+              </div>
+            </div>
+            <span id="obRoleStudentCheck" class="text-slate-600 font-black hidden">✓</span>
+          </div>
+
+          <!-- Sinf tanlash (agar O'quvchi tanlansa) -->
+          <div id="obStudentGradeRow" class="hidden space-y-1 pl-2">
+            <label class="text-[10px] font-bold text-slate-400">Sinfingizni tanlang:</label>
+            <select id="obGradeSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+              <option value="1">1-sinf</option>
+              <option value="2">2-sinf</option>
+              <option value="3">3-sinf</option>
+              <option value="4">4-sinf</option>
+              <option value="5" selected>5-sinf</option>
+              <option value="6">6-sinf</option>
+              <option value="7">7-sinf</option>
+              <option value="8">8-sinf</option>
+              <option value="9">9-sinf</option>
+              <option value="10">10-sinf</option>
+              <option value="11">11-sinf</option>
+            </select>
+          </div>
 
           <!-- Ustoz -->
-          <button onclick="selectAuthRole('teacher')" class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/60 to-slate-900 border border-emerald-500/40 hover:border-emerald-400 flex items-center justify-between transition">
+          <div onclick="selectOnboardRole('teacher')" id="obRoleTeacherCard" class="cursor-pointer p-3 rounded-2xl bg-slate-950 border border-slate-700 flex items-center justify-between transition">
             <div class="flex items-center gap-3">
               <span class="text-2xl">👨‍🏫</span>
               <div>
                 <p class="text-xs font-black text-white">Ustoz / Repetitor</p>
-                <p class="text-[10px] text-slate-400">Guruhlar, o'quvchilar va dars nazorati</p>
+                <p class="text-[10px] text-slate-400">O'quvchilar reytingi va dars nazorati</p>
               </div>
             </div>
-            <span class="material-symbols-outlined text-emerald-400 text-sm">arrow_forward</span>
+            <span id="obRoleTeacherCheck" class="text-slate-600 font-black hidden">✓</span>
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-1">
+          <button onclick="goToOnboardStep(1)" class="w-1/3 py-2.5 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold">Ortga</button>
+          <button onclick="goToOnboardStep(3)" class="w-2/3 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1">
+            <span>Davom etish</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
           </button>
         </div>
       </div>
 
-      <!-- Step 2: O'quvchi Onboarding (Yosh Qahramon Roziligi & 6 xonali Oila Kodi) -->
-      <div id="authStepStudent" class="hidden glass-card p-5 space-y-3.5 bg-slate-900/90 border-indigo-500/40 text-left">
-        <div class="text-center space-y-1">
-          <span class="text-3xl">🛡️✨</span>
-          <h2 class="text-sm font-black text-white">Salom, Yosh Qahramon! 🌟</h2>
-        </div>
-        <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-[11px] text-slate-200 leading-relaxed space-y-1.5">
-          <p><b>Bizning qoidamiz:</b> Ota-onang seni hech qachon poylamaydi va shaxsiy yozishmalaringni o'qimaydi.</p>
-          <p class="text-[10px] text-indigo-300">Bu ilova darslarda a'lochi bo'lishing va xavfsizligingda senga yaqin do'st bo'lish uchun yaratilgan!</p>
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-bold text-slate-300">🔑 6 Xonali Oila Kodi (Ota-onangizdan oling):</label>
-          <input type="text" id="authFamilyCodeInput" placeholder="Masalan: 849-210" maxlength="7" class="w-full bg-slate-950 border-2 border-indigo-500/60 rounded-2xl px-4 py-2.5 text-center text-base font-black text-white font-mono tracking-widest focus:outline-none focus:border-cyan-400">
+      <!-- ─── 3-QADAM: eMAKTAB (KUNDALIK) INTEGRATSIYASI ─── -->
+      <div id="onboardStep3" class="hidden glass-card p-5 space-y-3.5 bg-slate-900/90 border-blue-500/40 text-left">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+          <div>
+            <h3 class="text-xs font-black text-white">3-Qadam: eMaktab Integratsiyasi</h3>
+            <p class="text-[10px] text-blue-300">Kundalik baholar va dars jurnali sinxronlash</p>
+          </div>
+          <span class="text-xl">🏫</span>
         </div>
 
-        <button onclick="finishStudentAuth()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 text-white font-black text-xs rounded-2xl transition shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2">
-          <span>✅</span> <span>Roziman va Boshlayman</span>
-        </button>
-        <button onclick="backToAuthRoles()" class="w-full py-2 text-slate-400 text-xs text-center font-bold">Ortga qaytish</button>
-      </div>
-
-      <!-- Step 2: Ota-ona Onboarding (Ota/Ona Tanlovi + PIN-kod) -->
-      <div id="authStepParent" class="hidden glass-card p-5 space-y-3.5 bg-slate-900/90 border-cyan-500/40 text-left">
-        <div class="text-center space-y-1">
-          <span class="text-3xl">👨‍👩‍👧‍👦</span>
-          <h2 class="text-sm font-black text-white">Ota-ona Xavfsizlik Paneli</h2>
-          <p class="text-[10px] text-slate-400">Farzand nazorati va raqamli xavfsizlik</p>
+        <div class="p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 text-[11px] text-slate-300 leading-relaxed">
+          <p><b>Imkoniyat:</b> eMaktab orqali ulansangiz, farzandning kunlik maktab baholari, uyga berilgan vazifalari to'g'ridan-to'g'ri Maktab AI tizimiga integratsiya bo'ladi.</p>
         </div>
 
-        <div class="space-y-2">
-          <label class="text-[11px] font-bold text-slate-300">Sizning rolingiz:</label>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="setParentRoleRel('father')" id="authRelFather" class="py-2 rounded-xl text-xs font-bold bg-cyan-500/30 border border-cyan-400 text-cyan-200">👨 Otasi</button>
-            <button onclick="setParentRoleRel('mother')" id="authRelMother" class="py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400">👩 Onasi</button>
+        <div class="space-y-2.5">
+          <div>
+            <label class="text-[11px] font-bold text-slate-300">eMaktab.uz Login (ID yoki Telefon):</label>
+            <input type="text" id="obEmaktabLogin" placeholder="Masalan: 12345678" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-400">
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-slate-300">eMaktab Paroli:</label>
+            <input type="password" id="obEmaktabPassword" placeholder="••••••••" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-400">
           </div>
         </div>
 
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-bold text-slate-300">🔒 4 Xonali Xavfsizlik PIN-kodi:</label>
-          <input type="password" id="authParentPin" placeholder="••••" maxlength="4" class="w-full bg-slate-950 border-2 border-cyan-500/60 rounded-2xl px-4 py-2.5 text-center text-lg font-black text-white font-mono tracking-widest focus:outline-none focus:border-cyan-400">
-          <p class="text-[9px] text-slate-400 text-center">Farzandingiz sozlamalarni o'zgartira olmasligi uchun PIN o'rnating.</p>
+        <div class="space-y-2 pt-1">
+          <button onclick="goToOnboardStep(4)" class="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1">
+            <span>Ulash va Davom etish</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </button>
+          <button onclick="skipEmaktabAndContinue()" class="w-full py-1.5 text-[11px] text-slate-400 hover:text-white font-bold text-center">
+            Hozircha o'tkazib yuborish (Keyinroq ulash) ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- ─── 4-QADAM: OILAVIY XAVFSIZLIK PAROLI (PIN) ─── -->
+      <div id="onboardStep4" class="hidden glass-card p-5 space-y-3.5 bg-slate-900/90 border-emerald-500/40 text-left">
+        <div class="text-center space-y-1">
+          <span class="text-3xl">🔒🛡️</span>
+          <h2 class="text-xs font-black text-white">4-Qadam: Oilaviy Xavfsizlik Kodi</h2>
+          <p class="text-[10px] text-emerald-300">Farzand va ota-ona qurilmasini xavfsiz bog'lash</p>
         </div>
 
-        <button onclick="finishParentAuth()" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 text-white font-black text-xs rounded-2xl transition shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2">
-          <span>🛡️</span> <span>Panelga Kirish</span>
-        </button>
-        <button onclick="backToAuthRoles()" class="w-full py-2 text-slate-400 text-xs text-center font-bold">Ortga qaytish</button>
+        <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-[11px] text-slate-200 leading-relaxed space-y-1">
+          <p><b>Axloqiy qoida:</b> Ushbu kod orqali oila a'zolari bir-biriga bog'lanadi. Shaxsiy yozishmalar sir saqlanadi.</p>
+        </div>
+
+        <div class="space-y-1.5 text-center">
+          <label class="text-[11px] font-bold text-slate-300">🔑 6 Xonali Oilaviy PIN / Parol:</label>
+          <input type="text" id="obFamilyCode" value="849-210" maxlength="7" class="w-full bg-slate-950 border-2 border-emerald-500/60 rounded-2xl px-4 py-2.5 text-center text-lg font-black text-white font-mono tracking-widest focus:outline-none focus:border-emerald-400">
+          <p class="text-[10px] text-slate-400">Farzandingiz telefonidagi ilovaga aynan shu kod kiritiladi.</p>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button onclick="goToOnboardStep(3)" class="w-1/3 py-2.5 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold">Ortga</button>
+          <button onclick="completeRegistration()" class="w-2/3 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 text-white rounded-2xl text-xs font-black transition shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-1.5">
+            <span>✅</span> <span>Ro'yxatdan O'tish</span>
+          </button>
+        </div>
       </div>
 
     </div>
@@ -196,7 +275,6 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <!-- Stars & TON Balance -->
         <button onclick="openPaymentModal()" class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-500/20 to-brand-500/20 border border-amber-500/30 hover:border-amber-400 transition">
           <span class="text-xs">⭐</span>
           <span class="text-xs font-bold text-amber-300 font-mono">150</span>
@@ -210,7 +288,7 @@
   <!-- 📑 TAB 1: 📊 ASOSIY PANEL (DASHBOARD)                                -->
   <!-- ==================================================================== -->
   <section id="tabDashboard" class="tab-content px-4 py-4 space-y-4">
-    <!-- O'quvchi Dashboard Kontenti -->
+    <!-- O'quvchi Dashboard -->
     <div id="studentDashboardBox" class="space-y-4">
       <div class="glass-card p-4 space-y-3 bg-gradient-to-r from-indigo-950/40 via-slate-900 to-slate-900 border-brand-500/30">
         <div class="flex items-center justify-between">
@@ -218,7 +296,7 @@
             <span class="text-2xl">🌟</span>
             <div>
               <h3 class="text-xs font-black text-white">Bugungi O'quv Rejasi</h3>
-              <p class="text-[10px] text-slate-400">DTS bo'yicha 5-sinf darslari</p>
+              <p class="text-[10px] text-slate-400" id="dashGradeInfo">DTS bo'yicha 5-sinf darslari</p>
             </div>
           </div>
           <span class="text-xs font-mono font-bold text-emerald-400">80 / 100 Ball</span>
@@ -234,13 +312,12 @@
             <p class="text-cyan-400 font-black font-mono mt-0.5">45 daqiqa</p>
           </div>
           <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-            <p class="text-slate-400 text-[10px]">AI Repetitor</p>
-            <p class="text-emerald-400 font-black font-mono mt-0.5">Faol 🤖</p>
+            <p class="text-slate-400 text-[10px]">eMaktab</p>
+            <p class="text-emerald-400 font-black font-mono mt-0.5">Ulandi ✓</p>
           </div>
         </div>
       </div>
 
-      <!-- Tezkor Darsliklar -->
       <div class="glass-card p-4 space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-black text-white">Darsliklar Katalogi</h3>
@@ -250,18 +327,18 @@
           <button onclick="switchTab('ai')" class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-left hover:border-brand-500 transition">
             <span class="text-lg">📐</span>
             <p class="text-xs font-bold text-white mt-1">Matematika</p>
-            <p class="text-[10px] text-slate-400">Kasrlar va amallar</p>
+            <p class="text-[10px] text-slate-400">Oddiy va o'nli kasrlar</p>
           </button>
           <button onclick="switchTab('ai')" class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-left hover:border-brand-500 transition">
             <span class="text-lg">🇬🇧</span>
             <p class="text-xs font-bold text-white mt-1">Ingliz tili</p>
-            <p class="text-[10px] text-slate-400">Grammar & Tenses</p>
+            <p class="text-[10px] text-slate-400">Present Simple & Grammar</p>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Ota-ona Dashboard Kontenti -->
+    <!-- Ota-ona Dashboard -->
     <div id="parentDashboardBox" class="hidden space-y-4">
       <div class="glass-card p-3.5 flex items-center justify-between border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 to-slate-900">
         <div class="flex items-center gap-3">
@@ -270,10 +347,10 @@
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="text-sm font-black text-white">Aliyorbek</h3>
+              <h3 class="text-sm font-black text-white" id="parentDashChildName">Aliyorbek</h3>
               <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">Xavfsiz zonada</span>
             </div>
-            <p class="text-[11px] text-slate-400">5-«B» sinf • 12-maktab</p>
+            <p class="text-[11px] text-slate-400" id="parentDashGradeText">5-«B» sinf • 12-maktab</p>
           </div>
         </div>
         <div class="text-right font-mono">
@@ -285,7 +362,6 @@
         </div>
       </div>
 
-      <!-- Tezkor Xarita Kichik Ko'rinishi -->
       <div class="glass-card p-4 space-y-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
@@ -307,7 +383,6 @@
     
     <!-- 🎓 A) O'QUVCHI UCHUN MAXSUS AI TA'LIM VA VISION LAB DASHBOARDI -->
     <div id="studentAiDashboard" class="space-y-4">
-      <!-- 1-11 Sinf Tanlash -->
       <div class="space-y-1.5">
         <div class="flex items-center justify-between text-xs font-bold text-slate-400 px-1">
           <span>Sinfingiz:</span>
@@ -316,7 +391,6 @@
         <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none" id="aiGradePillsContainer"></div>
       </div>
 
-      <!-- AI Repetitor Chat & Vision -->
       <div class="glass-card p-4 space-y-3 border-brand-500/30">
         <div class="flex items-center justify-between border-b border-slate-700/60 pb-2.5">
           <div class="flex items-center gap-2">
@@ -425,7 +499,6 @@
 
     <!-- 🛡️ B) OTA-ONA UCHUN MAXSUS AI TAHLIL & MASLAHAT DASHBOARDI -->
     <div id="parentAiDashboard" class="hidden space-y-4">
-      <!-- 🧠 Oila Maslahatchisi AI Chat -->
       <div class="glass-card p-4 space-y-3 border-cyan-500/30 bg-gradient-to-br from-cyan-950/30 to-slate-900">
         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
           <div class="flex items-center gap-2">
@@ -449,7 +522,6 @@
         </div>
       </div>
 
-      <!-- 📊 Haftalik Telegram AI Digest -->
       <div class="glass-card p-4 space-y-3 bg-gradient-to-br from-emerald-950/30 to-slate-900 border-emerald-500/30">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
@@ -473,7 +545,6 @@
   <!-- 📱 TAB 3: 📱 NAZORAT & TAHLIL (MONITORING)                           -->
   <!-- ==================================================================== -->
   <section id="tabMonitoring" class="tab-content hidden px-4 py-4 space-y-4">
-    <!-- Jonli GPS Xarita (To'liq) -->
     <div class="glass-card p-4 space-y-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -491,7 +562,6 @@
       </div>
     </div>
 
-    <!-- Reels & Video Kontent AI Tahlili -->
     <div class="glass-card p-4 space-y-3 bg-gradient-to-br from-indigo-950/30 to-slate-900 border-indigo-500/30">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -531,7 +601,6 @@
       </div>
     </div>
 
-    <!-- Ilovalar va Ekran Vaqti -->
     <div class="glass-card p-4 space-y-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -566,6 +635,22 @@
     <div class="glass-card p-4 space-y-4">
       <h3 class="text-sm font-black text-white border-b border-slate-800 pb-2">⚙️ Tizim Sozlamalari</h3>
 
+      <!-- 👤 Profil Ma'lumotlari -->
+      <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5 text-xs">
+        <div class="flex justify-between items-center">
+          <span class="text-slate-400">Telegram Profil:</span>
+          <span class="font-bold text-white" id="settingsTgUser">@username</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-400">Telefon:</span>
+          <span class="font-bold text-white font-mono" id="settingsPhone">+998 90 123 45 67</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-400">eMaktab Holati:</span>
+          <span class="font-bold text-emerald-400" id="settingsEmaktabStatus">Ulandi ✓</span>
+        </div>
+      </div>
+
       <!-- 1. Til Tanlash -->
       <div class="space-y-1.5">
         <label class="text-xs font-bold text-slate-300">🌐 Ilova Tili:</label>
@@ -575,7 +660,7 @@
         </div>
       </div>
 
-      <!-- 2. Dizayn Mavzusi (Themes) -->
+      <!-- 2. Dizayn Mavzusi -->
       <div class="space-y-1.5">
         <label class="text-xs font-bold text-slate-300">🎨 Dizayn Mavzusi:</label>
         <div class="grid grid-cols-2 gap-2">
@@ -586,10 +671,10 @@
         </div>
       </div>
 
-      <!-- 3. GPS va Geozona Sozlamalari -->
+      <!-- 3. GPS Oralig'i -->
       <div class="space-y-1.5">
         <label class="text-xs font-bold text-slate-300">📍 GPS Yangilanish Oralig'i:</label>
-        <select id="gpsIntervalSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+        <select class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
           <option value="10">Har 10 daqiqada (Tavsiya etiladi)</option>
           <option value="15">Har 15 daqiqada (Batareyani tejash)</option>
           <option value="30">Har 30 daqiqada</option>
@@ -600,22 +685,16 @@
       <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
         <div class="flex justify-between items-center text-xs">
           <span class="font-bold text-white">Farzand ulanish kodi:</span>
-          <span class="font-mono font-bold text-cyan-400 text-sm">849-210</span>
+          <span class="font-mono font-bold text-cyan-400 text-sm" id="settingsFamilyCode">849-210</span>
         </div>
         <p class="text-[10px] text-slate-400">Farzand telefonidagi Android ilovaga ushbu kod kiritiladi.</p>
       </div>
 
-      <!-- 5. Kiberxavfsizlik & PIN kod -->
-      <div class="space-y-1.5">
-        <label class="text-xs font-bold text-slate-300">🔒 Ota-ona PIN-kodi:</label>
-        <button onclick="changePinCode()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition">PIN-kodni o'zgartirish</button>
-      </div>
-
-      <!-- 6. Rolni almashtirish / Qayta tanlash -->
+      <!-- 5. Qayta Ro'yxatdan o'tish -->
       <div class="pt-2 border-t border-slate-800">
-        <button onclick="openAuthModal()" class="w-full py-2.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
-          <span class="material-symbols-outlined text-[16px]">logout</span>
-          <span>Boshqa Rolga O'tish / Qayta Kirish</span>
+        <button onclick="resetAndOpenOnboarding()" class="w-full py-2.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+          <span>Profilni Yangilash / Qayta Ro'yxatdan O'tish</span>
         </button>
       </div>
     </div>
@@ -674,7 +753,7 @@
     </div>
   </div>
 
-  <!-- 💎 TO'LOV VA PRO TARIF MODALI -->
+  <!-- 💎 TO'LOV MODALI -->
   <div id="paymentModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="glass-card w-full max-w-sm p-5 space-y-4 bg-slate-900 border-slate-700 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -714,9 +793,10 @@
   <!-- 📜 JAVASCRIPT APP LOGIC                                              -->
   <!-- ==================================================================== -->
   <script>
-    let userRole = localStorage.getItem('app_user_role') || null; // 'student', 'parent', 'teacher'
-    let parentRelation = localStorage.getItem('parent_relation') || 'father';
-    let activeGrade = 5;
+    let userProfile = JSON.parse(localStorage.getItem('app_user_profile') || 'null');
+    let userRole = userProfile?.role || 'parent';
+    let parentRelation = userProfile?.relation || 'father';
+    let activeGrade = userProfile?.grade || 5;
     let activeSubject = 'Matematika';
     let currentTab = 'dashboard';
     let uploadedImageBase64 = null;
@@ -724,86 +804,152 @@
     let mapDashboard = null;
     let mapMonitoring = null;
 
-    // Telegram WebApp Setup
+    // Selected temporary onboarding states
+    let tempRole = 'parent';
+    let tempParentRel = 'father';
+
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
-      if (tg.initDataUnsafe?.user?.first_name) {
-        document.getElementById('headerUserName').innerText = tg.initDataUnsafe.user.first_name;
+      if (tg.initDataUnsafe?.user) {
+        const u = tg.initDataUnsafe.user;
+        if (u.username) document.getElementById('obTgUsername').value = u.username;
+        if (u.first_name) document.getElementById('obFullName').value = `${u.first_name} ${u.last_name || ''}`.trim();
       }
     }
 
-    // 1. Auth & Onboarding Flow
+    // 1. Onboarding Step Flow
     function checkAuthOnLoad() {
-      if (!userRole) {
-        openAuthModal();
+      if (!userProfile) {
+        document.getElementById('authOverlay').classList.remove('hidden');
+        goToOnboardStep(1);
       } else {
-        applyUserRoleUI();
+        applyProfileToUI();
       }
     }
 
-    function openAuthModal() {
-      document.getElementById('authOverlay').classList.remove('hidden');
-      document.getElementById('authStepRole').classList.remove('hidden');
-      document.getElementById('authStepStudent').classList.add('hidden');
-      document.getElementById('authStepParent').classList.add('hidden');
+    function goToOnboardStep(step) {
+      [1, 2, 3, 4].forEach(s => {
+        document.getElementById(`onboardStep${s}`)?.classList.add('hidden');
+        const dot = document.getElementById(`stepDot${s}`);
+        if (dot) {
+          if (s === step) {
+            dot.className = "w-6 h-1.5 rounded-full bg-brand-500 transition-all";
+          } else if (s < step) {
+            dot.className = "w-2 h-1.5 rounded-full bg-emerald-500 transition-all";
+          } else {
+            dot.className = "w-2 h-1.5 rounded-full bg-slate-700 transition-all";
+          }
+        }
+      });
+      document.getElementById(`onboardStep${step}`)?.classList.remove('hidden');
     }
 
-    function selectAuthRole(role) {
-      if (role === 'student') {
-        document.getElementById('authStepRole').classList.add('hidden');
-        document.getElementById('authStepStudent').classList.remove('hidden');
-      } else if (role === 'parent') {
-        document.getElementById('authStepRole').classList.add('hidden');
-        document.getElementById('authStepParent').classList.remove('hidden');
+    function selectOnboardRole(role) {
+      tempRole = role;
+      const pCard = document.getElementById('obRoleParentCard');
+      const sCard = document.getElementById('obRoleStudentCard');
+      const tCard = document.getElementById('obRoleTeacherCard');
+
+      pCard.className = "cursor-pointer p-3 rounded-2xl bg-slate-950 border border-slate-700 flex items-center justify-between transition";
+      sCard.className = "cursor-pointer p-3 rounded-2xl bg-slate-950 border border-slate-700 flex items-center justify-between transition";
+      tCard.className = "cursor-pointer p-3 rounded-2xl bg-slate-950 border border-slate-700 flex items-center justify-between transition";
+
+      document.getElementById('obRoleParentCheck').classList.add('hidden');
+      document.getElementById('obRoleStudentCheck').classList.add('hidden');
+      document.getElementById('obRoleTeacherCheck').classList.add('hidden');
+      document.getElementById('obParentRelRow').classList.add('hidden');
+      document.getElementById('obStudentGradeRow').classList.add('hidden');
+
+      if (role === 'parent') {
+        pCard.className = "cursor-pointer p-3 rounded-2xl bg-cyan-950/40 border-2 border-cyan-500/80 flex items-center justify-between transition";
+        document.getElementById('obRoleParentCheck').classList.remove('hidden');
+        document.getElementById('obParentRelRow').classList.remove('hidden');
+      } else if (role === 'student') {
+        sCard.className = "cursor-pointer p-3 rounded-2xl bg-indigo-950/40 border-2 border-brand-500/80 flex items-center justify-between transition";
+        document.getElementById('obRoleStudentCheck').classList.remove('hidden');
+        document.getElementById('obStudentGradeRow').classList.remove('hidden');
       } else {
-        userRole = 'teacher';
-        localStorage.setItem('app_user_role', userRole);
-        document.getElementById('authOverlay').classList.add('hidden');
-        applyUserRoleUI();
+        tCard.className = "cursor-pointer p-3 rounded-2xl bg-emerald-950/40 border-2 border-emerald-500/80 flex items-center justify-between transition";
+        document.getElementById('obRoleTeacherCheck').classList.remove('hidden');
       }
     }
 
-    function setParentRoleRel(rel) {
-      parentRelation = rel;
-      localStorage.setItem('parent_relation', rel);
+    function setObParentRel(rel) {
+      tempParentRel = rel;
       if (rel === 'father') {
-        document.getElementById('authRelFather').className = "py-2 rounded-xl text-xs font-bold bg-cyan-500/30 border border-cyan-400 text-cyan-200";
-        document.getElementById('authRelMother').className = "py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400";
+        document.getElementById('obRelFatherBtn').className = "py-1.5 rounded-xl text-[11px] font-bold bg-cyan-500/30 border border-cyan-400 text-cyan-200";
+        document.getElementById('obRelMotherBtn').className = "py-1.5 rounded-xl text-[11px] font-bold bg-slate-800 border border-slate-700 text-slate-400";
       } else {
-        document.getElementById('authRelMother').className = "py-2 rounded-xl text-xs font-bold bg-cyan-500/30 border border-cyan-400 text-cyan-200";
-        document.getElementById('authRelFather').className = "py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400";
+        document.getElementById('obRelMotherBtn').className = "py-1.5 rounded-xl text-[11px] font-bold bg-cyan-500/30 border border-cyan-400 text-cyan-200";
+        document.getElementById('obRelFatherBtn').className = "py-1.5 rounded-xl text-[11px] font-bold bg-slate-800 border border-slate-700 text-slate-400";
       }
     }
 
-    function finishStudentAuth() {
-      userRole = 'student';
-      localStorage.setItem('app_user_role', userRole);
+    function skipEmaktabAndContinue() {
+      document.getElementById('obEmaktabLogin').value = '';
+      document.getElementById('obEmaktabPassword').value = '';
+      goToOnboardStep(4);
+    }
+
+    async function completeRegistration() {
+      const tgUsername = document.getElementById('obTgUsername').value.trim() || 'foydalanuvchi';
+      const fullName = document.getElementById('obFullName').value.trim() || 'Foydalanuvchi';
+      const phone = document.getElementById('obPhone').value.trim() || '+998 90 123 45 67';
+      const emaktabLogin = document.getElementById('obEmaktabLogin').value.trim();
+      const familyCode = document.getElementById('obFamilyCode').value.trim() || '849-210';
+      const grade = tempRole === 'student' ? Number(document.getElementById('obGradeSelect').value) : 5;
+
+      const profileData = {
+        tgUsername: tgUsername.startsWith('@') ? tgUsername : '@' + tgUsername,
+        fullName,
+        phone,
+        role: tempRole,
+        relation: tempParentRel,
+        grade,
+        emaktabLogin: emaktabLogin || null,
+        familyCode
+      };
+
+      try {
+        await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(profileData)
+        });
+      } catch(e) {}
+
+      userProfile = profileData;
+      userRole = tempRole;
+      parentRelation = tempParentRel;
+      activeGrade = grade;
+      localStorage.setItem('app_user_profile', JSON.stringify(profileData));
+
       document.getElementById('authOverlay').classList.add('hidden');
-      applyUserRoleUI();
+      applyProfileToUI();
+      alert("🎉 Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!");
     }
 
-    function finishParentAuth() {
-      const pin = document.getElementById('authParentPin').value.trim();
-      if (pin.length < 4) {
-        alert("Iltimos, 4 xonali PIN-kodni to'liq kiriting!");
-        return;
-      }
-      localStorage.setItem('parent_pin_code', pin);
-      userRole = 'parent';
-      localStorage.setItem('app_user_role', userRole);
-      document.getElementById('authOverlay').classList.add('hidden');
-      applyUserRoleUI();
+    function resetAndOpenOnboarding() {
+      localStorage.removeItem('app_user_profile');
+      userProfile = null;
+      document.getElementById('authOverlay').classList.remove('hidden');
+      goToOnboardStep(1);
     }
 
-    function backToAuthRoles() {
-      document.getElementById('authStepRole').classList.remove('hidden');
-      document.getElementById('authStepStudent').classList.add('hidden');
-      document.getElementById('authStepParent').classList.add('hidden');
-    }
+    function applyProfileToUI() {
+      if (!userProfile) return;
+      document.getElementById('headerUserName').innerText = userProfile.fullName.split(' ')[0];
+      document.getElementById('settingsTgUser').innerText = userProfile.tgUsername;
+      document.getElementById('settingsPhone').innerText = userProfile.phone;
+      document.getElementById('settingsFamilyCode').innerText = userProfile.familyCode;
+      document.getElementById('settingsEmaktabStatus').innerText = userProfile.emaktabLogin ? "Ulangan (" + userProfile.emaktabLogin + ")" : "Ulanmagan";
 
-    function applyUserRoleUI() {
+      userRole = userProfile.role;
+      parentRelation = userProfile.relation;
+      activeGrade = userProfile.grade || 5;
+
       const avatar = document.getElementById('headerUserAvatar');
       const subtitle = document.getElementById('headerSubtitle');
       const studentDash = document.getElementById('studentDashboardBox');
@@ -854,7 +1000,7 @@
       }
     }
 
-    // 3. Map Initialization (Leaflet)
+    // 3. Map Initialization
     function initDashboardMap() {
       if (mapDashboard) {
         setTimeout(() => mapDashboard.invalidateSize(), 100);
@@ -881,7 +1027,7 @@
       }, 200);
     }
 
-    // 4. Grade Pills
+    // 4. Grade Pills & DTS
     function initGradePills() {
       const container = document.getElementById('aiGradePillsContainer');
       let html = '';
@@ -906,7 +1052,6 @@
       loadDtsCurriculum();
     }
 
-    // 5. DTS Darsliklar
     async function loadDtsCurriculum() {
       try {
         const res = await fetch(`/api/dts/curriculum?grade=${activeGrade}`);
@@ -945,7 +1090,7 @@
       sendMessage();
     }
 
-    // 6. Vision Image & Speech
+    // 5. Vision Image & Speech
     function handleImageSelected(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1078,7 +1223,7 @@
       `;
     }
 
-    // 7. Parent AI Chat & Digest
+    // 6. Parent AI & Digest
     async function sendParentAiMsg() {
       const input = document.getElementById('parentAiInput');
       const text = input.value.trim();
@@ -1127,7 +1272,7 @@
       }
     }
 
-    // 8. Ixtiro Lab
+    // 7. Ixtiro Lab
     async function sendIxtiroPrompt() {
       const val = document.getElementById('ixtiroInput').value.trim();
       if (!val) return;
@@ -1160,7 +1305,7 @@
       }
     }
 
-    // 9. AI Viktorina Engine
+    // 8. AI Viktorina Engine
     let currentQuiz = null;
     let currentQIndex = 0;
     let quizScore = 0;
@@ -1245,7 +1390,7 @@
       document.getElementById('quizModal').classList.add('hidden');
     }
 
-    // 10. Settings & Themes
+    // 9. Settings & Themes
     function setAppLang(lang) {
       localStorage.setItem('app_lang', lang);
       if (lang === 'uz') {
@@ -1262,15 +1407,7 @@
       localStorage.setItem('app_theme', theme);
     }
 
-    function changePinCode() {
-      const p = prompt("Yangi 4 xonali PIN-kodni kiriting:");
-      if (p && p.length === 4) {
-        localStorage.setItem('parent_pin_code', p);
-        alert("PIN-kod yangilandi!");
-      }
-    }
-
-    // 11. Payments
+    // 10. Payments
     function openPaymentModal() { document.getElementById('paymentModal').classList.remove('hidden'); }
     function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
 
