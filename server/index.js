@@ -517,6 +517,134 @@ app.post('/api/payments/create-invoice', (req, res) => {
   });
 });
 
+// ============================================================================
+// 7. AI Test va Viktorina Generatori (DTS Standarti)
+// ============================================================================
+app.post('/api/quiz/generate', async (req, res) => {
+  const { grade, subject } = req.body;
+  const targetGrade = Number(grade) || 5;
+  const targetSubject = subject || 'Matematika';
+
+  // 1. DTS darsliklar bazasidan mavzularni topish
+  const matchingModules = dtsKnowledgeBase.filter(
+    m => m.grade === targetGrade && (!subject || m.subject.toLowerCase().includes(targetSubject.toLowerCase()))
+  );
+
+  const activeModule = matchingModules.length > 0
+    ? matchingModules[0]
+    : {
+        grade: targetGrade,
+        subject: targetSubject,
+        chapter: `${targetGrade}-sinf ${targetSubject} asosiy mavzulari`,
+        rule: "Davlat Ta'lim Standarti talablari doirasidagi asosiy tushunchalar",
+        formula: "a + b = c"
+      };
+
+  // 2. AI orqali 5 ta sifatli test savolini tuzish
+  const prompt = `Siz O'zbekiston Respublikasi ${targetGrade}-sinf ${targetSubject} fani bo'yicha test tuzuvchisiz.
+Darslik mavzusi: "${activeModule.chapter}".
+Rasmiy qoida: "${activeModule.rule}".
+
+Quyidagi JSON formatda AYNAN 5 TA test savolini tuzing. Hech qanday ortiqcha matnsiz, FAQAT JSON qaytaring:
+{
+  "grade": ${targetGrade},
+  "subject": "${targetSubject}",
+  "chapter": "${activeModule.chapter}",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Savol matni",
+      "options": ["A varianti", "B varianti", "C varianti", "D varianti"],
+      "correctIndex": 0,
+      "explanation": "Nima uchun bu variant to'g'ri ekanligi tushuntirilishi."
+    }
+  ]
+}`;
+
+  try {
+    if (process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY.includes('your_')) {
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      const result = await model.generateContent(prompt);
+      let text = result.response.text().trim();
+      if (text.includes("```")) {
+        const start = text.indexOf("{");
+        const end = text.lastIndexOf("}") + 1;
+        text = text.substring(start, end);
+      }
+      const parsed = JSON.parse(text);
+      return res.json({ success: true, quiz: parsed });
+    }
+  } catch (e) {
+    console.warn("AI Quiz generation fallback:", e.message);
+  }
+
+  // Zaxira DTS test to'plami
+  const fallbackQuiz = {
+    grade: targetGrade,
+    subject: targetSubject,
+    chapter: activeModule.chapter,
+    questions: [
+      {
+        id: 1,
+        question: `${activeModule.chapter} mavzusi bo'yicha asosiy qoida qaysi javobda to'g'ri keltirilgan?`,
+        options: [
+          activeModule.rule.substring(0, 70) + "...",
+          "Bu mavzuga tegishli bo'lmagan noto'g'ri ta'rif",
+          "Faqat manfiy sonlar uchun qo'llaniladi",
+          "Hech qanday hisoblash talab etilmaydi"
+        ],
+        correctIndex: 0,
+        explanation: `To'g'ri javob darslikning ${activeModule.page || 40}-betidagi rasmiy DTS qoidasiga asoslangan.`
+      },
+      {
+        id: 2,
+        question: activeModule.formula
+          ? `Mavzuga doir rasmiy formula qaysi?`
+          : `${targetGrade}-sinfda ushbu fanni o'rganishda nima asosiy hisoblanadi?`,
+        options: [
+          activeModule.formula || "Qoidalarni amalda qo'llay olish",
+          "Faqat nazariy yodlab olish",
+          "Hech qanday qoidasiz yechish",
+          "Tenglamasiz ishlash"
+        ],
+        correctIndex: 0,
+        explanation: "Asosiy qoida va formula orqali masalalar to'g'ri yechiladi."
+      },
+      {
+        id: 3,
+        question: `100 ballik tizimda ushbu mavzuni mustahkamlash uchun qanday tavsiya beriladi?`,
+        options: [
+          "Darslikdagi 2-3 ta mashqni mustaqil yechish",
+          "Topshiriqni ko'chirib olish",
+          "Faqat kalkulyatordan foydalanish",
+          "Mavzuni o'tkazib yuborish"
+        ],
+        correctIndex: 0,
+        explanation: "Mustaqil mashq bajarish bilimni mustahkamlaydi."
+      }
+    ]
+  };
+
+  res.json({ success: true, quiz: fallbackQuiz });
+});
+
+app.post('/api/quiz/submit-result', (req, res) => {
+  const { childId, grade, subject, score, totalQuestions } = req.body;
+  const targetId = childId || 'child_1';
+  const child = telemetryStore.children[targetId];
+  if (child) {
+    child.lastQuizResult = {
+      grade,
+      subject,
+      score,
+      totalQuestions,
+      percentage: Math.round((score / totalQuestions) * 100),
+      timestamp: new Date().toISOString()
+    };
+  }
+  res.json({ success: true, result: child?.lastQuizResult });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Maktab AI & Qalqon Ekotizimi http://localhost:${PORT} da ishlamoqda`);

@@ -218,6 +218,22 @@
       <div id="dtsCurriculumList" class="space-y-2.5"></div>
     </div>
 
+    <!-- ══ 🎯 AI TEST VA VIKTORINA (DTS STANDARTI) ══ -->
+    <div class="glass-card p-4 space-y-3 bg-gradient-to-br from-purple-950/40 via-slate-900 to-slate-900 border-purple-500/30">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🎯</span>
+          <div>
+            <h3 class="text-xs font-black text-white">AI Test va Viktorina (100 Ballik DTS)</h3>
+            <p class="text-[10px] text-purple-300">Darslik mavzulari bo'yicha bilimingizni sinang</p>
+          </div>
+        </div>
+        <button onclick="startAiQuiz()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-black transition shadow-md shadow-purple-600/30 flex items-center gap-1">
+          <span>Boshlash</span> ▶️
+        </button>
+      </div>
+    </div>
+
     <!-- ══ 💡 IXTIRO VA STARTAP LABORATORIYASI ══ -->
     <div class="glass-card p-4 space-y-3 bg-gradient-to-br from-amber-500/10 via-slate-900/60 to-slate-900/80 border-amber-500/20">
       <div class="flex items-center justify-between">
@@ -852,6 +868,113 @@
       utterance.onerror = () => { isSpeaking = false; };
 
       window.speechSynthesis.speak(utterance);
+    }
+
+    // ============================================================================
+    // 🎯 AI TEST VA VIKTORINA ENGINE
+    // ============================================================================
+    let currentQuiz = null;
+    let currentQIndex = 0;
+    let quizScore = 0;
+
+    async function startAiQuiz() {
+      document.getElementById('quizModal').classList.remove('hidden');
+      document.getElementById('quizQuestionBox').classList.remove('hidden');
+      document.getElementById('quizResultBox').classList.add('hidden');
+      document.getElementById('quizTitle').innerText = `${activeGrade}-sinf ${activeSubject} Viktorinasi`;
+      document.getElementById('quizQuestionText').innerText = "AI savollarni tuzmoqda... ⏳";
+      document.getElementById('quizOptionsContainer').innerHTML = "";
+
+      try {
+        const res = await fetch('/api/quiz/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ grade: activeGrade, subject: activeSubject })
+        });
+        const data = await res.json();
+        if (data.quiz && data.quiz.questions) {
+          currentQuiz = data.quiz;
+          currentQIndex = 0;
+          quizScore = 0;
+          renderQuizQuestion();
+        }
+      } catch (e) {
+        document.getElementById('quizQuestionText').innerText = "Testni yuklashda xatolik yuz berdi.";
+      }
+    }
+
+    function renderQuizQuestion() {
+      if (!currentQuiz || !currentQuiz.questions[currentQIndex]) {
+        finishQuiz();
+        return;
+      }
+
+      const q = currentQuiz.questions[currentQIndex];
+      document.getElementById('quizProgress').innerText = `Savol ${currentQIndex + 1} / ${currentQuiz.questions.length}`;
+      document.getElementById('quizScoreText').innerText = `Ball: ${quizScore * 20}`;
+      document.getElementById('quizQuestionText').innerText = q.question;
+      document.getElementById('quizExplanation').classList.add('hidden');
+
+      let optsHtml = '';
+      q.options.forEach((opt, idx) => {
+        optsHtml += `
+          <button onclick="handleQuizAnswer(${idx})" class="quiz-opt-btn w-full p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 text-left text-xs text-white transition flex items-center justify-between">
+            <span><b>${['A', 'B', 'C', 'D'][idx]})</b> ${opt}</span>
+          </button>
+        `;
+      });
+      document.getElementById('quizOptionsContainer').innerHTML = optsHtml;
+    }
+
+    function handleQuizAnswer(selectedIdx) {
+      const q = currentQuiz.questions[currentQIndex];
+      const isCorrect = (selectedIdx === q.correctIndex);
+      const btns = document.querySelectorAll('.quiz-opt-btn');
+
+      btns.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === q.correctIndex) {
+          btn.className = "w-full p-2.5 rounded-xl bg-emerald-600/30 border border-emerald-500 text-emerald-300 text-xs font-bold flex items-center justify-between";
+        } else if (idx === selectedIdx) {
+          btn.className = "w-full p-2.5 rounded-xl bg-rose-600/30 border border-rose-500 text-rose-300 text-xs flex items-center justify-between";
+        }
+      });
+
+      if (isCorrect) quizScore++;
+
+      const expBox = document.getElementById('quizExplanation');
+      expBox.classList.remove('hidden');
+      expBox.innerHTML = `💡 <b>Qoida tushuntirishi:</b> ${q.explanation || 'DTS darslik qoidasi.'}`;
+
+      setTimeout(() => {
+        currentQIndex++;
+        renderQuizQuestion();
+      }, 2200);
+    }
+
+    function finishQuiz() {
+      document.getElementById('quizQuestionBox').classList.add('hidden');
+      document.getElementById('quizResultBox').classList.remove('hidden');
+      const total = currentQuiz.questions.length;
+      const finalScore = Math.round((quizScore / total) * 100);
+      document.getElementById('quizFinalScore').innerText = `${finalScore} / 100 Ball`;
+
+      // Natijani serverga jo'natish
+      fetch('/api/quiz/submit-result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          childId: 'child_1',
+          grade: activeGrade,
+          subject: activeSubject,
+          score: quizScore,
+          totalQuestions: total
+        })
+      }).catch(() => {});
+    }
+
+    function closeQuizModal() {
+      document.getElementById('quizModal').classList.add('hidden');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
