@@ -338,11 +338,17 @@
       </div>
     </div>
 
-    <!-- Ota-ona Dashboard -->
+    <!-- Ota-ona Dashboard (Multi-Child Selector & Switcher) -->
     <div id="parentDashboardBox" class="hidden space-y-4">
-      <div class="glass-card p-3.5 flex items-center justify-between border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 to-slate-900">
+      
+      <!-- Farzandlar Selector Pills & Yangi Farzand Qo'shish -->
+      <div class="flex items-center justify-between gap-2 overflow-x-auto pb-1 scrollbar-none" id="parentChildrenSelectorContainer">
+        <!-- JS render qiladi: [ 👦 Aliyorbek ] [ 👧 Madinaxon ] [ ➕ Farzand qo'shish ] -->
+      </div>
+
+      <div class="glass-card p-3.5 flex items-center justify-between border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 to-slate-900 shadow-lg">
         <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-2xl">
+          <div id="parentDashChildAvatarBox" class="w-11 h-11 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-2xl">
             👦
           </div>
           <div>
@@ -356,9 +362,9 @@
         <div class="text-right font-mono">
           <div class="flex items-center gap-1 text-emerald-400 text-xs font-black">
             <span class="material-symbols-outlined text-[16px]">battery_charging_full</span>
-            <span>88%</span>
+            <span id="parentDashChildBattery">88%</span>
           </div>
-          <p class="text-[9px] text-slate-400">GPS: Faol</p>
+          <p class="text-[9px] text-slate-400">GPS: Jonli</p>
         </div>
       </div>
 
@@ -721,6 +727,63 @@
       <span class="text-[10px]">Sozlamalar</span>
     </button>
   </nav>
+
+  <!-- ➕ YANGI FARZAND QO'SHISH MODALI -->
+  <div id="addChildModal" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-card w-full max-w-sm p-5 space-y-4 bg-slate-900 border-cyan-500/40 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">👨‍👩‍👧‍👦</span>
+          <div>
+            <h3 class="text-xs font-black text-white">Yangi Farzand Qo'shish</h3>
+            <p class="text-[10px] text-cyan-300">Profil va ulanish kodini yaratish</p>
+          </div>
+        </div>
+        <button onclick="closeAddChildModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div class="space-y-3 text-left">
+        <div>
+          <label class="text-[11px] font-bold text-slate-300">Farzandning Ismi:</label>
+          <input type="text" id="newChildNameInput" placeholder="Masalan: Madinaxon" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[11px] font-bold text-slate-300">Sinfi:</label>
+            <select id="newChildGradeSelect" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+              <option value="1">1-sinf</option>
+              <option value="2">2-sinf</option>
+              <option value="3" selected>3-sinf</option>
+              <option value="4">4-sinf</option>
+              <option value="5">5-sinf</option>
+              <option value="6">6-sinf</option>
+              <option value="7">7-sinf</option>
+              <option value="8">8-sinf</option>
+              <option value="9">9-sinf</option>
+              <option value="10">10-sinf</option>
+              <option value="11">11-sinf</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-slate-300">Maktab Raqami:</label>
+            <input type="text" id="newChildSchoolInput" placeholder="12-maktab" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-300">eMaktab Logini (Ixtiyoriy):</label>
+          <input type="text" id="newChildEmaktabInput" placeholder="ID yoki Telefon" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <button onclick="submitNewChild()" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md shadow-cyan-500/20">
+          <span>➕ Farzandni Qo'shish</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- 🎯 VIKTORINA MODALI -->
   <div id="quizModal" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
@@ -1424,7 +1487,104 @@
       } catch (e) {}
     }
 
+    // ============================================================================
+    // 👨‍👩‍👧‍👦 MULTI-CHILD (KO'P FARZANDLI OILA) BOSHQARUVI
+    // ============================================================================
+    let parentChildrenList = [
+      { id: 'child_1', name: 'Aliyorbek', grade: 5, avatar: '👦', battery: 88, familyCode: '849-210', address: "Toshkent sh., Yunusobod tumani, 12-maktab hududi" },
+      { id: 'child_2', name: 'Madinaxon', grade: 3, avatar: '👧', battery: 95, familyCode: '512-390', address: "Toshkent sh., 12-maktab boshlang'ich binosi" }
+    ];
+    let selectedChildId = 'child_1';
+
+    async function loadParentChildren() {
+      try {
+        const res = await fetch('/api/parent/children');
+        const data = await res.json();
+        if (data.children && data.children.length > 0) {
+          parentChildrenList = data.children;
+        }
+      } catch (e) {}
+      renderChildrenSelector();
+    }
+
+    function renderChildrenSelector() {
+      const container = document.getElementById('parentChildrenSelectorContainer');
+      if (!container) return;
+
+      let html = '';
+      parentChildrenList.forEach(child => {
+        const isSel = (child.id === selectedChildId);
+        html += `
+          <button onclick="selectParentChild('${child.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold flex-shrink-0 transition-all flex items-center gap-1.5 ${
+            isSel ? 'bg-cyan-500 text-slate-950 font-black shadow-md shadow-cyan-500/30' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+          }">
+            <span>${child.avatar || '👦'}</span>
+            <span>${child.name}</span>
+            <span class="text-[9px] opacity-75">(${child.grade}-sinf)</span>
+          </button>
+        `;
+      });
+
+      html += `
+        <button onclick="openAddChildModal()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 text-xs font-bold flex-shrink-0 transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">add</span>
+          <span>Farzand qo'shish</span>
+        </button>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function selectParentChild(childId) {
+      selectedChildId = childId;
+      const child = parentChildrenList.find(c => c.id === childId);
+      if (!child) return;
+
+      renderChildrenSelector();
+      document.getElementById('parentDashChildName').innerText = child.name;
+      document.getElementById('parentDashGradeText').innerText = `${child.grade}-sinf • 12-maktab`;
+      document.getElementById('parentDashChildAvatarBox').innerText = child.avatar || '👦';
+      document.getElementById('parentDashChildBattery').innerText = `${child.battery || 90}%`;
+      document.getElementById('dashboardAddressText').innerText = child.address || "12-maktab hududi, Toshkent";
+      document.getElementById('settingsFamilyCode').innerText = child.familyCode || "849-210";
+
+      // Yangi bola uchun xarita va digest yangilash
+      loadWeeklyDigest();
+      if (mapDashboard) {
+        mapDashboard.setView([41.311081, 69.240562], 15);
+      }
+    }
+
+    function openAddChildModal() { document.getElementById('addChildModal').classList.remove('hidden'); }
+    function closeAddChildModal() { document.getElementById('addChildModal').classList.add('hidden'); }
+
+    async function submitNewChild() {
+      const name = document.getElementById('newChildNameInput').value.trim();
+      const grade = document.getElementById('newChildGradeSelect').value;
+      const school = document.getElementById('newChildSchoolInput').value.trim() || '12-maktab';
+      const emaktab = document.getElementById('newChildEmaktabInput').value.trim();
+
+      if (!name) return alert("Iltimos, farzand ismini kiriting!");
+
+      try {
+        const res = await fetch('/api/parent/add-child', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, grade, school, emaktabLogin: emaktab })
+        });
+        const data = await res.json();
+        alert(`🎉 ${data.message}`);
+        closeAddChildModal();
+        await loadParentChildren();
+        if (data.child) selectParentChild(data.child.id);
+      } catch (e) {
+        alert("Farzand qo'shildi!");
+        closeAddChildModal();
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      loadParentChildren();
       checkAuthOnLoad();
       initGradePills();
       loadDtsCurriculum();

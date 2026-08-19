@@ -483,6 +483,61 @@ app.get('/api/parent/analytics/:childId', (req, res) => {
 });
 
 // ============================================================================
+// 5.1 Multi-Child (Ko'p Farzandli Oila) Boshqaruv API
+// ============================================================================
+app.get('/api/parent/children', (req, res) => {
+  const list = Object.values(telemetryStore.children).map(c => ({
+    id: c.id,
+    name: c.name,
+    grade: c.grade,
+    avatar: c.avatar || (c.grade > 4 ? "👦" : "👧"),
+    battery: c.location.battery || 85,
+    safeZone: c.location.address ? "12-maktab" : "Xavfsiz hudud",
+    familyCode: c.familyCode || "849-210"
+  }));
+  res.json({ success: true, children: list });
+});
+
+app.post('/api/parent/add-child', (req, res) => {
+  const { name, grade, school, emaktabLogin } = req.body;
+  const newId = 'child_' + (Object.keys(telemetryStore.children).length + 1);
+  const randomCode = `${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`;
+
+  telemetryStore.children[newId] = {
+    id: newId,
+    name: name || "Yangi Farzand",
+    grade: Number(grade) || 1,
+    school: school || "12-maktab",
+    avatar: Number(grade) % 2 === 0 ? "👧" : "👦",
+    familyCode: randomCode,
+    location: {
+      lat: 41.311081 + (Math.random() - 0.5) * 0.01,
+      lng: 69.240562 + (Math.random() - 0.5) * 0.01,
+      speed: 0,
+      battery: 92,
+      address: `${school || "12-maktab"} hududi, Toshkent`,
+      updatedAt: new Date().toISOString()
+    },
+    locationHistory: [],
+    appUsage: [
+      { appName: "YouTube & Shorts", timeMinutes: 35, category: "Media" },
+      { appName: "Maktab AI Ta'lim", timeMinutes: 50, category: "Education" }
+    ],
+    reelsTopics: {
+      education: 50,
+      science: 30,
+      entertainment: 20
+    }
+  };
+
+  res.json({
+    success: true,
+    child: telemetryStore.children[newId],
+    message: `${name} muvaffaqiyatli qo'shildi! Ulanish kodi: ${randomCode}`
+  });
+});
+
+// ============================================================================
 // 6. Gibrid To'lov Tizimi API (Click / Payme / Telegram Stars / TON)
 // ============================================================================
 app.post('/api/payments/create-invoice', async (req, res) => {
