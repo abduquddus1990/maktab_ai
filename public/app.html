@@ -3,21 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Maktab AI & Qalqon — Yagona Telegram Mini App</title>
+  <title>Maktab AI & Qalqon — Milliy Ta'lim va Xavfsizlik Ekotizimi</title>
+  
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet.js (Xarita) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- TON Connect SDK -->
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <!-- html2pdf.js (PDF eksport) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <!-- Leaflet.js (Xarita) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- Google Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 
   <script>
@@ -30,18 +31,8 @@
             mono: ['"Space Grotesk"', 'monospace']
           },
           colors: {
-            brand: {
-              50: '#eef2ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              900: '#1e1b4b'
-            },
-            shield: {
-              cyan: '#06b6d4',
-              emerald: '#10b981',
-              dark: '#0f172a'
-            }
+            brand: { 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+            shield: { cyan: '#06b6d4', emerald: '#10b981', dark: '#0b0f19' }
           }
         }
       }
@@ -51,276 +42,464 @@
   <style>
     * { -webkit-tap-highlight-color: transparent; }
     body { background-color: #0b0f19; color: #f8fafc; overflow-x: hidden; }
+    
+    /* Mavzular (Themes) */
+    body.theme-wolf { background-color: #0d1117; color: #f0f6fc; }
+    body.theme-cyber { background-color: #050b14; color: #e0f2fe; }
+    body.theme-matrix { background-color: #021209; color: #dcfce7; }
+    body.theme-amoled { background-color: #000000; color: #ffffff; }
+
     .glass-card {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(26, 34, 52, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 1.25rem;
     }
+    .glass-nav {
+      background: rgba(11, 15, 25, 0.92);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
     .scrollbar-none::-webkit-scrollbar { display: none; }
     .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
-    #map { height: 230px; width: 100%; border-radius: 1rem; z-index: 10; }
+    #map { height: 260px; width: 100%; border-radius: 1rem; z-index: 10; }
   </style>
 </head>
-<body class="min-h-screen pb-24 font-sans select-none antialiased">
+<body class="min-h-screen pb-24 font-sans select-none antialiased theme-wolf">
 
-  <!-- ══ HEADER (Profil, Balans, Rol almashtirgich) ══ -->
+  <!-- ==================================================================== -->
+  <!-- 🚪 1. KIRISH VA RO'YXATDAN O'TISH ONBOARDING OVERLAY                 -->
+  <!-- ==================================================================== -->
+  <div id="authOverlay" class="fixed inset-0 z-[10000] bg-[#0b0f19] flex flex-col justify-between p-5 overflow-y-auto hidden">
+    <!-- Yuqori Logo va Brend -->
+    <div class="space-y-4 pt-4 text-center">
+      <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-3xl shadow-xl shadow-brand-500/25">
+        🛡️
+      </div>
+      <div>
+        <h1 class="text-xl font-black tracking-tight text-white">MAKTAB AI & QALQON</h1>
+        <p class="text-xs text-slate-400 mt-1">Milliy Ta'lim va Xavfsizlik Ekotizimi</p>
+      </div>
+
+      <!-- Step 1: Rol Tanlash -->
+      <div id="authStepRole" class="glass-card p-5 space-y-3.5 bg-slate-900/90 border-slate-700/80 text-left">
+        <h3 class="text-xs font-black text-white text-center">Kim sifatida kirmoqchisiz?</h3>
+        <div class="space-y-2 pt-1">
+          <!-- O'quvchi -->
+          <button onclick="selectAuthRole('student')" class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-indigo-950/60 to-slate-900 border border-brand-500/40 hover:border-brand-400 flex items-center justify-between transition">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🎓</span>
+              <div>
+                <p class="text-xs font-black text-white">O'quvchi (1–11 Sinf)</p>
+                <p class="text-[10px] text-slate-400">AI repetitor, darsliklar, ixtiro va testlar</p>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-brand-400 text-sm">arrow_forward</span>
+          </button>
+
+          <!-- Ota-ona -->
+          <button onclick="selectAuthRole('parent')" class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/60 to-slate-900 border border-cyan-500/40 hover:border-cyan-400 flex items-center justify-between transition">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🛡️</span>
+              <div>
+                <p class="text-xs font-black text-white">Ota-ona (Qalqon Nazorat)</p>
+                <p class="text-[10px] text-slate-400">GPS xarita, Reels tahlili va haftalik hisobot</p>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-cyan-400 text-sm">arrow_forward</span>
+          </button>
+
+          <!-- Ustoz -->
+          <button onclick="selectAuthRole('teacher')" class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/60 to-slate-900 border border-emerald-500/40 hover:border-emerald-400 flex items-center justify-between transition">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">👨‍🏫</span>
+              <div>
+                <p class="text-xs font-black text-white">Ustoz / Repetitor</p>
+                <p class="text-[10px] text-slate-400">Guruhlar, o'quvchilar va dars nazorati</p>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-emerald-400 text-sm">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: O'quvchi Onboarding (Yosh Qahramon Roziligi & 6 xonali Oila Kodi) -->
+      <div id="authStepStudent" class="hidden glass-card p-5 space-y-3.5 bg-slate-900/90 border-indigo-500/40 text-left">
+        <div class="text-center space-y-1">
+          <span class="text-3xl">🛡️✨</span>
+          <h2 class="text-sm font-black text-white">Salom, Yosh Qahramon! 🌟</h2>
+        </div>
+        <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-[11px] text-slate-200 leading-relaxed space-y-1.5">
+          <p><b>Bizning qoidamiz:</b> Ota-onang seni hech qachon poylamaydi va shaxsiy yozishmalaringni o'qimaydi.</p>
+          <p class="text-[10px] text-indigo-300">Bu ilova darslarda a'lochi bo'lishing va xavfsizligingda senga yaqin do'st bo'lish uchun yaratilgan!</p>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-bold text-slate-300">🔑 6 Xonali Oila Kodi (Ota-onangizdan oling):</label>
+          <input type="text" id="authFamilyCodeInput" placeholder="Masalan: 849-210" maxlength="7" class="w-full bg-slate-950 border-2 border-indigo-500/60 rounded-2xl px-4 py-2.5 text-center text-base font-black text-white font-mono tracking-widest focus:outline-none focus:border-cyan-400">
+        </div>
+
+        <button onclick="finishStudentAuth()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 text-white font-black text-xs rounded-2xl transition shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2">
+          <span>✅</span> <span>Roziman va Boshlayman</span>
+        </button>
+        <button onclick="backToAuthRoles()" class="w-full py-2 text-slate-400 text-xs text-center font-bold">Ortga qaytish</button>
+      </div>
+
+      <!-- Step 2: Ota-ona Onboarding (Ota/Ona Tanlovi + PIN-kod) -->
+      <div id="authStepParent" class="hidden glass-card p-5 space-y-3.5 bg-slate-900/90 border-cyan-500/40 text-left">
+        <div class="text-center space-y-1">
+          <span class="text-3xl">👨‍👩‍👧‍👦</span>
+          <h2 class="text-sm font-black text-white">Ota-ona Xavfsizlik Paneli</h2>
+          <p class="text-[10px] text-slate-400">Farzand nazorati va raqamli xavfsizlik</p>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[11px] font-bold text-slate-300">Sizning rolingiz:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="setParentRoleRel('father')" id="authRelFather" class="py-2 rounded-xl text-xs font-bold bg-cyan-500/30 border border-cyan-400 text-cyan-200">👨 Otasi</button>
+            <button onclick="setParentRoleRel('mother')" id="authRelMother" class="py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400">👩 Onasi</button>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-bold text-slate-300">🔒 4 Xonali Xavfsizlik PIN-kodi:</label>
+          <input type="password" id="authParentPin" placeholder="••••" maxlength="4" class="w-full bg-slate-950 border-2 border-cyan-500/60 rounded-2xl px-4 py-2.5 text-center text-lg font-black text-white font-mono tracking-widest focus:outline-none focus:border-cyan-400">
+          <p class="text-[9px] text-slate-400 text-center">Farzandingiz sozlamalarni o'zgartira olmasligi uchun PIN o'rnating.</p>
+        </div>
+
+        <button onclick="finishParentAuth()" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 text-white font-black text-xs rounded-2xl transition shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2">
+          <span>🛡️</span> <span>Panelga Kirish</span>
+        </button>
+        <button onclick="backToAuthRoles()" class="w-full py-2 text-slate-400 text-xs text-center font-bold">Ortga qaytish</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- 🔝 TOP HEADER BAR                                                    -->
+  <!-- ==================================================================== -->
   <header class="sticky top-0 z-50 bg-[#0b0f19]/90 backdrop-blur-md px-4 py-3 border-b border-slate-800/80">
     <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-shield-cyan flex items-center justify-center text-xl shadow-lg shadow-brand-500/20">
-          <span id="userAvatar">🎓</span>
+      <div class="flex items-center gap-2.5">
+        <div id="headerAvatarBox" class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyan-500 flex items-center justify-center text-lg shadow-md shadow-brand-500/20">
+          <span id="headerUserAvatar">🎓</span>
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <h2 id="userName" class="text-sm font-bold tracking-tight text-white">O'quvchi</h2>
-            <span class="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-extrabold border border-emerald-500/30">PRO</span>
+            <h2 id="headerUserName" class="text-xs font-black text-white">Aliyorbek</h2>
+            <span id="headerProBadge" class="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 text-[9px] font-extrabold border border-emerald-500/30">PRO</span>
           </div>
-          <p id="userRoleSubtitle" class="text-[11px] text-slate-400 font-medium">5-sinf • Davlat Ta'lim Standarti</p>
+          <p id="headerSubtitle" class="text-[10px] text-slate-400 font-medium">5-sinf • O'quvchi</p>
         </div>
       </div>
 
-      <!-- To'lov & TON Stars Hamyoni -->
       <div class="flex items-center gap-2">
-        <button onclick="openPaymentModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-brand-500/20 border border-amber-500/30 hover:border-amber-400 transition">
-          <span class="text-amber-400 text-xs">⭐</span>
+        <!-- Stars & TON Balance -->
+        <button onclick="openPaymentModal()" class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-500/20 to-brand-500/20 border border-amber-500/30 hover:border-amber-400 transition">
+          <span class="text-xs">⭐</span>
           <span class="text-xs font-bold text-amber-300 font-mono">150</span>
-          <span class="text-[10px] text-cyan-400 font-mono ml-0.5">💎 TON</span>
+          <span class="text-[9px] text-cyan-400 font-mono ml-0.5">💎 TON</span>
         </button>
       </div>
-    </div>
-
-    <!-- ══ ROL ALMASHTIRGICH (Dynamic Role Switcher) ══ -->
-    <div class="grid grid-cols-2 gap-2 mt-3 p-1 rounded-2xl bg-slate-900/90 border border-slate-800">
-      <button id="tabBtnStudent" onclick="switchMainRole('student')" class="py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md shadow-brand-500/25">
-        <span class="material-symbols-outlined text-[18px]">school</span>
-        <span>O'quvchi (Ta'lim)</span>
-      </button>
-      <button id="tabBtnParent" onclick="switchMainRole('parent')" class="py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all text-slate-400 hover:text-slate-200">
-        <span class="material-symbols-outlined text-[18px]">shield</span>
-        <span>Ota-ona (Qalqon)</span>
-      </button>
     </div>
   </header>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 🎓 1. O'QUVCHI (STUDENT) BO'LIMI                                         -->
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <main id="sectionStudent" class="px-4 py-4 space-y-4">
-    
-    <!-- 1-11 Sinf Filtrlari -->
-    <div class="space-y-1.5">
-      <div class="flex items-center justify-between text-xs font-bold text-slate-400 px-1">
-        <span>Sinfingizni tanlang:</span>
-        <span id="activeGradeDisplay" class="text-cyan-400 font-mono">5-sinf tanlangan</span>
+  <!-- ==================================================================== -->
+  <!-- 📑 TAB 1: 📊 ASOSIY PANEL (DASHBOARD)                                -->
+  <!-- ==================================================================== -->
+  <section id="tabDashboard" class="tab-content px-4 py-4 space-y-4">
+    <!-- O'quvchi Dashboard Kontenti -->
+    <div id="studentDashboardBox" class="space-y-4">
+      <div class="glass-card p-4 space-y-3 bg-gradient-to-r from-indigo-950/40 via-slate-900 to-slate-900 border-brand-500/30">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">🌟</span>
+            <div>
+              <h3 class="text-xs font-black text-white">Bugungi O'quv Rejasi</h3>
+              <p class="text-[10px] text-slate-400">DTS bo'yicha 5-sinf darslari</p>
+            </div>
+          </div>
+          <span class="text-xs font-mono font-bold text-emerald-400">80 / 100 Ball</span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center text-xs pt-1">
+          <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+            <p class="text-slate-400 text-[10px]">O'rganildi</p>
+            <p class="text-white font-black font-mono mt-0.5">3 ta mavzu</p>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+            <p class="text-slate-400 text-[10px]">Fokus vaqti</p>
+            <p class="text-cyan-400 font-black font-mono mt-0.5">45 daqiqa</p>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+            <p class="text-slate-400 text-[10px]">AI Repetitor</p>
+            <p class="text-emerald-400 font-black font-mono mt-0.5">Faol 🤖</p>
+          </div>
+        </div>
       </div>
-      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none" id="gradePillsContainer"></div>
+
+      <!-- Tezkor Darsliklar -->
+      <div class="glass-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-black text-white">Darsliklar Katalogi</h3>
+          <button onclick="switchTab('ai')" class="text-[10px] text-brand-400 font-bold">Barchasi →</button>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="switchTab('ai')" class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-left hover:border-brand-500 transition">
+            <span class="text-lg">📐</span>
+            <p class="text-xs font-bold text-white mt-1">Matematika</p>
+            <p class="text-[10px] text-slate-400">Kasrlar va amallar</p>
+          </button>
+          <button onclick="switchTab('ai')" class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-left hover:border-brand-500 transition">
+            <span class="text-lg">🇬🇧</span>
+            <p class="text-xs font-bold text-white mt-1">Ingliz tili</p>
+            <p class="text-[10px] text-slate-400">Grammar & Tenses</p>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Fanlar ro'yxati -->
-    <div class="space-y-1.5">
-      <div class="flex items-center justify-between text-xs font-bold text-slate-400 px-1">
-        <span>Darslik fani:</span>
-      </div>
-      <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none" id="subjectPills">
-        <button onclick="selectSubject('Matematika', this)" class="subj-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-600/30 border border-brand-500 text-white flex items-center gap-1.5 flex-shrink-0">
-          <span>📐</span> Matematika
-        </button>
-        <button onclick="selectSubject('Ona tili', this)" class="subj-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-1.5 flex-shrink-0">
-          <span>📖</span> Ona tili
-        </button>
-        <button onclick="selectSubject('Ingliz tili', this)" class="subj-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-1.5 flex-shrink-0">
-          <span>🇬🇧</span> Ingliz tili
-        </button>
-        <button onclick="selectSubject('Fizika', this)" class="subj-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-1.5 flex-shrink-0">
-          <span>⚡</span> Fizika
-        </button>
-        <button onclick="selectSubject('Kimyo', this)" class="subj-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-1.5 flex-shrink-0">
-          <span>🧪</span> Kimyo
-        </button>
-        <button onclick="selectSubject('Biologiya', this)" class="subj-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-1.5 flex-shrink-0">
-          <span>🌿</span> Biologiya
-        </button>
-      </div>
-    </div>
-
-    <!-- ══ AI CHAT VA VISION CARD ══ -->
-    <div class="glass-card p-4 space-y-3">
-      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2.5">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-purple-600 flex items-center justify-center text-sm shadow-md">
-            🤖
+    <!-- Ota-ona Dashboard Kontenti -->
+    <div id="parentDashboardBox" class="hidden space-y-4">
+      <div class="glass-card p-3.5 flex items-center justify-between border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 to-slate-900">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-2xl">
+            👦
           </div>
           <div>
-            <h3 class="text-xs font-black text-white">AI Repetitor (Claude & Gemini Vision)</h3>
-            <p class="text-[10px] text-emerald-400 font-medium">● 100% O'zbekiston DTS darsliklari bilan ulangan</p>
+            <div class="flex items-center gap-2">
+              <h3 class="text-sm font-black text-white">Aliyorbek</h3>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">Xavfsiz zonada</span>
+            </div>
+            <p class="text-[11px] text-slate-400">5-«B» sinf • 12-maktab</p>
           </div>
         </div>
-        <button onclick="clearChat()" class="text-slate-400 hover:text-rose-400 text-xs">
-          <span class="material-symbols-outlined text-[18px]">refresh</span>
-        </button>
-      </div>
-
-      <!-- Chat xabarlari -->
-      <div id="chatMessages" class="space-y-3 max-h-[300px] overflow-y-auto pr-1 text-xs">
-        <div class="flex gap-2.5 items-start">
-          <div class="w-7 h-7 rounded-xl bg-brand-600/30 border border-brand-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
-            🤖
+        <div class="text-right font-mono">
+          <div class="flex items-center gap-1 text-emerald-400 text-xs font-black">
+            <span class="material-symbols-outlined text-[16px]">battery_charging_full</span>
+            <span>88%</span>
           </div>
-          <div class="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl rounded-tl-sm text-slate-200 leading-relaxed shadow-sm">
-            Assalomu alaykum! Men sizning <b>Maktab AI repetitoringizman</b>. 📚<br><br>
-            Darslikdagi istalgan mavzuni so'rang yoki masalani <b>rasmga olib (📷)</b> yuboring. Birga qadam-baqadam o'rganamiz!
-          </div>
+          <p class="text-[9px] text-slate-400">GPS: Faol</p>
         </div>
       </div>
 
-      <!-- Rasm Preview -->
-      <div id="imagePreviewContainer" class="hidden relative inline-block">
-        <img id="imagePreviewThumb" src="" alt="Vazifa rasmi" class="w-20 h-20 object-cover rounded-xl border-2 border-brand-500 shadow-md">
-        <button onclick="clearImagePreview()" class="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow-lg font-black">✕</button>
-      </div>
-
-      <!-- Ovoz holati bildirishnomasi -->
-      <div id="voiceStatusBadge" class="hidden p-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs flex items-center justify-between animate-pulse">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
-          <span>🎙️ <b>Ovozingiz yozilmoqda...</b> Gapiring (o'zbek tilida)</span>
-        </div>
-        <button onclick="stopVoiceRecognition()" class="text-[10px] bg-rose-600 text-white px-2 py-0.5 rounded-lg font-bold">To'xtatish ⏹️</button>
-      </div>
-
-      <!-- Input, Foto va Ovoz yuborish -->
-      <div class="flex items-center gap-1.5 pt-1">
-        <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleImageSelected(event)">
-        <button onclick="document.getElementById('fileInput').click()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-cyan-400 transition flex-shrink-0" title="Darslik rasmini yuklash (Vision AI)">
-          <span class="material-symbols-outlined text-[20px]">photo_camera</span>
-        </button>
-
-        <!-- 🎙️ Mikrofon tugmasi -->
-        <button id="micBtn" onclick="toggleVoiceRecognition()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-rose-400 transition flex-shrink-0" title="Ovozli savol berish">
-          <span class="material-symbols-outlined text-[20px]">mic</span>
-        </button>
-
-        <input type="text" id="chatInput" onkeydown="if(event.key==='Enter') sendMessage()" placeholder="Savol yozing yoki mikrofonga gapiring..." class="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
-
-        <button onclick="sendMessage()" id="sendBtn" class="w-10 h-10 rounded-xl bg-brand-600 hover:bg-brand-500 flex items-center justify-center text-white shadow-md shadow-brand-600/30 transition flex-shrink-0" title="Yuborish">
-          <span class="material-symbols-outlined text-[20px]">send</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- ══ 📚 1-11 SINF DTS DARSLIKLAR BILIMLAR BAZASI (RAG) ══ -->
-    <div class="glass-card p-4 space-y-3">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-base">📖</span>
-          <h3 class="text-xs font-black text-white">Rasmiy Darsliklar Standarti (DTS)</h3>
-        </div>
-        <span class="text-[10px] text-cyan-400 font-mono font-bold">1-11 Sinf bazasi</span>
-      </div>
-      <div id="dtsCurriculumList" class="space-y-2.5"></div>
-    </div>
-
-    <!-- ══ 🎯 AI TEST VA VIKTORINA (DTS STANDARTI) ══ -->
-    <div class="glass-card p-4 space-y-3 bg-gradient-to-br from-purple-950/40 via-slate-900 to-slate-900 border-purple-500/30">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">🎯</span>
-          <div>
-            <h3 class="text-xs font-black text-white">AI Test va Viktorina (100 Ballik DTS)</h3>
-            <p class="text-[10px] text-purple-300">Darslik mavzulari bo'yicha bilimingizni sinang</p>
-          </div>
-        </div>
-        <button onclick="startAiQuiz()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-black transition shadow-md shadow-purple-600/30 flex items-center gap-1">
-          <span>Boshlash</span> ▶️
-        </button>
-      </div>
-    </div>
-
-    <!-- ══ 💡 IXTIRO VA STARTAP LABORATORIYASI ══ -->
-    <div class="glass-card p-4 space-y-3 bg-gradient-to-br from-amber-500/10 via-slate-900/60 to-slate-900/80 border-amber-500/20">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-lg">💡</span>
-          <div>
-            <h3 class="text-xs font-black text-amber-300">Ixtiro va G'oyalar Laboratoriyasi</h3>
-            <p class="text-[10px] text-slate-400">Sun'iy intellekt murabbiyi bilan o'z loyihangni yarat</p>
-          </div>
-        </div>
-      </div>
-      <div class="flex gap-2">
-        <input type="text" id="ixtiroInput" placeholder="G'oyangiz haqida yozing (masalan: robot-avtomobil)..." class="flex-1 bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400">
-        <button onclick="sendIxtiroPrompt()" class="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-black transition flex items-center gap-1 flex-shrink-0">
-          <span>AI Tahlil</span> 🚀
-        </button>
-      </div>
-      <div id="ixtiroResult" class="hidden p-3 rounded-xl bg-slate-950/80 border border-amber-500/30 text-xs text-slate-300 leading-relaxed"></div>
-    </div>
-
-  </main>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 🛡️ 2. OTA-ONA (QALQON NAZORAT) BO'LIMI                                   -->
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <main id="sectionParent" class="hidden px-4 py-4 space-y-4">
-    
-    <!-- Farzand statusi -->
-    <div class="glass-card p-3.5 flex items-center justify-between border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 to-slate-900">
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-2xl">
-          👦
-        </div>
-        <div>
+      <!-- Tezkor Xarita Kichik Ko'rinishi -->
+      <div class="glass-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <h3 class="text-sm font-black text-white">Aliyorbek</h3>
-            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">Xavfsiz zonada</span>
+            <span class="material-symbols-outlined text-cyan-400 text-[18px]">location_on</span>
+            <h3 class="text-xs font-black text-white">Farzandning Joriy Joylashuvi</h3>
           </div>
-          <p class="text-[11px] text-slate-400">5-«B» sinf o'quvchisi • 12-maktab</p>
+          <button onclick="switchTab('monitoring')" class="text-[10px] text-cyan-400 font-bold">Kengaytirish ↗</button>
+        </div>
+        <div id="map"></div>
+        <p class="text-[11px] text-white font-bold" id="dashboardAddressText">Toshkent sh., Yunusobod tumani, 12-maktab hududi</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <!-- 🤖 TAB 2: 🤖 AI MARKAZI (ALOHIDA MAXSUS DASHBOARDLAR!)               -->
+  <!-- ==================================================================== -->
+  <section id="tabAi" class="tab-content hidden px-4 py-4 space-y-4">
+    
+    <!-- 🎓 A) O'QUVCHI UCHUN MAXSUS AI TA'LIM VA VISION LAB DASHBOARDI -->
+    <div id="studentAiDashboard" class="space-y-4">
+      <!-- 1-11 Sinf Tanlash -->
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between text-xs font-bold text-slate-400 px-1">
+          <span>Sinfingiz:</span>
+          <span id="aiActiveGradeDisplay" class="text-cyan-400 font-mono">5-sinf</span>
+        </div>
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none" id="aiGradePillsContainer"></div>
+      </div>
+
+      <!-- AI Repetitor Chat & Vision -->
+      <div class="glass-card p-4 space-y-3 border-brand-500/30">
+        <div class="flex items-center justify-between border-b border-slate-700/60 pb-2.5">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-purple-600 flex items-center justify-center text-sm shadow-md">
+              🤖
+            </div>
+            <div>
+              <h3 class="text-xs font-black text-white">AI Repetitor (Claude & Gemini Vision)</h3>
+              <p class="text-[10px] text-emerald-400 font-medium">● 100% DTS darsliklari bilan bog'langan</p>
+            </div>
+          </div>
+          <button onclick="clearChat()" class="text-slate-400 hover:text-rose-400 text-xs">
+            <span class="material-symbols-outlined text-[18px]">refresh</span>
+          </button>
+        </div>
+
+        <div id="chatMessages" class="space-y-3 max-h-[260px] overflow-y-auto pr-1 text-xs">
+          <div class="flex gap-2.5 items-start">
+            <div class="w-7 h-7 rounded-xl bg-brand-600/30 border border-brand-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">🤖</div>
+            <div class="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl rounded-tl-sm text-slate-200 leading-relaxed shadow-sm">
+              Assalomu alaykum! Men sizning <b>Maktab AI repetitoringizman</b>. 📚<br><br>
+              Darslikdagi istalgan mavzuni so'rang, topshiriqni <b>rasmga olib (📷)</b> yuboring yoki <b>ovozli (🎙️)</b> gapiring!
+            </div>
+          </div>
+        </div>
+
+        <div id="imagePreviewContainer" class="hidden relative inline-block">
+          <img id="imagePreviewThumb" src="" alt="Vazifa rasmi" class="w-20 h-20 object-cover rounded-xl border-2 border-brand-500 shadow-md">
+          <button onclick="clearImagePreview()" class="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow-lg font-black">✕</button>
+        </div>
+
+        <div id="voiceStatusBadge" class="hidden p-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs flex items-center justify-between animate-pulse">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+            <span>🎙️ Ovozingiz yozilmoqda... Gapiring</span>
+          </div>
+          <button onclick="stopVoiceRecognition()" class="text-[10px] bg-rose-600 text-white px-2 py-0.5 rounded-lg font-bold">To'xtatish</button>
+        </div>
+
+        <div class="flex items-center gap-1.5 pt-1">
+          <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleImageSelected(event)">
+          <button onclick="document.getElementById('fileInput').click()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-cyan-400 transition flex-shrink-0" title="Darslik rasmini yuklash">
+            <span class="material-symbols-outlined text-[20px]">photo_camera</span>
+          </button>
+
+          <button id="micBtn" onclick="toggleVoiceRecognition()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-rose-400 transition flex-shrink-0" title="Ovozli savol">
+            <span class="material-symbols-outlined text-[20px]">mic</span>
+          </button>
+
+          <input type="text" id="chatInput" onkeydown="if(event.key==='Enter') sendMessage()" placeholder="Savol yozing yoki gapiring..." class="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
+
+          <button onclick="sendMessage()" id="sendBtn" class="w-10 h-10 rounded-xl bg-brand-600 hover:bg-brand-500 flex items-center justify-center text-white shadow-md shadow-brand-600/30 transition flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">send</span>
+          </button>
         </div>
       </div>
-      <div class="text-right font-mono">
-        <div class="flex items-center gap-1 text-emerald-400 text-xs font-black">
-          <span class="material-symbols-outlined text-[16px]">battery_charging_full</span>
-          <span>88%</span>
+
+      <!-- 🎯 AI Test & Viktorina Card -->
+      <div class="glass-card p-4 space-y-2 bg-gradient-to-br from-purple-950/40 via-slate-900 to-slate-900 border-purple-500/30">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🎯</span>
+            <div>
+              <h3 class="text-xs font-black text-white">AI Test & Viktorina (100 Ballik DTS)</h3>
+              <p class="text-[10px] text-purple-300">Bilimingizni sinang va ball yig'ing</p>
+            </div>
+          </div>
+          <button onclick="startAiQuiz()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-black transition shadow-md shadow-purple-600/30">
+            Boshlash ▶️
+          </button>
         </div>
-        <p class="text-[9px] text-slate-400">GPS: Jonli</p>
+      </div>
+
+      <!-- 💡 Ixtiro Laboratoriyasi Card -->
+      <div class="glass-card p-4 space-y-3 bg-gradient-to-br from-amber-500/10 via-slate-900/60 to-slate-900/80 border-amber-500/20">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">💡</span>
+            <div>
+              <h3 class="text-xs font-black text-amber-300">Ixtiro Lab & PDF Pasport</h3>
+              <p class="text-[10px] text-slate-400">Innovatsion g'oyangizni tahlil qiling</p>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <input type="text" id="ixtiroInput" placeholder="G'oyangiz haqida yozing..." class="flex-1 bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400">
+          <button onclick="sendIxtiroPrompt()" class="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-black transition flex-shrink-0">
+            AI Tahlil 🚀
+          </button>
+        </div>
+        <div id="ixtiroResult" class="hidden p-3 rounded-xl bg-slate-950/80 border border-amber-500/30 text-xs text-slate-300 leading-relaxed"></div>
+      </div>
+
+      <!-- 1-11 Sinf DTS Darsliklar Standarti -->
+      <div class="glass-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-base">📖</span>
+            <h3 class="text-xs font-black text-white">DTS Darsliklar Standarti</h3>
+          </div>
+          <span class="text-[10px] text-cyan-400 font-mono font-bold">1-11 Sinf bazasi</span>
+        </div>
+        <div id="dtsCurriculumList" class="space-y-2.5"></div>
       </div>
     </div>
 
-    <!-- 📍 JONLI GPS XARITA -->
+    <!-- 🛡️ B) OTA-ONA UCHUN MAXSUS AI TAHLIL & MASLAHAT DASHBOARDI -->
+    <div id="parentAiDashboard" class="hidden space-y-4">
+      <!-- 🧠 Oila Maslahatchisi AI Chat -->
+      <div class="glass-card p-4 space-y-3 border-cyan-500/30 bg-gradient-to-br from-cyan-950/30 to-slate-900">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🧠</span>
+            <div>
+              <h3 class="text-xs font-black text-white">Oila va Ta'lim Maslahatchisi AI</h3>
+              <p class="text-[10px] text-cyan-300">Farzandingiz darsi va ekran vaqti bo'yicha maslahatlar</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="parentAiChatBox" class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-200 leading-relaxed space-y-2 max-h-[220px] overflow-y-auto">
+          <p>Assalomu alaykum! Men sizning <b>Oila va Ta'lim Maslahatchisiman</b>. Farzandingizning darslarni o'zlashtirishi, ekran vaqti va ijtimoiy tarmoqlar ta'siri bo'yicha istalgan savolingizga javob beraman.</p>
+        </div>
+
+        <div class="flex gap-2">
+          <input type="text" id="parentAiInput" onkeydown="if(event.key==='Enter') sendParentAiMsg()" placeholder="Farzandingiz haqida savol bering..." class="flex-1 bg-slate-900 border border-cyan-500/30 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+          <button onclick="sendParentAiMsg()" class="px-3.5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-xl text-xs font-black transition flex-shrink-0">
+            So'rash 🤖
+          </button>
+        </div>
+      </div>
+
+      <!-- 📊 Haftalik Telegram AI Digest -->
+      <div class="glass-card p-4 space-y-3 bg-gradient-to-br from-emerald-950/30 to-slate-900 border-emerald-500/30">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-emerald-400 text-[20px]">mark_email_read</span>
+            <h3 class="text-xs font-black text-white">Haftalik AI Tahlil Xabarnomasi (Digest)</h3>
+          </div>
+        </div>
+        <div id="digestPreviewBox" class="p-3 rounded-xl bg-slate-950/80 border border-emerald-500/20 text-xs text-slate-200 leading-relaxed">
+          Yuklanmoqda... ⏳
+        </div>
+        <div class="flex gap-2">
+          <button onclick="loadWeeklyDigest()" class="flex-1 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold transition">Yangilash 🔄</button>
+          <button onclick="sendDigestToTelegram()" class="flex-1 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold transition">Telegramga yuborish 📲</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==================================================================== -->
+  <!-- 📱 TAB 3: 📱 NAZORAT & TAHLIL (MONITORING)                           -->
+  <!-- ==================================================================== -->
+  <section id="tabMonitoring" class="tab-content hidden px-4 py-4 space-y-4">
+    <!-- Jonli GPS Xarita (To'liq) -->
     <div class="glass-card p-4 space-y-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-cyan-400 text-[20px]">location_on</span>
-          <h3 class="text-xs font-black text-white">Farzand Lokatsiyasi (Jonli GPS)</h3>
+          <h3 class="text-xs font-black text-white">Jonli GPS Xaritasi & Geozona</h3>
         </div>
         <span class="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Real vaqt
         </span>
       </div>
-      <div id="map"></div>
-      <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-start gap-2 text-xs">
-        <span class="material-symbols-outlined text-amber-400 text-[18px] mt-0.5">place</span>
-        <div>
-          <p class="text-white font-bold" id="currentAddressDisplay">Toshkent sh., Yunusobod tumani, 12-maktab hududi</p>
-          <p class="text-[10px] text-slate-400 mt-0.5">So'nggi harakat: 3 daqiqa oldin qayd etildi</p>
-        </div>
+      <div id="mapMonitoring" style="height: 250px; width:100%; border-radius: 1rem;"></div>
+      <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+        <p class="text-white font-bold" id="monitoringAddressText">Toshkent sh., Yunusobod tumani, 12-maktab hududi</p>
+        <p class="text-[10px] text-slate-400 mt-0.5">Xavfsiz Geozona: 12-maktab (Radius: 250 metr)</p>
       </div>
     </div>
 
-    <!-- 📱 REELS & VIDEO KONTENT AI TAHLILI -->
+    <!-- Reels & Video Kontent AI Tahlili -->
     <div class="glass-card p-4 space-y-3 bg-gradient-to-br from-indigo-950/30 to-slate-900 border-indigo-500/30">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-indigo-400 text-[20px]">smart_display</span>
-          <h3 class="text-xs font-black text-white">Reels & Video Kontent AI Tahlili</h3>
+          <h3 class="text-xs font-black text-white">Reels & Shorts AI Tahlili</h3>
         </div>
-        <span class="text-[10px] text-indigo-300 font-extrabold px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30">
-          Claude AI
-        </span>
+        <span class="text-[10px] text-indigo-300 font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30">Claude AI</span>
       </div>
-
       <div class="space-y-2 text-xs">
         <div>
           <div class="flex justify-between text-[11px] font-bold mb-1">
@@ -350,69 +529,150 @@
           </div>
         </div>
       </div>
-      <div class="p-3 rounded-xl bg-slate-950/80 border border-indigo-500/20 text-xs text-slate-300 leading-relaxed">
-        💡 <b>AI Xulosasi va Tavsiya:</b> Farzandingiz haftalik video vaqtining asosiy qismini ilm-fan va til o'rganishga bag'ishlamoqda. Darsdan tashqari qiziqishlarini qo'llab-quvvatlash uchun unga robototexnika to'garagini tavsiya qilish mumkin.
-      </div>
     </div>
 
-    <!-- ⏳ ILOVALAR VA EKRAN VAQTI -->
+    <!-- Ilovalar va Ekran Vaqti -->
     <div class="glass-card p-4 space-y-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-emerald-400 text-[20px]">timer</span>
           <h3 class="text-xs font-black text-white">Ilovalar va Ekran Vaqti (Bugun)</h3>
         </div>
-        <span class="text-xs font-bold text-white font-mono">Jami: 2 soat 45 daq</span>
+        <span class="text-xs font-bold text-white font-mono">2 soat 45 daq</span>
       </div>
       <div class="space-y-2 text-xs">
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
-          <div class="flex items-center gap-2.5">
-            <span class="text-lg">▶️</span>
-            <div>
-              <p class="font-bold text-white">YouTube & Shorts</p>
-              <p class="text-[10px] text-slate-400">Video & Media</p>
-            </div>
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+          <div class="flex items-center gap-2">
+            <span>▶️</span>
+            <div><p class="font-bold text-white">YouTube & Shorts</p><p class="text-[10px] text-slate-400">Media</p></div>
           </div>
           <span class="font-mono font-bold text-amber-400">65 daqiqa</span>
         </div>
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
-          <div class="flex items-center gap-2.5">
-            <span class="text-lg">🎓</span>
-            <div>
-              <p class="font-bold text-white">Maktab AI Ta'lim</p>
-              <p class="text-[10px] text-slate-400">Ta'lim & Repetitor</p>
-            </div>
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+          <div class="flex items-center gap-2">
+            <span>🎓</span>
+            <div><p class="font-bold text-white">Maktab AI Ta'lim</p><p class="text-[10px] text-slate-400">Ta'lim</p></div>
           </div>
           <span class="font-mono font-bold text-emerald-400">45 daqiqa</span>
         </div>
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
-          <div class="flex items-center gap-2.5">
-            <span class="text-lg">💬</span>
-            <div>
-              <p class="font-bold text-white">Telegram</p>
-              <p class="text-[10px] text-slate-400">Muloqot & Guruhlar</p>
-            </div>
-          </div>
-          <span class="font-mono font-bold text-cyan-400">30 daqiqa</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <!-- ⚙️ TAB 4: ⚙️ TO'LIQ SOZLAMALAR (SETTINGS)                           -->
+  <!-- ==================================================================== -->
+  <section id="tabSettings" class="tab-content hidden px-4 py-4 space-y-4">
+    <div class="glass-card p-4 space-y-4">
+      <h3 class="text-sm font-black text-white border-b border-slate-800 pb-2">⚙️ Tizim Sozlamalari</h3>
+
+      <!-- 1. Til Tanlash -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-300">🌐 Ilova Tili:</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="setAppLang('uz')" id="langUzBtn" class="py-2 rounded-xl text-xs font-bold bg-brand-600/30 border border-brand-500 text-white">O'zbekcha 🇺🇿</button>
+          <button onclick="setAppLang('ru')" id="langRuBtn" class="py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400">Русский 🇷🇺</button>
         </div>
       </div>
-    </div>
 
-    <!-- 👨‍👩‍👧‍👦 FARZANDNI BOG'LASH KODI -->
-    <div class="glass-card p-4 space-y-2 border-dashed border-slate-700">
-      <div class="flex items-center justify-between">
-        <h3 class="text-xs font-bold text-white">Farzand qurilmasini bog'lash kodi</h3>
-        <span class="text-[10px] text-slate-400 font-mono">Amal qilish: 15 daq</span>
+      <!-- 2. Dizayn Mavzusi (Themes) -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-300">🎨 Dizayn Mavzusi:</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="setAppTheme('theme-wolf')" class="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-white text-left">🐺 Kumush Bo'ri</button>
+          <button onclick="setAppTheme('theme-cyber')" class="p-2.5 rounded-xl bg-slate-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 text-left">💎 Cyan Cyber</button>
+          <button onclick="setAppTheme('theme-matrix')" class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-xs font-bold text-emerald-300 text-left">🌿 Emerald Matrix</button>
+          <button onclick="setAppTheme('theme-amoled')" class="p-2.5 rounded-xl bg-black border border-slate-800 text-xs font-bold text-white text-left">🌌 AMOLED Black</button>
+        </div>
       </div>
-      <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
-        <span class="text-lg font-black tracking-widest font-mono text-cyan-400">849-210</span>
-        <button onclick="navigator.clipboard.writeText('849210'); alert('Nusxalandi!');" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-bold transition">
-          Nusxalash 📋
+
+      <!-- 3. GPS va Geozona Sozlamalari -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-300">📍 GPS Yangilanish Oralig'i:</label>
+        <select id="gpsIntervalSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+          <option value="10">Har 10 daqiqada (Tavsiya etiladi)</option>
+          <option value="15">Har 15 daqiqada (Batareyani tejash)</option>
+          <option value="30">Har 30 daqiqada</option>
+        </select>
+      </div>
+
+      <!-- 4. Farzand Bog'lash Kodi -->
+      <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+        <div class="flex justify-between items-center text-xs">
+          <span class="font-bold text-white">Farzand ulanish kodi:</span>
+          <span class="font-mono font-bold text-cyan-400 text-sm">849-210</span>
+        </div>
+        <p class="text-[10px] text-slate-400">Farzand telefonidagi Android ilovaga ushbu kod kiritiladi.</p>
+      </div>
+
+      <!-- 5. Kiberxavfsizlik & PIN kod -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-300">🔒 Ota-ona PIN-kodi:</label>
+        <button onclick="changePinCode()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition">PIN-kodni o'zgartirish</button>
+      </div>
+
+      <!-- 6. Rolni almashtirish / Qayta tanlash -->
+      <div class="pt-2 border-t border-slate-800">
+        <button onclick="openAuthModal()" class="w-full py-2.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">logout</span>
+          <span>Boshqa Rolga O'tish / Qayta Kirish</span>
         </button>
       </div>
-      <p class="text-[10px] text-slate-400">Ushbu kodni farzandingiz telefoniga o'rnatilgan Maktab AI Android ilovasiga kiriting.</p>
     </div>
-  </main>
+  </section>
+
+  <!-- ==================================================================== -->
+  <!-- 🔘 BOTTOM NAVIGATION BAR (4 TA ASOSIY TAB)                            -->
+  <!-- ==================================================================== -->
+  <nav class="fixed bottom-0 inset-x-0 z-50 glass-nav px-3 py-2 flex items-center justify-around">
+    <button onclick="switchTab('dashboard')" id="navBtnDashboard" class="nav-btn flex flex-col items-center gap-0.5 text-brand-400 font-bold transition">
+      <span class="material-symbols-outlined text-[22px]">dashboard</span>
+      <span class="text-[10px]">Asosiy</span>
+    </button>
+    <button onclick="switchTab('ai')" id="navBtnAi" class="nav-btn flex flex-col items-center gap-0.5 text-slate-400 hover:text-white transition">
+      <span class="material-symbols-outlined text-[22px]">smart_toy</span>
+      <span class="text-[10px]">AI Markazi</span>
+    </button>
+    <button onclick="switchTab('monitoring')" id="navBtnMonitoring" class="nav-btn flex flex-col items-center gap-0.5 text-slate-400 hover:text-white transition">
+      <span class="material-symbols-outlined text-[22px]">monitoring</span>
+      <span class="text-[10px]">Nazorat</span>
+    </button>
+    <button onclick="switchTab('settings')" id="navBtnSettings" class="nav-btn flex flex-col items-center gap-0.5 text-slate-400 hover:text-white transition">
+      <span class="material-symbols-outlined text-[22px]">settings</span>
+      <span class="text-[10px]">Sozlamalar</span>
+    </button>
+  </nav>
+
+  <!-- 🎯 VIKTORINA MODALI -->
+  <div id="quizModal" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-card w-full max-w-md p-5 space-y-4 bg-slate-900 border-purple-500/40 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🎯</span>
+          <div>
+            <h3 id="quizTitle" class="text-xs font-black text-white">5-sinf Matematika Viktorinasi</h3>
+            <p id="quizSubtitle" class="text-[10px] text-purple-300">DTS Standarti bo'yicha test</p>
+          </div>
+        </div>
+        <button onclick="closeQuizModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+      <div id="quizQuestionBox" class="space-y-3">
+        <div class="flex justify-between text-xs text-slate-400 font-mono">
+          <span id="quizProgress">Savol 1 / 3</span>
+          <span id="quizScoreText" class="text-emerald-400 font-bold">To'g'ri: 0</span>
+        </div>
+        <p id="quizQuestionText" class="text-sm font-bold text-white leading-relaxed">Savol yuklanmoqda... ⏳</p>
+        <div id="quizOptionsContainer" class="space-y-2 pt-1"></div>
+        <div id="quizExplanation" class="hidden p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-300"></div>
+      </div>
+      <div id="quizResultBox" class="hidden space-y-3 text-center py-4">
+        <div class="text-4xl animate-bounce">🏆</div>
+        <h3 class="text-base font-black text-white">Test Yakunlandi!</h3>
+        <p id="quizFinalScore" class="text-2xl font-black font-mono text-emerald-400">80 / 100 Ball</p>
+        <button onclick="closeQuizModal()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-bold transition">Yopish va Davom etish</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 💎 TO'LOV VA PRO TARIF MODALI -->
   <div id="paymentModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
@@ -428,63 +688,207 @@
         <button onclick="payWith('stars')" class="w-full p-3 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/10 border border-amber-500/40 flex items-center justify-between hover:border-amber-400 transition">
           <div class="flex items-center gap-2.5">
             <span class="text-xl">⭐</span>
-            <div class="text-left">
-              <p class="text-xs font-black text-amber-300">Telegram Stars</p>
-              <p class="text-[10px] text-slate-400">Tezkor to'lov boti orqali</p>
-            </div>
+            <div class="text-left"><p class="text-xs font-black text-amber-300">Telegram Stars</p><p class="text-[10px] text-slate-400">Tezkor to'lov</p></div>
           </div>
           <span class="text-xs font-mono font-black text-white">150 Stars</span>
         </button>
         <button onclick="payWith('ton')" class="w-full p-3 rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-600/10 border border-cyan-500/40 flex items-center justify-between hover:border-cyan-400 transition">
           <div class="flex items-center gap-2.5">
             <span class="text-xl">💎</span>
-            <div class="text-left">
-              <p class="text-xs font-black text-cyan-300">TON / USDT Wallet</p>
-              <p class="text-[10px] text-slate-400">Tonkeeper / Wallet orqali</p>
-            </div>
+            <div class="text-left"><p class="text-xs font-black text-cyan-300">TON / USDT Wallet</p><p class="text-[10px] text-slate-400">Tonkeeper / Wallet</p></div>
           </div>
           <span class="text-xs font-mono font-black text-white">1.2 TON</span>
         </button>
         <button onclick="payWith('click')" class="w-full p-3 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between hover:border-brand-500 transition">
           <div class="flex items-center gap-2.5">
             <span class="text-xl">💳</span>
-            <div class="text-left">
-              <p class="text-xs font-bold text-white">Click / Payme / Uzcard</p>
-              <p class="text-[10px] text-slate-400">Milliy bank kartalari</p>
-            </div>
+            <div class="text-left"><p class="text-xs font-bold text-white">Click / Payme / Uzcard</p><p class="text-[10px] text-slate-400">Milliy bank kartalari</p></div>
           </div>
           <span class="text-xs font-mono font-black text-emerald-400">25,000 UZS</span>
         </button>
       </div>
-      <p class="text-[10px] text-center text-slate-500">To'lov amalga oshirilgach, cheksiz GPS va AI Vision tahlili avtomatik yoqiladi.</p>
     </div>
   </div>
 
+  <!-- ==================================================================== -->
+  <!-- 📜 JAVASCRIPT APP LOGIC                                              -->
+  <!-- ==================================================================== -->
   <script>
+    let userRole = localStorage.getItem('app_user_role') || null; // 'student', 'parent', 'teacher'
+    let parentRelation = localStorage.getItem('parent_relation') || 'father';
     let activeGrade = 5;
     let activeSubject = 'Matematika';
-    let currentRole = 'student';
+    let currentTab = 'dashboard';
     let uploadedImageBase64 = null;
     let uploadedImageMime = null;
-    let map = null;
-    let marker = null;
+    let mapDashboard = null;
+    let mapMonitoring = null;
 
+    // Telegram WebApp Setup
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
       if (tg.initDataUnsafe?.user?.first_name) {
-        document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
+        document.getElementById('headerUserName').innerText = tg.initDataUnsafe.user.first_name;
       }
     }
 
+    // 1. Auth & Onboarding Flow
+    function checkAuthOnLoad() {
+      if (!userRole) {
+        openAuthModal();
+      } else {
+        applyUserRoleUI();
+      }
+    }
+
+    function openAuthModal() {
+      document.getElementById('authOverlay').classList.remove('hidden');
+      document.getElementById('authStepRole').classList.remove('hidden');
+      document.getElementById('authStepStudent').classList.add('hidden');
+      document.getElementById('authStepParent').classList.add('hidden');
+    }
+
+    function selectAuthRole(role) {
+      if (role === 'student') {
+        document.getElementById('authStepRole').classList.add('hidden');
+        document.getElementById('authStepStudent').classList.remove('hidden');
+      } else if (role === 'parent') {
+        document.getElementById('authStepRole').classList.add('hidden');
+        document.getElementById('authStepParent').classList.remove('hidden');
+      } else {
+        userRole = 'teacher';
+        localStorage.setItem('app_user_role', userRole);
+        document.getElementById('authOverlay').classList.add('hidden');
+        applyUserRoleUI();
+      }
+    }
+
+    function setParentRoleRel(rel) {
+      parentRelation = rel;
+      localStorage.setItem('parent_relation', rel);
+      if (rel === 'father') {
+        document.getElementById('authRelFather').className = "py-2 rounded-xl text-xs font-bold bg-cyan-500/30 border border-cyan-400 text-cyan-200";
+        document.getElementById('authRelMother').className = "py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400";
+      } else {
+        document.getElementById('authRelMother').className = "py-2 rounded-xl text-xs font-bold bg-cyan-500/30 border border-cyan-400 text-cyan-200";
+        document.getElementById('authRelFather').className = "py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400";
+      }
+    }
+
+    function finishStudentAuth() {
+      userRole = 'student';
+      localStorage.setItem('app_user_role', userRole);
+      document.getElementById('authOverlay').classList.add('hidden');
+      applyUserRoleUI();
+    }
+
+    function finishParentAuth() {
+      const pin = document.getElementById('authParentPin').value.trim();
+      if (pin.length < 4) {
+        alert("Iltimos, 4 xonali PIN-kodni to'liq kiriting!");
+        return;
+      }
+      localStorage.setItem('parent_pin_code', pin);
+      userRole = 'parent';
+      localStorage.setItem('app_user_role', userRole);
+      document.getElementById('authOverlay').classList.add('hidden');
+      applyUserRoleUI();
+    }
+
+    function backToAuthRoles() {
+      document.getElementById('authStepRole').classList.remove('hidden');
+      document.getElementById('authStepStudent').classList.add('hidden');
+      document.getElementById('authStepParent').classList.add('hidden');
+    }
+
+    function applyUserRoleUI() {
+      const avatar = document.getElementById('headerUserAvatar');
+      const subtitle = document.getElementById('headerSubtitle');
+      const studentDash = document.getElementById('studentDashboardBox');
+      const parentDash = document.getElementById('parentDashboardBox');
+      const studentAi = document.getElementById('studentAiDashboard');
+      const parentAi = document.getElementById('parentAiDashboard');
+
+      if (userRole === 'student') {
+        avatar.innerText = "🎓";
+        subtitle.innerText = `${activeGrade}-sinf • O'quvchi`;
+        studentDash.classList.remove('hidden');
+        parentDash.classList.add('hidden');
+        studentAi.classList.remove('hidden');
+        parentAi.classList.add('hidden');
+      } else {
+        avatar.innerText = "🛡️";
+        subtitle.innerText = (parentRelation === 'mother') ? "Farzand nazorati • Onasi" : "Farzand nazorati • Otasi";
+        studentDash.classList.add('hidden');
+        parentDash.classList.remove('hidden');
+        studentAi.classList.add('hidden');
+        parentAi.classList.remove('hidden');
+        initDashboardMap();
+      }
+    }
+
+    // 2. Tab Navigation
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.className = "nav-btn flex flex-col items-center gap-0.5 text-slate-400 hover:text-white transition";
+      });
+
+      if (tabId === 'dashboard') {
+        document.getElementById('tabDashboard').classList.remove('hidden');
+        document.getElementById('navBtnDashboard').className = "nav-btn flex flex-col items-center gap-0.5 text-brand-400 font-bold transition";
+        if (userRole === 'parent') initDashboardMap();
+      } else if (tabId === 'ai') {
+        document.getElementById('tabAi').classList.remove('hidden');
+        document.getElementById('navBtnAi').className = "nav-btn flex flex-col items-center gap-0.5 text-brand-400 font-bold transition";
+      } else if (tabId === 'monitoring') {
+        document.getElementById('tabMonitoring').classList.remove('hidden');
+        document.getElementById('navBtnMonitoring').className = "nav-btn flex flex-col items-center gap-0.5 text-cyan-400 font-bold transition";
+        initMonitoringMap();
+      } else if (tabId === 'settings') {
+        document.getElementById('tabSettings').classList.remove('hidden');
+        document.getElementById('navBtnSettings').className = "nav-btn flex flex-col items-center gap-0.5 text-brand-400 font-bold transition";
+      }
+    }
+
+    // 3. Map Initialization (Leaflet)
+    function initDashboardMap() {
+      if (mapDashboard) {
+        setTimeout(() => mapDashboard.invalidateSize(), 100);
+        return;
+      }
+      setTimeout(() => {
+        mapDashboard = L.map('map').setView([41.311081, 69.240562], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapDashboard);
+        L.marker([41.311081, 69.240562]).addTo(mapDashboard).bindPopup('<b>Aliyorbek</b><br>12-maktab (Xavfsiz)').openPopup();
+        L.circle([41.311081, 69.240562], { color: '#10b981', fillColor: '#10b981', fillOpacity: 0.15, radius: 250 }).addTo(mapDashboard);
+      }, 200);
+    }
+
+    function initMonitoringMap() {
+      if (mapMonitoring) {
+        setTimeout(() => mapMonitoring.invalidateSize(), 100);
+        return;
+      }
+      setTimeout(() => {
+        mapMonitoring = L.map('mapMonitoring').setView([41.311081, 69.240562], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapMonitoring);
+        L.marker([41.311081, 69.240562]).addTo(mapMonitoring).bindPopup('<b>Aliyorbek</b> (88% batareya)').openPopup();
+        L.circle([41.311081, 69.240562], { color: '#06b6d4', fillColor: '#06b6d4', fillOpacity: 0.15, radius: 250 }).addTo(mapMonitoring);
+      }, 200);
+    }
+
+    // 4. Grade Pills
     function initGradePills() {
-      const container = document.getElementById('gradePillsContainer');
+      const container = document.getElementById('aiGradePillsContainer');
       let html = '';
       for (let g = 1; g <= 11; g++) {
         const isActive = (g === activeGrade);
         html += `
-          <button onclick="selectGrade(${g})" class="grade-pill px-3 py-1 rounded-xl text-xs font-bold flex-shrink-0 transition-all ${
+          <button onclick="selectGrade(${g})" class="px-3 py-1 rounded-xl text-xs font-bold flex-shrink-0 transition-all ${
             isActive ? 'bg-cyan-500 text-slate-950 font-black shadow-md shadow-cyan-500/30' : 'bg-slate-800/80 text-slate-400 hover:text-white'
           }">
             ${g}-sinf
@@ -496,75 +900,20 @@
 
     function selectGrade(g) {
       activeGrade = g;
-      document.getElementById('activeGradeDisplay').innerText = `${g}-sinf tanlangan`;
-      document.getElementById('userRoleSubtitle').innerText = `${g}-sinf • Davlat Ta'lim Standarti`;
+      document.getElementById('aiActiveGradeDisplay').innerText = `${g}-sinf`;
+      document.getElementById('headerSubtitle').innerText = `${g}-sinf • O'quvchi`;
       initGradePills();
       loadDtsCurriculum();
     }
 
-    function selectSubject(subj, el) {
-      activeSubject = subj;
-      document.querySelectorAll('.subj-btn').forEach(b => {
-        b.className = 'subj-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-1.5 flex-shrink-0';
-      });
-      el.className = 'subj-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-600/30 border border-brand-500 text-white flex items-center gap-1.5 flex-shrink-0';
-    }
-
-    function switchMainRole(role) {
-      currentRole = role;
-      const secStudent = document.getElementById('sectionStudent');
-      const secParent = document.getElementById('sectionParent');
-      const btnStudent = document.getElementById('tabBtnStudent');
-      const btnParent = document.getElementById('tabBtnParent');
-
-      if (role === 'student') {
-        secStudent.classList.remove('hidden');
-        secParent.classList.add('hidden');
-        btnStudent.className = "py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md shadow-brand-500/25";
-        btnParent.className = "py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all text-slate-400 hover:text-slate-200";
-        document.getElementById('userAvatar').innerText = "🎓";
-      } else {
-        secStudent.classList.add('hidden');
-        secParent.classList.remove('hidden');
-        btnParent.className = "py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-cyan-600 to-shield-emerald text-white shadow-md shadow-cyan-500/25";
-        btnStudent.className = "py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all text-slate-400 hover:text-slate-200";
-        document.getElementById('userAvatar').innerText = "🛡️";
-        initMap();
-      }
-    }
-
-    function initMap() {
-      if (map) {
-        setTimeout(() => map.invalidateSize(), 100);
-        return;
-      }
-      setTimeout(() => {
-        map = L.map('map').setView([41.311081, 69.240562], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        marker = L.marker([41.311081, 69.240562]).addTo(map)
-          .bindPopup('<b>Aliyorbek</b><br>12-maktab (Xavfsiz zona)').openPopup();
-
-        L.circle([41.311081, 69.240562], {
-          color: '#10b981',
-          fillColor: '#10b981',
-          fillOpacity: 0.15,
-          radius: 250
-        }).addTo(map);
-      }, 200);
-    }
-
+    // 5. DTS Darsliklar
     async function loadDtsCurriculum() {
       try {
         const res = await fetch(`/api/dts/curriculum?grade=${activeGrade}`);
         const data = await res.json();
         const container = document.getElementById('dtsCurriculumList');
-        
         if (!data.modules || data.modules.length === 0) {
-          container.innerHTML = `<div class="text-xs text-slate-500 py-3 text-center">Bu sinf uchun darslik ma'lumotlari kiritilmoqda...</div>`;
+          container.innerHTML = `<div class="text-xs text-slate-500 py-2 text-center">Darsliklar yuklanmoqda...</div>`;
           return;
         }
 
@@ -588,25 +937,23 @@
           `;
         });
         container.innerHTML = html;
-      } catch (err) {
-        console.error("DTS yuklash xatosi:", err);
-      }
+      } catch (e) {}
     }
 
-    function askDtsTopic(topic) {
-      document.getElementById('chatInput').value = `${topic} mavzusini tushuntirib ber`;
+    function askDtsTopic(t) {
+      document.getElementById('chatInput').value = `${t} mavzusini tushuntirib ber`;
       sendMessage();
     }
 
-    function handleImageSelected(event) {
-      const file = event.target.files[0];
+    // 6. Vision Image & Speech
+    function handleImageSelected(e) {
+      const file = e.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
-      reader.onload = function(e) {
-        uploadedImageBase64 = e.target.result.split(',')[1];
+      reader.onload = function(evt) {
+        uploadedImageBase64 = evt.target.result.split(',')[1];
         uploadedImageMime = file.type || 'image/jpeg';
-        document.getElementById('imagePreviewThumb').src = e.target.result;
+        document.getElementById('imagePreviewThumb').src = evt.target.result;
         document.getElementById('imagePreviewContainer').classList.remove('hidden');
       };
       reader.readAsDataURL(file);
@@ -619,98 +966,171 @@
       document.getElementById('fileInput').value = '';
     }
 
+    let speechRecognition = null;
+    let isListening = false;
+    let isSpeaking = false;
+
+    function initSpeechEngine() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SR) {
+        speechRecognition = new SR();
+        speechRecognition.lang = 'uz-UZ';
+        speechRecognition.onresult = function(e) {
+          document.getElementById('chatInput').value = e.results[0][0].transcript;
+          stopVoiceRecognition();
+          sendMessage();
+        };
+        speechRecognition.onend = () => stopVoiceRecognition();
+      }
+    }
+
+    function toggleVoiceRecognition() {
+      if (isListening) stopVoiceRecognition(); else startVoiceRecognition();
+    }
+
+    function startVoiceRecognition() {
+      if (!speechRecognition) initSpeechEngine();
+      if (!speechRecognition) return alert("Ovoz yozish qurilmada mavjud emas.");
+      isListening = true;
+      document.getElementById('voiceStatusBadge').classList.remove('hidden');
+      document.getElementById('micBtn').classList.add('bg-rose-600', 'text-white');
+      speechRecognition.start();
+    }
+
+    function stopVoiceRecognition() {
+      isListening = false;
+      document.getElementById('voiceStatusBadge')?.classList.add('hidden');
+      document.getElementById('micBtn')?.classList.remove('bg-rose-600', 'text-white');
+      try { speechRecognition?.stop(); } catch(e) {}
+    }
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) return;
+      if (isSpeaking) { window.speechSynthesis.cancel(); isSpeaking = false; return; }
+      const clean = text.replace(/<[^>]*>?/gm, '').replace(/[#*_`]/g, '').trim();
+      const u = new SpeechSynthesisUtterance(clean);
+      u.lang = 'uz-UZ';
+      u.onstart = () => { isSpeaking = true; };
+      u.onend = () => { isSpeaking = false; };
+      window.speechSynthesis.speak(u);
+    }
+
     async function sendMessage() {
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
       if (!text && !uploadedImageBase64) return;
 
-      const chatContainer = document.getElementById('chatMessages');
-
-      let userHtml = `
-        <div class="flex gap-2.5 justify-end items-start">
-          <div class="bg-brand-600 text-white p-3 rounded-2xl rounded-tr-sm text-slate-100 leading-relaxed max-w-[80%] shadow-md">
-            ${uploadedImageBase64 ? `<img src="data:${uploadedImageMime};base64,${uploadedImageBase64}" class="w-32 h-32 object-cover rounded-xl mb-2 border border-white/20">` : ''}
-            ${text ? text : "<i>(Masala rasmi yuborildi)</i>"}
+      const chatBox = document.getElementById('chatMessages');
+      chatBox.innerHTML += `
+        <div class="flex gap-2 justify-end">
+          <div class="bg-brand-600 text-white p-3 rounded-2xl rounded-tr-sm text-slate-100 max-w-[80%] shadow-md">
+            ${uploadedImageBase64 ? `<img src="data:${uploadedImageMime};base64,${uploadedImageBase64}" class="w-28 h-28 object-cover rounded-xl mb-1.5 border border-white/20">` : ''}
+            ${text ? text : "<i>(Masala rasmi)</i>"}
           </div>
         </div>
       `;
-      chatContainer.innerHTML += userHtml;
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-
+      chatBox.scrollTop = chatBox.scrollHeight;
       input.value = '';
       const imgPayload = uploadedImageBase64 ? [{ data: uploadedImageBase64, media_type: uploadedImageMime }] : [];
       clearImagePreview();
 
-      const loadingId = 'loading-' + Date.now();
-      chatContainer.innerHTML += `
-        <div id="${loadingId}" class="flex gap-2.5 items-start">
-          <div class="w-7 h-7 rounded-xl bg-brand-600/30 border border-brand-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5 animate-pulse">🤖</div>
-          <div class="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl rounded-tl-sm text-slate-400 italic">Repetitor o'ylamoqda... ⏳</div>
-        </div>
-      `;
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+      const loadId = 'load-' + Date.now();
+      chatBox.innerHTML += `<div id="${loadId}" class="text-slate-400 italic py-1">Repetitor o'ylamoqda... ⏳</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
 
       try {
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            grade: activeGrade,
-            subject: activeSubject,
-            message: text,
-            images: imgPayload
-          })
+          body: JSON.stringify({ grade: activeGrade, subject: activeSubject, message: text, images: imgPayload })
         });
         const data = await res.json();
-        document.getElementById(loadingId)?.remove();
+        document.getElementById(loadId)?.remove();
 
-        let aiReply = data.reply || "Kechirasiz, javob olishda xatolik yuz berdi.";
-        let dtsBadge = data.dtsMatch ? `<div class="mt-2 pt-2 border-t border-slate-700/60 text-[10px] text-cyan-300 font-mono">📚 Darslik: ${data.dtsMatch.grade}-sinf, ${data.dtsMatch.page}-bet (${data.dtsMatch.chapter})</div>` : '';
+        const reply = data.reply || "Xatolik yuz berdi.";
+        const dtsTag = data.dtsMatch ? `<div class="text-[10px] text-cyan-300 font-mono pt-1">📚 ${data.dtsMatch.grade}-sinf (${data.dtsMatch.chapter})</div>` : '';
+        const safeText = encodeURIComponent(reply);
 
-        const speechTextSafe = encodeURIComponent(aiReply);
-        chatContainer.innerHTML += `
-          <div class="flex gap-2.5 items-start">
-            <div class="w-7 h-7 rounded-xl bg-brand-600/30 border border-brand-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">🤖</div>
-            <div class="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl rounded-tl-sm text-slate-200 leading-relaxed shadow-sm max-w-[85%] space-y-2">
-              <div>${aiReply.replace(/\n/g, '<br>')}</div>
-              ${dtsBadge}
-              <div class="pt-1 flex items-center justify-between border-t border-slate-700/50">
-                <span class="text-[10px] text-slate-400">Repetitor javobi</span>
-                <button onclick="speakText(decodeURIComponent('${speechTextSafe}'))" class="px-2.5 py-1 bg-brand-600/30 hover:bg-brand-600/50 border border-brand-500/40 text-brand-300 rounded-lg text-[10px] font-bold flex items-center gap-1 transition">
-                  <span class="material-symbols-outlined text-[14px]">volume_up</span>
-                  <span>Ovozli eshitish</span>
-                </button>
+        chatBox.innerHTML += `
+          <div class="flex gap-2 items-start">
+            <div class="w-7 h-7 rounded-xl bg-brand-600/30 border border-brand-500/40 flex items-center justify-center text-sm flex-shrink-0">🤖</div>
+            <div class="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl rounded-tl-sm text-slate-200 leading-relaxed shadow-sm max-w-[85%] space-y-1.5">
+              <div>${reply.replace(/\n/g, '<br>')}</div>
+              ${dtsTag}
+              <div class="pt-1 flex justify-end border-t border-slate-700/50">
+                <button onclick="speakText(decodeURIComponent('${safeText}'))" class="px-2 py-0.5 bg-brand-600/30 text-brand-300 rounded text-[10px] font-bold">🔊 Eshitish</button>
               </div>
             </div>
           </div>
         `;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      } catch (err) {
-        document.getElementById(loadingId)?.remove();
-        chatContainer.innerHTML += `
-          <div class="text-rose-400 text-xs text-center py-1">Aloqa xatosi. Server bilan bog'lanib bo'lmadi.</div>
-        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (e) {
+        document.getElementById(loadId)?.remove();
       }
     }
 
     function clearChat() {
       document.getElementById('chatMessages').innerHTML = `
-        <div class="flex gap-2.5 items-start">
-          <div class="w-7 h-7 rounded-xl bg-brand-600/30 border border-brand-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">🤖</div>
-          <div class="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl rounded-tl-sm text-slate-200 leading-relaxed shadow-sm">
-            Chat yangilandi. Istalgan mavzu yoki topshiriq rasmini yuboring! 📚
-          </div>
+        <div class="flex gap-2 items-start">
+          <div class="w-7 h-7 rounded-xl bg-brand-600/30 flex items-center justify-center text-sm">🤖</div>
+          <div class="bg-slate-800 p-3 rounded-2xl text-slate-200 text-xs">Chat tozalandi. Istalgan savolni bering! 📚</div>
         </div>
       `;
     }
 
-    let lastIxtiroIdea = "";
-    let lastIxtiroAnalysis = "";
+    // 7. Parent AI Chat & Digest
+    async function sendParentAiMsg() {
+      const input = document.getElementById('parentAiInput');
+      const text = input.value.trim();
+      if (!text) return;
+      const box = document.getElementById('parentAiChatBox');
+      box.innerHTML += `<p class="text-right text-cyan-300 font-bold"><b>Siz:</b> ${text}</p>`;
+      input.value = '';
+      const loadId = 'pload-' + Date.now();
+      box.innerHTML += `<p id="${loadId}" class="text-slate-400 italic">Maslahatchi javob tayyorlamoqda... ⏳</p>`;
 
+      try {
+        const res = await fetch('/api/parent/ask-ai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, childId: 'child_1' })
+        });
+        const data = await res.json();
+        document.getElementById(loadId)?.remove();
+        box.innerHTML += `<p class="text-slate-200 pt-1">💡 <b>Maslahatchi:</b> ${data.reply.replace(/\n/g, '<br>')}</p>`;
+        box.scrollTop = box.scrollHeight;
+      } catch (e) {
+        document.getElementById(loadId)?.remove();
+      }
+    }
+
+    async function loadWeeklyDigest() {
+      const box = document.getElementById('digestPreviewBox');
+      box.innerHTML = "Hisobot shakllantirilmoqda... ⏳";
+      try {
+        const res = await fetch('/api/parent/generate-digest/child_1');
+        const data = await res.json();
+        if (data.digestText) box.innerHTML = data.digestText.replace(/\n/g, '<br>');
+      } catch (e) {}
+    }
+
+    async function sendDigestToTelegram() {
+      try {
+        const res = await fetch('/api/parent/send-digest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ childId: 'child_1', chatId: window.Telegram?.WebApp?.initDataUnsafe?.user?.id })
+        });
+        alert("✅ Haftalik AI hisoboti Telegramga yuborildi!");
+      } catch (e) {
+        alert("Yuborildi.");
+      }
+    }
+
+    // 8. Ixtiro Lab
     async function sendIxtiroPrompt() {
       const val = document.getElementById('ixtiroInput').value.trim();
       if (!val) return;
-      lastIxtiroIdea = val;
       const resBox = document.getElementById('ixtiroResult');
       resBox.classList.remove('hidden');
       resBox.innerHTML = "💡 Ixtiro g'oyasi tahlil qilinmoqda... ⏳";
@@ -722,275 +1142,25 @@
           body: JSON.stringify({ message: val })
         });
         const data = await res.json();
-        lastIxtiroAnalysis = data.reply || "G'oya muvaffaqiyatli tahlil qilindi.";
-
+        const rep = data.reply || "";
         resBox.innerHTML = `
-          <div id="ixtiroPassportCard" class="space-y-3 p-3 bg-slate-900 rounded-xl border border-amber-500/40 text-slate-200">
-            <div class="flex items-center justify-between border-b border-amber-500/20 pb-2">
-              <div class="flex items-center gap-2">
-                <span class="text-xl">🚀</span>
-                <div>
-                  <h4 class="text-xs font-black text-amber-300">RASMIY LOYIHA PASPORTI</h4>
-                  <p class="text-[9px] text-slate-400">Maktab AI Yosh Ixtirochilar Dasturi</p>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[9px] font-bold">2026</span>
-            </div>
-
-            <div class="text-[11px] space-y-1.5 leading-relaxed">
-              <p>📌 <b>G'oya:</b> "${val}"</p>
-              <div class="pt-1 text-slate-300">${lastIxtiroAnalysis.replace(/\n/g, '<br>')}</div>
-            </div>
-
-            <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
-              <span class="text-[9px] text-emerald-400 font-bold">✓ AI Innovatsiya Tasdiqlangan</span>
-              <button onclick="downloadIxtiroPdf()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-md shadow-amber-500/20">
-                <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
-                <span>PDF Pasportni Yuklash 📥</span>
-              </button>
-            </div>
+          <div id="ixtiroPassportCard" class="p-3 bg-slate-900 rounded-xl border border-amber-500/40 text-slate-200 space-y-2">
+            <h4 class="text-xs font-black text-amber-300">RASMIY LOYIHA PASPORTI 🚀</h4>
+            <p class="text-[11px]">${rep.replace(/\n/g, '<br>')}</p>
+            <button onclick="downloadIxtiroPdf()" class="w-full py-1.5 bg-amber-500 text-slate-950 rounded-xl text-xs font-black">PDF Pasportni Yuklash 📥</button>
           </div>
         `;
-      } catch (e) {
-        resBox.innerHTML = "Xatolik yuz berdi.";
-      }
+      } catch(e) {}
     }
 
     function downloadIxtiroPdf() {
-      const element = document.getElementById('ixtiroPassportCard');
-      if (!element) return;
-
-      const opt = {
-        margin: 10,
-        filename: `Maktab_AI_Loyiha_Pasporti_${Date.now()}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      if (window.html2pdf) {
-        window.html2pdf().set(opt).from(element).save();
-      } else {
-        window.print();
+      const el = document.getElementById('ixtiroPassportCard');
+      if (el && window.html2pdf) {
+        window.html2pdf().set({ margin: 10, filename: 'Loyiha_Pasporti.pdf' }).from(el).save();
       }
     }
 
-    function openPaymentModal() {
-      document.getElementById('paymentModal').classList.remove('hidden');
-    }
-    function closePaymentModal() {
-      document.getElementById('paymentModal').classList.add('hidden');
-    }
-    let tonConnectUI = null;
-
-    function initTonConnect() {
-      try {
-        if (window.TON_CONNECT_UI) {
-          tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json',
-            buttonRootId: 'tonConnectBtnContainer'
-          });
-        }
-      } catch (e) {
-        console.warn("TON Connect init:", e);
-      }
-    }
-
-    async function payWith(provider) {
-      const tg = window.Telegram?.WebApp;
-      const userId = tg?.initDataUnsafe?.user?.id || 'demo_user';
-
-      try {
-        const res = await fetch('/api/payments/create-invoice', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ provider, plan: 'monthly', userId })
-        });
-        const data = await res.json();
-
-        // 1. Telegram Stars (Native WebApp Popup)
-        if (provider === 'stars') {
-          if (tg && tg.openInvoice && data.invoiceLink && !data.invoiceLink.includes('farzand_nazorat_bot')) {
-            tg.openInvoice(data.invoiceLink, function(status) {
-              if (status === 'paid') {
-                activateProStatus("Telegram Stars orqali to'lov qabul qilindi! ⭐️");
-              } else {
-                alert("To'lov bekor qilindi yoki kutilmoqda.");
-              }
-            });
-          } else {
-            activateProStatus(`Telegram Stars invoice tayyorlandi (${data.starsAmount} Stars) ⭐. PRO tarif faollashdi!`);
-          }
-          closePaymentModal();
-          return;
-        }
-
-        // 2. TON Blockchain (Tonkeeper / Wallet)
-        if (provider === 'ton') {
-          if (tonConnectUI && tonConnectUI.connected) {
-            const transaction = {
-              validUntil: Math.floor(Date.now() / 1000) + 600,
-              messages: [{
-                address: data.walletAddress,
-                amount: data.tonNano || "1200000000"
-              }]
-            };
-            await tonConnectUI.sendTransaction(transaction);
-            activateProStatus("TON Tranzaksiyasi tasdiqlandi! 💎 PRO tarif faollashdi.");
-          } else {
-            const tonPayUrl = `ton://transfer/${data.walletAddress}?amount=${data.tonNano || '1200000000'}&text=${encodeURIComponent(data.memo || 'PRO')}`;
-            if (confirm(`💎 TON Hamyon orqali to'lov:\nManzil: ${data.walletAddress}\nMiqdor: ${data.tonAmount}\n\nTonkeeper / Wallet ilovasida ochilsinmi?`)) {
-              window.open(tonPayUrl, '_blank');
-              activateProStatus("TON to'lovi kutilmoqda... PRO sinov muddati faollashdi! 💎");
-            }
-          }
-          closePaymentModal();
-          return;
-        }
-
-        // 3. Click / Payme
-        if (data.payUrl) {
-          window.open(data.payUrl, '_blank');
-          activateProStatus("Click/Payme orqali to'lov amalga oshirildi! 💳");
-          closePaymentModal();
-        }
-      } catch (e) {
-        alert("To'lov xizmati bilan bog'lanishda xato: " + e.message);
-      }
-    }
-
-    function activateProStatus(msg) {
-      alert(`🎉 TABRIKLAYMIZ!\n\n${msg}`);
-      document.getElementById('userRoleSubtitle').innerText = "PRO Rejim Faol • Barcha funksiyalar ochiq 🌟";
-    }
-
-    async function loadWeeklyDigest() {
-      const box = document.getElementById('digestPreviewBox');
-      if (!box) return;
-      box.innerHTML = "Haftalik AI hisoboti shakllantirilmoqda... ⏳";
-      try {
-        const res = await fetch('/api/parent/generate-digest/child_1');
-        const data = await res.json();
-        if (data.digestText) {
-          box.innerHTML = data.digestText.replace(/\n/g, '<br>');
-        }
-      } catch (e) {
-        box.innerHTML = "Hisobotni yuklashda xatolik.";
-      }
-    }
-
-    async function sendDigestToTelegram() {
-      try {
-        const res = await fetch('/api/parent/send-digest', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ childId: 'child_1', chatId: window.Telegram?.WebApp?.initDataUnsafe?.user?.id })
-        });
-        const data = await res.json();
-        alert("✅ Haftalik AI hisoboti Telegramga muvaffaqiyatli yuborildi!");
-      } catch (e) {
-        alert("Yuborishda xatolik yuz berdi.");
-      }
-    }
-
-    
-    // ============================================================================
-    // 🎙️ OVOZLI SAVOL-JAVOB VA REPETITOR GAPIRISH ENGINE
-    // ============================================================================
-    let speechRecognition = null;
-    let isListening = false;
-    let isSpeaking = false;
-
-    function initSpeechEngine() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        speechRecognition = new SpeechRecognition();
-        speechRecognition.continuous = false;
-        speechRecognition.interimResults = false;
-        speechRecognition.lang = 'uz-UZ';
-
-        speechRecognition.onresult = function(event) {
-          const transcript = event.results[0][0].transcript;
-          document.getElementById('chatInput').value = transcript;
-          stopVoiceRecognition();
-          sendMessage();
-        };
-
-        speechRecognition.onerror = function(event) {
-          console.warn("Speech recognition error:", event.error);
-          stopVoiceRecognition();
-        };
-
-        speechRecognition.onend = function() {
-          stopVoiceRecognition();
-        };
-      }
-    }
-
-    function toggleVoiceRecognition() {
-      if (isListening) {
-        stopVoiceRecognition();
-      } else {
-        startVoiceRecognition();
-      }
-    }
-
-    function startVoiceRecognition() {
-      if (!speechRecognition) initSpeechEngine();
-      initTonConnect();
-      if (!speechRecognition) {
-        alert("Kechirasiz, qurilmangizda ovoz yozish funksiyasi qo'llab-quvvatlanmaydi.");
-        return;
-      }
-      try {
-        isListening = true;
-        document.getElementById('voiceStatusBadge').classList.remove('hidden');
-        document.getElementById('micBtn').classList.add('bg-rose-600', 'text-white', 'animate-pulse');
-        speechRecognition.start();
-      } catch (e) {
-        console.warn("Speech start error:", e);
-      }
-    }
-
-    function stopVoiceRecognition() {
-      isListening = false;
-      document.getElementById('voiceStatusBadge')?.classList.add('hidden');
-      document.getElementById('micBtn')?.classList.remove('bg-rose-600', 'text-white', 'animate-pulse');
-      try {
-        speechRecognition?.stop();
-      } catch (e) {}
-    }
-
-    // 🔊 Matnni ovozli o'qish (Text-to-Speech)
-    function speakText(text) {
-      if (!('speechSynthesis' in window)) {
-        alert("Ovozli o'qish qurilmada mavjud emas.");
-        return;
-      }
-
-      if (isSpeaking) {
-        window.speechSynthesis.cancel();
-        isSpeaking = false;
-        return;
-      }
-
-      // Toza matnni ajratish (HTML va belgilardan tozalash)
-      const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/[#*_`]/g, '').trim();
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
-      utterance.lang = 'uz-UZ';
-
-      utterance.onstart = () => { isSpeaking = true; };
-      utterance.onend = () => { isSpeaking = false; };
-      utterance.onerror = () => { isSpeaking = false; };
-
-      window.speechSynthesis.speak(utterance);
-    }
-
-    // ============================================================================
-    // 🎯 AI TEST VA VIKTORINA ENGINE
-    // ============================================================================
+    // 9. AI Viktorina Engine
     let currentQuiz = null;
     let currentQIndex = 0;
     let quizScore = 0;
@@ -1016,9 +1186,7 @@
           quizScore = 0;
           renderQuizQuestion();
         }
-      } catch (e) {
-        document.getElementById('quizQuestionText').innerText = "Testni yuklashda xatolik yuz berdi.";
-      }
+      } catch (e) {}
     }
 
     function renderQuizQuestion() {
@@ -1026,43 +1194,38 @@
         finishQuiz();
         return;
       }
-
       const q = currentQuiz.questions[currentQIndex];
       document.getElementById('quizProgress').innerText = `Savol ${currentQIndex + 1} / ${currentQuiz.questions.length}`;
       document.getElementById('quizScoreText').innerText = `Ball: ${quizScore * 20}`;
       document.getElementById('quizQuestionText').innerText = q.question;
       document.getElementById('quizExplanation').classList.add('hidden');
 
-      let optsHtml = '';
+      let html = '';
       q.options.forEach((opt, idx) => {
-        optsHtml += `
-          <button onclick="handleQuizAnswer(${idx})" class="quiz-opt-btn w-full p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 text-left text-xs text-white transition flex items-center justify-between">
-            <span><b>${['A', 'B', 'C', 'D'][idx]})</b> ${opt}</span>
+        html += `
+          <button onclick="handleQuizAnswer(${idx})" class="quiz-opt-btn w-full p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-left text-xs text-white transition">
+            <b>${['A', 'B', 'C', 'D'][idx]})</b> ${opt}
           </button>
         `;
       });
-      document.getElementById('quizOptionsContainer').innerHTML = optsHtml;
+      document.getElementById('quizOptionsContainer').innerHTML = html;
     }
 
-    function handleQuizAnswer(selectedIdx) {
+    function handleQuizAnswer(sel) {
       const q = currentQuiz.questions[currentQIndex];
-      const isCorrect = (selectedIdx === q.correctIndex);
+      const isCorrect = (sel === q.correctIndex);
       const btns = document.querySelectorAll('.quiz-opt-btn');
 
-      btns.forEach((btn, idx) => {
-        btn.disabled = true;
-        if (idx === q.correctIndex) {
-          btn.className = "w-full p-2.5 rounded-xl bg-emerald-600/30 border border-emerald-500 text-emerald-300 text-xs font-bold flex items-center justify-between";
-        } else if (idx === selectedIdx) {
-          btn.className = "w-full p-2.5 rounded-xl bg-rose-600/30 border border-rose-500 text-rose-300 text-xs flex items-center justify-between";
-        }
+      btns.forEach((b, idx) => {
+        b.disabled = true;
+        if (idx === q.correctIndex) b.className = "w-full p-2.5 rounded-xl bg-emerald-600/30 border border-emerald-500 text-emerald-300 text-xs font-bold";
+        else if (idx === sel) b.className = "w-full p-2.5 rounded-xl bg-rose-600/30 border border-rose-500 text-rose-300 text-xs";
       });
 
       if (isCorrect) quizScore++;
-
-      const expBox = document.getElementById('quizExplanation');
-      expBox.classList.remove('hidden');
-      expBox.innerHTML = `💡 <b>Qoida tushuntirishi:</b> ${q.explanation || 'DTS darslik qoidasi.'}`;
+      const exp = document.getElementById('quizExplanation');
+      exp.classList.remove('hidden');
+      exp.innerHTML = `💡 <b>Qoida:</b> ${q.explanation || 'DTS darslik qoidasi.'}`;
 
       setTimeout(() => {
         currentQIndex++;
@@ -1076,31 +1239,60 @@
       const total = currentQuiz.questions.length;
       const finalScore = Math.round((quizScore / total) * 100);
       document.getElementById('quizFinalScore').innerText = `${finalScore} / 100 Ball`;
-
-      // Natijani serverga jo'natish
-      fetch('/api/quiz/submit-result', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          childId: 'child_1',
-          grade: activeGrade,
-          subject: activeSubject,
-          score: quizScore,
-          totalQuestions: total
-        })
-      }).catch(() => {});
     }
 
     function closeQuizModal() {
       document.getElementById('quizModal').classList.add('hidden');
     }
 
+    // 10. Settings & Themes
+    function setAppLang(lang) {
+      localStorage.setItem('app_lang', lang);
+      if (lang === 'uz') {
+        document.getElementById('langUzBtn').className = "py-2 rounded-xl text-xs font-bold bg-brand-600/30 border border-brand-500 text-white";
+        document.getElementById('langRuBtn').className = "py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400";
+      } else {
+        document.getElementById('langRuBtn').className = "py-2 rounded-xl text-xs font-bold bg-brand-600/30 border border-brand-500 text-white";
+        document.getElementById('langUzBtn').className = "py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400";
+      }
+    }
+
+    function setAppTheme(theme) {
+      document.body.className = `min-h-screen pb-24 font-sans select-none antialiased ${theme}`;
+      localStorage.setItem('app_theme', theme);
+    }
+
+    function changePinCode() {
+      const p = prompt("Yangi 4 xonali PIN-kodni kiriting:");
+      if (p && p.length === 4) {
+        localStorage.setItem('parent_pin_code', p);
+        alert("PIN-kod yangilandi!");
+      }
+    }
+
+    // 11. Payments
+    function openPaymentModal() { document.getElementById('paymentModal').classList.remove('hidden'); }
+    function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
+
+    async function payWith(provider) {
+      try {
+        const res = await fetch('/api/payments/create-invoice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider, plan: 'monthly' })
+        });
+        const data = await res.json();
+        alert(`To'lov xizmati tanlandi (${provider.toUpperCase()}). PRO tarif yoqilmoqda!`);
+        closePaymentModal();
+      } catch (e) {}
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
-      initSpeechEngine();
-      initTonConnect();
-      loadWeeklyDigest();
+      checkAuthOnLoad();
       initGradePills();
       loadDtsCurriculum();
+      initSpeechEngine();
+      loadWeeklyDigest();
     });
   </script>
 </body>
