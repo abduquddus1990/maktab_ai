@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0f172a"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Logo / Icon -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🛡️"
+            android:textSize="54sp"
+            android:layout_marginTop="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shield Parental Guard"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Farzand Xavfsizligi &amp; Ota-Ona Nazorati\nБезопасность ребёнка и Родительский контроль"
+            android:textColor="#94a3b8"
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:layout_marginTop="4dp" />
+
+        <!-- 1. Code Input Screen -->
+        <LinearLayout
+            android:id="@+id/layoutCodeInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#1e293b"
+            android:padding="20dp"
+            android:layout_marginTop="28dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Oila Kodini Kiriting / Введите код семьи:"
+                android:textColor="#38bdf8"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ota-onangizning Telegram botidagi 6 xonali kod (masalan: 849-210)"
+                android:textColor="#64748b"
+                android:textSize="11sp"
+                android:layout_marginTop="2dp" />
+
+            <EditText
+                android:id="@+id/etPairingCode"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="#0f172a"
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:hint="849-210"
+                android:textColorHint="#475569"
+                android:layout_marginTop="14dp" />
+
+            <Button
+                android:id="@+id/btnPair"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:text="🔗 Ulash / Подключить"
+                android:textColor="#ffffff"
+                android:textStyle="bold"
+                android:background="#10b981"
+                android:layout_marginTop="16dp" />
+        </LinearLayout>
+
+        <!-- 2. Permissions Wizard -->
+        <LinearLayout
+            android:id="@+id/layoutPermissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="#1e293b"
+            android:padding="20dp"
+            android:layout_marginTop="28dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚙️ Kerakli Ruxsatlar / Необходимые разрешения:"
+                android:textColor="#38bdf8"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnGrantLocation"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:text="📍 1. Lokatsiyaga ruxsat (GPS)"
+                android:textColor="#ffffff"
+                android:background="#334155"
+                android:layout_marginTop="12dp" />
+
+            <Button
+                android:id="@+id/btnGrantUsage"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:text="📱 2. Ekran vaqti ruxsati"
+                android:textColor="#ffffff"
+                android:background="#334155"
+                android:layout_marginTop="10dp" />
+
+            <Button
+                android:id="@+id/btnGrantAccessibility"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:text="🎬 3. Video tahlili (Maxsus xizmat)"
+                android:textColor="#ffffff"
+                android:background="#334155"
+                android:layout_marginTop="10dp" />
+        </LinearLayout>
+
+        <!-- 3. Active Running Status -->
+        <LinearLayout
+            android:id="@+id/layoutStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center"
+            android:background="#1e293b"
+            android:padding="24dp"
+            android:layout_marginTop="28dp">
+
+            <TextView
+                android:id="@+id/tvStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🛡️ Qurilma himoyalangan va ulangan!\nУстройство защищено и подключено!"
+                android:textColor="#10b981"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textAlignment="center" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

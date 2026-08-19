@@ -1,4 +1,4 @@
-import os
+﻿import os
 import time
 import logging
 from pathlib import Path
@@ -14,16 +14,17 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://maktab-ai-one.vercel.app")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "http://localhost:3000/app.html")
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    name = user.first_name or "O'quvchi"
+    name = user.first_name or "Foydalanuvchi"
 
     keyboard = [
-        [InlineKeyboardButton("🚀 MAKTAB AI ni ochish", web_app=WebAppInfo(url=WEBAPP_URL))],
+        [InlineKeyboardButton("🚀 MAKTAB AI & QALQON (Mini App)", web_app=WebAppInfo(url=WEBAPP_URL))],
+        [InlineKeyboardButton("🛡️ Ota-ona Nazorati (GPS & Reels)", web_app=WebAppInfo(url=f"{WEBAPP_URL}?role=parent")),
+         InlineKeyboardButton("🎓 AI Darslik Repetitor", web_app=WebAppInfo(url=f"{WEBAPP_URL}?role=student"))],
         [InlineKeyboardButton("📖 Qo'llanma", callback_data="help"),
          InlineKeyboardButton("💬 Murojaat", url="https://t.me/maktabai_support")]
     ]
@@ -31,40 +32,36 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         f"Assalomu alaykum, *{name}*\\! 👋\n\n"
-        "🎓 *MAKTAB AI* — O'zbekistonning eng aqlli o'quv yordamchisi\\!\n\n"
+        "🎓 *MAKTAB AI & QALQON* — Yagona Milliy Ta'lim va Xavfsizlik Ekotizimi\\!\n\n"
         "━━━━━━━━━━━━━━━━\n"
-        "✅ *1\\-11 sinf* barcha fanlar\n"
-        "✅ *Gemini AI* bilan real vaqt javoblari\n"
-        "✅ *O'zbek tilida* — sizning yoshingizga mos\n"
-        "✅ *Test va olimpiada* tayyorgarligи\n"
-        "✅ *Fayllar* — PDF va rasm yuklash\n"
-        "✅ *Ovozli* savol berish\n"
+        "✅ *1\\-11 sinf DTS* darsliklar bazasi va AI Repetitor\n"
+        "✅ *Vision AI* — masala va darslik rasmini tahlil qilish\n"
+        "✅ *Jonli GPS* lokatsiya va xavfsiz geozonalar\n"
+        "✅ *Reels / Shorts* kontentini AI orqali tahlil qilish\n"
+        "✅ *Ixtiro Laboratoriyasi* — yosh ixtirochilar uchun\n"
+        "✅ *Telegram Stars & TON* to'lov integratsiyasi\n"
         "━━━━━━━━━━━━━━━━\n\n"
-        "👇 Quyidagi tugmani bosing va boshlang\\!",
+        "👇 Quyidagi tugmani bosing va Mini App'ni oching\\!",
         reply_markup=reply_markup,
         parse_mode="MarkdownV2"
     )
 
-
 async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [[InlineKeyboardButton("🚀 MAKTAB AI ni ochish", web_app=WebAppInfo(url=WEBAPP_URL))]]
+    keyboard = [[InlineKeyboardButton("🚀 Mini App'ni ochish", web_app=WebAppInfo(url=WEBAPP_URL))]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.message.reply_text(
-        "📚 *MAKTAB AI — Qo'llanma*\n\n"
+        "📚 *MAKTAB AI & QALQON — Qo'llanma*\n\n"
         "━━━━━━━━━━━━━━━━\n"
         "🔹 /start — Botni ishga tushirish\n"
         "🔹 /help — Ushbu yordam xabari\n\n"
         "📱 *Qanday ishlatish:*\n"
-        "1\\. \"MAKTAB AI ni ochish\" tugmasini bosing\n"
-        "2\\. Sinfingizni tanlang \\(1\\-11\\)\n"
-        "3\\. Fanlingizni tanlang\n"
-        "4\\. AI bilan suhbat boshlang\\!\n\n"
-        "💡 *Maslahat:* PDF darslik yoki rasm yuklasangiz, AI uni tahlil qiladi\\.",
+        "1\\. \"MAKTAB AI & QALQON\" tugmasini bosing\n"
+        "2\\. O'quvchi yoki Ota-ona rejimini tanlang\n"
+        "3\\. Darslik savolini yozing yoki topshiriqni rasmga olib yuboring\\!",
         reply_markup=reply_markup,
         parse_mode="MarkdownV2"
     )
-
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -72,10 +69,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "help":
         await help_cmd(update, context)
 
-
 def main():
     if not BOT_TOKEN:
-        logger.error("TELEGRAM_BOT_TOKEN topilmadi!")
+        logger.warning("TELEGRAM_BOT_TOKEN hozircha sozlanmagan. .env fayliga kiriting!")
         return
 
     while True:
@@ -88,9 +84,7 @@ def main():
             app.run_polling(drop_pending_updates=True)
         except Exception as e:
             logger.error(f"Bot xatosi: {e}")
-            logger.info("5 soniyadan keyin qayta uriniladi...")
             time.sleep(5)
-
 
 if __name__ == "__main__":
     main()
