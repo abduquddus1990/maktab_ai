@@ -177,16 +177,30 @@
         <button onclick="clearImagePreview()" class="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow-lg font-black">✕</button>
       </div>
 
-      <!-- Input va Foto yuborish -->
-      <div class="flex items-center gap-2 pt-1">
+      <!-- Ovoz holati bildirishnomasi -->
+      <div id="voiceStatusBadge" class="hidden p-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs flex items-center justify-between animate-pulse">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+          <span>🎙️ <b>Ovozingiz yozilmoqda...</b> Gapiring (o'zbek tilida)</span>
+        </div>
+        <button onclick="stopVoiceRecognition()" class="text-[10px] bg-rose-600 text-white px-2 py-0.5 rounded-lg font-bold">To'xtatish ⏹️</button>
+      </div>
+
+      <!-- Input, Foto va Ovoz yuborish -->
+      <div class="flex items-center gap-1.5 pt-1">
         <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleImageSelected(event)">
-        <button onclick="document.getElementById('fileInput').click()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-cyan-400 transition flex-shrink-0" title="Darslik rasmini yuklash">
+        <button onclick="document.getElementById('fileInput').click()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-cyan-400 transition flex-shrink-0" title="Darslik rasmini yuklash (Vision AI)">
           <span class="material-symbols-outlined text-[20px]">photo_camera</span>
         </button>
 
-        <input type="text" id="chatInput" onkeydown="if(event.key==='Enter') sendMessage()" placeholder="Savol yoki mavzuni yozing..." class="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
+        <!-- 🎙️ Mikrofon tugmasi -->
+        <button id="micBtn" onclick="toggleVoiceRecognition()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-rose-400 transition flex-shrink-0" title="Ovozli savol berish">
+          <span class="material-symbols-outlined text-[20px]">mic</span>
+        </button>
 
-        <button onclick="sendMessage()" id="sendBtn" class="w-10 h-10 rounded-xl bg-brand-600 hover:bg-brand-500 flex items-center justify-center text-white shadow-md shadow-brand-600/30 transition flex-shrink-0">
+        <input type="text" id="chatInput" onkeydown="if(event.key==='Enter') sendMessage()" placeholder="Savol yozing yoki mikrofonga gapiring..." class="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
+
+        <button onclick="sendMessage()" id="sendBtn" class="w-10 h-10 rounded-xl bg-brand-600 hover:bg-brand-500 flex items-center justify-center text-white shadow-md shadow-brand-600/30 transition flex-shrink-0" title="Yuborish">
           <span class="material-symbols-outlined text-[20px]">send</span>
         </button>
       </div>
@@ -633,12 +647,20 @@
         let aiReply = data.reply || "Kechirasiz, javob olishda xatolik yuz berdi.";
         let dtsBadge = data.dtsMatch ? `<div class="mt-2 pt-2 border-t border-slate-700/60 text-[10px] text-cyan-300 font-mono">📚 Darslik: ${data.dtsMatch.grade}-sinf, ${data.dtsMatch.page}-bet (${data.dtsMatch.chapter})</div>` : '';
 
+        const speechTextSafe = encodeURIComponent(aiReply);
         chatContainer.innerHTML += `
           <div class="flex gap-2.5 items-start">
             <div class="w-7 h-7 rounded-xl bg-brand-600/30 border border-brand-500/40 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">🤖</div>
-            <div class="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl rounded-tl-sm text-slate-200 leading-relaxed shadow-sm max-w-[85%]">
-              ${aiReply.replace(/\n/g, '<br>')}
+            <div class="bg-slate-800/90 border border-slate-700/70 p-3 rounded-2xl rounded-tl-sm text-slate-200 leading-relaxed shadow-sm max-w-[85%] space-y-2">
+              <div>${aiReply.replace(/\n/g, '<br>')}</div>
               ${dtsBadge}
+              <div class="pt-1 flex items-center justify-between border-t border-slate-700/50">
+                <span class="text-[10px] text-slate-400">Repetitor javobi</span>
+                <button onclick="speakText(decodeURIComponent('${speechTextSafe}'))" class="px-2.5 py-1 bg-brand-600/30 hover:bg-brand-600/50 border border-brand-500/40 text-brand-300 rounded-lg text-[10px] font-bold flex items-center gap-1 transition">
+                  <span class="material-symbols-outlined text-[14px]">volume_up</span>
+                  <span>Ovozli eshitish</span>
+                </button>
+              </div>
             </div>
           </div>
         `;
@@ -738,7 +760,102 @@
       }
     }
 
+    
+    // ============================================================================
+    // 🎙️ OVOZLI SAVOL-JAVOB VA REPETITOR GAPIRISH ENGINE
+    // ============================================================================
+    let speechRecognition = null;
+    let isListening = false;
+    let isSpeaking = false;
+
+    function initSpeechEngine() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        speechRecognition = new SpeechRecognition();
+        speechRecognition.continuous = false;
+        speechRecognition.interimResults = false;
+        speechRecognition.lang = 'uz-UZ';
+
+        speechRecognition.onresult = function(event) {
+          const transcript = event.results[0][0].transcript;
+          document.getElementById('chatInput').value = transcript;
+          stopVoiceRecognition();
+          sendMessage();
+        };
+
+        speechRecognition.onerror = function(event) {
+          console.warn("Speech recognition error:", event.error);
+          stopVoiceRecognition();
+        };
+
+        speechRecognition.onend = function() {
+          stopVoiceRecognition();
+        };
+      }
+    }
+
+    function toggleVoiceRecognition() {
+      if (isListening) {
+        stopVoiceRecognition();
+      } else {
+        startVoiceRecognition();
+      }
+    }
+
+    function startVoiceRecognition() {
+      if (!speechRecognition) initSpeechEngine();
+      if (!speechRecognition) {
+        alert("Kechirasiz, qurilmangizda ovoz yozish funksiyasi qo'llab-quvvatlanmaydi.");
+        return;
+      }
+      try {
+        isListening = true;
+        document.getElementById('voiceStatusBadge').classList.remove('hidden');
+        document.getElementById('micBtn').classList.add('bg-rose-600', 'text-white', 'animate-pulse');
+        speechRecognition.start();
+      } catch (e) {
+        console.warn("Speech start error:", e);
+      }
+    }
+
+    function stopVoiceRecognition() {
+      isListening = false;
+      document.getElementById('voiceStatusBadge')?.classList.add('hidden');
+      document.getElementById('micBtn')?.classList.remove('bg-rose-600', 'text-white', 'animate-pulse');
+      try {
+        speechRecognition?.stop();
+      } catch (e) {}
+    }
+
+    // 🔊 Matnni ovozli o'qish (Text-to-Speech)
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) {
+        alert("Ovozli o'qish qurilmada mavjud emas.");
+        return;
+      }
+
+      if (isSpeaking) {
+        window.speechSynthesis.cancel();
+        isSpeaking = false;
+        return;
+      }
+
+      // Toza matnni ajratish (HTML va belgilardan tozalash)
+      const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/[#*_`]/g, '').trim();
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
+      utterance.lang = 'uz-UZ';
+
+      utterance.onstart = () => { isSpeaking = true; };
+      utterance.onend = () => { isSpeaking = false; };
+      utterance.onerror = () => { isSpeaking = false; };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      initSpeechEngine();
       loadWeeklyDigest();
       initGradePills();
       loadDtsCurriculum();
