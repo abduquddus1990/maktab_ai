@@ -8,6 +8,8 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- html2pdf.js (PDF eksport) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <!-- Leaflet.js (Xarita) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -700,9 +702,13 @@
       `;
     }
 
+    let lastIxtiroIdea = "";
+    let lastIxtiroAnalysis = "";
+
     async function sendIxtiroPrompt() {
       const val = document.getElementById('ixtiroInput').value.trim();
       if (!val) return;
+      lastIxtiroIdea = val;
       const resBox = document.getElementById('ixtiroResult');
       resBox.classList.remove('hidden');
       resBox.innerHTML = "💡 Ixtiro g'oyasi tahlil qilinmoqda... ⏳";
@@ -714,9 +720,56 @@
           body: JSON.stringify({ message: val })
         });
         const data = await res.json();
-        resBox.innerHTML = `🚀 <b>AI Murabbiy Xulosasi:</b><br><br>${(data.reply || '').replace(/\n/g, '<br>')}`;
+        lastIxtiroAnalysis = data.reply || "G'oya muvaffaqiyatli tahlil qilindi.";
+
+        resBox.innerHTML = `
+          <div id="ixtiroPassportCard" class="space-y-3 p-3 bg-slate-900 rounded-xl border border-amber-500/40 text-slate-200">
+            <div class="flex items-center justify-between border-b border-amber-500/20 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🚀</span>
+                <div>
+                  <h4 class="text-xs font-black text-amber-300">RASMIY LOYIHA PASPORTI</h4>
+                  <p class="text-[9px] text-slate-400">Maktab AI Yosh Ixtirochilar Dasturi</p>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[9px] font-bold">2026</span>
+            </div>
+
+            <div class="text-[11px] space-y-1.5 leading-relaxed">
+              <p>📌 <b>G'oya:</b> "${val}"</p>
+              <div class="pt-1 text-slate-300">${lastIxtiroAnalysis.replace(/\n/g, '<br>')}</div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
+              <span class="text-[9px] text-emerald-400 font-bold">✓ AI Innovatsiya Tasdiqlangan</span>
+              <button onclick="downloadIxtiroPdf()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-md shadow-amber-500/20">
+                <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+                <span>PDF Pasportni Yuklash 📥</span>
+              </button>
+            </div>
+          </div>
+        `;
       } catch (e) {
         resBox.innerHTML = "Xatolik yuz berdi.";
+      }
+    }
+
+    function downloadIxtiroPdf() {
+      const element = document.getElementById('ixtiroPassportCard');
+      if (!element) return;
+
+      const opt = {
+        margin: 10,
+        filename: `Maktab_AI_Loyiha_Pasporti_${Date.now()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      if (window.html2pdf) {
+        window.html2pdf().set(opt).from(element).save();
+      } else {
+        window.print();
       }
     }
 
