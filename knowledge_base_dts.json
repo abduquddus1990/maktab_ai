@@ -1,7 +1,7 @@
 {
-  "version": "2026.1",
+  "version": "2026.2",
   "country": "Uzbekistan",
-  "curriculum": "Davlat Ta'lim Standartlari (DTS)",
+  "curriculum": "O'zbekiston Respublikasi Davlat Ta'lim Standartlari (DTS)",
   "modules": [
     {
       "grade": 1,
@@ -16,7 +16,41 @@
         "1-sinf",
         "yig'indi",
         "ayirma",
-        "sanoq"
+        "sanoq",
+        "o'nlik"
+      ]
+    },
+    {
+      "grade": 1,
+      "subject": "Ona tili",
+      "chapter": "Tovushlar va Harflar (Unli va Undosh)",
+      "page": 18,
+      "rule": "O'zbek tilida 6 ta unli tovush (a, o, i, u, o', e) va 23 ta undosh tovush bor. Unli tovushlar bo'g'in hosil qiladi: so'zda nechta unli bo'lsa, shuncha bo'g'in bo'ladi.",
+      "formula": "Bo'g'in soni = Unli harflar soni",
+      "keywords": [
+        "unli",
+        "undosh",
+        "harf",
+        "tovush",
+        "bo'g'in",
+        "alifbo",
+        "1-sinf"
+      ]
+    },
+    {
+      "grade": 1,
+      "subject": "Ingliz tili",
+      "chapter": "Colors and Numbers (Ranglar va Sonlar)",
+      "page": 22,
+      "rule": "Ranglar (red, blue, green, yellow) va 1-10 gacha sonlar (one, two, three...). 'What color is it?' savoliga 'It is red' deb javob beriladi.",
+      "formula": "It is + [Color] | Number + [Noun]",
+      "keywords": [
+        "ranglar",
+        "colors",
+        "numbers",
+        "sonlar",
+        "ingliz tili",
+        "1-sinf"
       ]
     },
     {
@@ -25,53 +59,121 @@
       "chapter": "Ko'paytirish va Bo'lish jadvali",
       "page": 48,
       "rule": "Ko'paytirish — bir xil qo'shiluvchilar yig'indisidir. Masalan: 3 * 4 = 3 + 3 + 3 + 3 = 12. Ko'paytuvchilar o'rni almashgani bilan ko'paytma o'zgarmaydi (a * b = b * a).",
-      "formula": "a * b = c (Ko'paytuvchi * Ko'paytuvchi = Ko'paytma)",
+      "formula": "a * b = c (Ko'paytuvchi * Ko'paytuvchi = Ko'paytma); a / b = c (Bo'linuvchi / Bo'luvchi = Bo'linma)",
       "keywords": [
         "ko'paytirish",
         "bo'lish",
         "jadval",
         "2-sinf",
-        "ko'paytma"
+        "ko'paytma",
+        "bo'linma"
+      ]
+    },
+    {
+      "grade": 2,
+      "subject": "Ona tili",
+      "chapter": "Bosh harflar imlosi va Gap turlari",
+      "page": 32,
+      "rule": "Kishilarning ismi, familiyasi, shahar, daryo nomlari doim bosh harf bilan yoziladi. Darak gap oxiriga nuqta (.), so'roq gapga so'roq belgisi (?), his-hayajon gapga undov (!) qo'yiladi.",
+      "formula": "Gap boshida va atoqli otlarda: Bosh harf",
+      "keywords": [
+        "bosh harf",
+        "atoqli ot",
+        "gap",
+        "tinish belgilari",
+        "ona tili",
+        "2-sinf"
       ]
     },
     {
       "grade": 3,
-      "subject": "Ona tili va O'qish",
-      "chapter": "So'z turkumlari: Ot, Sifat, Fe'l",
+      "subject": "Matematika",
+      "chapter": "Qoldiqli bo'lish va Amallar tartibi",
+      "page": 52,
+      "rule": "Qoldiq har doim bo'luvchidan kichik bo'lishi shart (r < b). Tekshirish: a = b * c + r. Qavsli ifodalarda avval qavs ichidagi amallar, so'ng ko'paytirish/bo'lish, oxirida qo'shish/ayirish bajariladi.",
+      "formula": "a = b * c + r (r < b); Amallar tartibi: () -> * / -> + -",
+      "keywords": [
+        "qoldiq",
+        "qoldiqli bo'lish",
+        "amallar tartibi",
+        "qavs",
+        "3-sinf"
+      ]
+    },
+    {
+      "grade": 3,
+      "subject": "Ona tili",
+      "chapter": "So'z turkumlari: Ot, Sifat, Fe'l, Son",
       "page": 56,
-      "rule": "Shaxs va narsa nomini bildirgan so'zlar Ot (Kim? Nima?), belgisini bildirgan so'zlar Sifat (Qanday? Qanaqa?), harakatini bildirgan so'zlar Fe'l (Nima qildi? Nima qilyapti?) deyiladi.",
-      "formula": "Ot: Kim? Nima? | Sifat: Qanday? | Fe'l: Nima qildi?",
+      "rule": "Shaxs va narsa nomini bildirgan so'zlar Ot (Kim? Nima?), belgisini bildirgan so'zlar Sifat (Qanday? Qanaqa?), harakatini bildirgan so'zlar Fe'l (Nima qildi?), sanoq va tartibini bildirsa Son (Nechta? Nechanchi?) deyiladi.",
+      "formula": "Ot (Kim? Nima?) | Sifat (Qanday?) | Fe'l (Nima qildi?) | Son (Nechta?)",
       "keywords": [
         "ot",
         "sifat",
         "fe'l",
+        "son",
         "ona tili",
         "3-sinf",
         "so'z turkumi"
       ]
     },
     {
+      "grade": 3,
+      "subject": "Tabiatshunoslik",
+      "chapter": "O'simlik va Hayvonot olami",
+      "page": 40,
+      "rule": "O'simlik organlari: ildiz, poya, barg, gul, meva va urug'. Hayvonlar o'txo'r, yirtqich va hammaxo'r turlarga bo'linadi.",
+      "formula": "O'simlik = Ildiz + Poya + Barg + Gul + Meva",
+      "keywords": [
+        "tabiat",
+        "o'simlik",
+        "hayvon",
+        "ildiz",
+        "barg",
+        "tabiatshunoslik",
+        "3-sinf"
+      ]
+    },
+    {
       "grade": 4,
       "subject": "Matematika",
-      "chapter": "Ko'p xonali sonlar va Geometrik shakllar",
+      "chapter": "Ko'p xonali sonlar, Perimetr, Yuza va Tezlik",
       "page": 74,
-      "rule": "To'g'ri to'rtburchakning perimetri barcha tomonlari yig'indisiga teng: P = 2 * (a + b). Yuzi esa bo'yi va eni ko'paytmasiga teng: S = a * b.",
-      "formula": "P = 2(a + b); S = a * b",
+      "rule": "To'g'ri to'rtburchak perimetri P = 2 * (a + b), yuzi S = a * b. Harakat masalalarida bosib o'tilgan yo'l S = v * t (tezlik ko'paytirilgan vaqt).",
+      "formula": "P = 2(a + b); S = a * b; S = v * t",
       "keywords": [
         "perimetr",
         "yuza",
-        "to'g'ri to'rtburchak",
+        "tezlik",
+        "vaqt",
+        "masofa",
         "4-sinf",
         "geometriya"
       ]
     },
     {
+      "grade": 4,
+      "subject": "Ona tili",
+      "chapter": "Gapning bosh bo'laklari (Ega va Kesim)",
+      "page": 62,
+      "rule": "Ega — gapda kim yoki nima harakat bajarganini bildiradi (tagiga bir chiziq). Kesim — eganing harakat-holatini bildiradi va egaga bo'ysunadi (tagiga ikki chiziq).",
+      "formula": "Ega (Kim? Nima?) ===> Kesim (Nima qildi?)",
+      "keywords": [
+        "ega",
+        "kesim",
+        "bosh bo'laklar",
+        "gap",
+        "ona tili",
+        "4-sinf"
+      ]
+    },
+    {
       "grade": 5,
       "subject": "Matematika",
-      "chapter": "Oddiy va O'nli Kasrlar",
+      "chapter": "Oddiy va O'nli Kasrlar, EKUK va EKUB",
       "page": 42,
-      "rule": "Har xil maxrajli oddiy kasrlarni qo'shish yoki ayirish uchun avval ularni eng kichik umumiy maxrajga (EKUK) keltirish, so'ng suratlarni qo'shish yoki ayirish kerak. Kasrlarni ko'paytirishda surat suratga, maxraj maxrajga ko'paytiriladi.",
-      "formula": "a/b + c/d = (a*d + c*b)/(b*d); (a/b) * (c/d) = (a*c)/(b*d)",
+      "rule": "Har xil maxrajli kasrlarni qo'shish/ayirish uchun EKUK topilib umumiy maxrajga keltiriladi. Kasrlarni ko'paytirishda surat suratga, maxraj maxrajga ko'paytiriladi. Bo'lishda 2-kasr teskarisiga ko'paytiriladi.",
+      "formula": "a/b + c/d = (ad + cb)/(bd); (a/b) * (c/d) = (ac)/(bd); (a/b) / (c/d) = (ad)/(bc)",
       "keywords": [
         "kasr",
         "oddiy kasr",
@@ -88,8 +190,8 @@
       "subject": "Ingliz tili",
       "chapter": "Present Simple Tense (Hozirgi oddiy zamon)",
       "page": 28,
-      "rule": "Doimiy takrorlanadigan odatlar va faktlar uchun Present Simple ishlatiladi. He/She/It olmoshlaridan so'ng fe'lga -s yoki -es qo'shimchasi qo'shiladi. Inkor shakli: don't / doesn't + V1.",
-      "formula": "Subject + Verb(s/es) | I work, He works | Do/Does + Subject + Verb?",
+      "rule": "Doimiy takrorlanadigan ish-harakatlar uchun ishlatiladi. He/She/It olmoshlarida fe'lga -s/-es qo'shiladi. Inkor: don't / doesn't + V1. So'roq: Do / Does + Subj + V1?",
+      "formula": "I/You/We/They + V1 | He/She/It + V1(s/es) | Do/Does + Subj + V1?",
       "keywords": [
         "present simple",
         "ingliz tili",
@@ -100,28 +202,44 @@
       ]
     },
     {
+      "grade": 5,
+      "subject": "Tarix",
+      "chapter": "Qadimgi Sharq va O'zbekiston hududidagi ilk davlatlar",
+      "page": 35,
+      "rule": "Qadimgi Xorazm, Baqtriya va So'g'd davlatlari. O'rta Osiyoda ilk yozuv yodgorliklari (Avesto) va dehqonchilik vohalari shakllanishi.",
+      "formula": "Tarixiy davr: Ibtidoiy jamoa -> Quldorlik -> Feodalizm",
+      "keywords": [
+        "tarix",
+        "qadimgi sharq",
+        "baqtriya",
+        "xorazm",
+        "avesto",
+        "5-sinf"
+      ]
+    },
+    {
       "grade": 6,
       "subject": "Matematika",
-      "chapter": "Nisbat, Proporsiya va Foizlar",
+      "chapter": "Nisbat, Proporsiya, Manfiy sonlar va Foizlar",
       "page": 64,
-      "rule": "Ikki nisbatning tengligi proporsiya deyiladi: a/b = c/d. Proporsiyaning asosiy xossasi: chetki hadlar ko'paytmasi o'rta hadlar ko'paytmasiga teng (a * d = b * c). Sonning foizini topish uchun sonni foizga ko'paytirib 100 ga bo'linadi.",
-      "formula": "a/b = c/d => a*d = b*c; A sonining p% = (A * p) / 100",
+      "rule": "Proporsiya — ikki nisbatning tengligidir: a/b = c/d (a*d = b*c). Manfiy sonlarni qo'shish va ko'paytirish qoidalari: (-) * (-) = (+), (-) * (+) = (-).",
+      "formula": "a/b = c/d => a*d = b*c; (-a) * (-b) = a*b",
       "keywords": [
         "proporsiya",
         "foiz",
+        "manfiy sonlar",
         "nisbat",
         "6-sinf",
-        "matematika",
-        "tenglama"
+        "matematika"
       ]
     },
     {
       "grade": 6,
       "subject": "Botanika",
-      "chapter": "O'simlik hujayrasi va Fotosintez",
+      "chapter": "Fotosintez va O'simlik hujayrasi",
       "page": 38,
-      "rule": "O'simliklar quyosh nuri, suv va karbonat angidrid (CO2) yordamida xlorofill orqali organik moddalar va kislorod (O2) ishlab chiqaradi. Bu jarayon fotosintez deyiladi.",
-      "formula": "6CO2 + 6H2O + Quyosh nuri => C6H12O6 (Glyukoza) + 6O2",
+      "rule": "Xloroplastlardagi xlorofill pigmenti quyosh nuri ta'sirida suv va CO2 dan glyukoza va erkin kislorod (O2) hosil qiladi.",
+      "formula": "6CO2 + 6H2O + Yorug'lik => C6H12O6 + 6O2",
       "keywords": [
         "fotosintez",
         "botanika",
@@ -132,12 +250,28 @@
       ]
     },
     {
+      "grade": 6,
+      "subject": "Geografiya",
+      "chapter": "Yerning qobiqlari: Litosfera, Atmosfera, Gidrosfera",
+      "page": 50,
+      "rule": "Atmosfera qatlamlari: Troposfera, Stratosfera, Mezosfera, Termosfera. Har 100 metr balandlikka ko'tarilganda havo harorati 0.6°C ga pasayadi.",
+      "formula": "deltaT = (h / 100) * 0.6°C; P = 760 mm sim. ust.",
+      "keywords": [
+        "atmosfera",
+        "litosfera",
+        "gidrosfera",
+        "geografiya",
+        "iqlim",
+        "6-sinf"
+      ]
+    },
+    {
       "grade": 7,
       "subject": "Algebra",
-      "chapter": "Chiziqli tenglamalar va Qisqa ko'paytirish formulalari",
+      "chapter": "Qisqa ko'paytirish formulalari va Chiziqli tenglamalar",
       "page": 55,
-      "rule": "Qisqa ko'paytirish formulalari hisoblashni osonlashtiradi: Yig'indining kvadrati (a+b)^2 = a^2 + 2ab + b^2. Kvadratlar ayirmasi: a^2 - b^2 = (a-b)(a+b).",
-      "formula": "(a + b)^2 = a^2 + 2ab + b^2; a^2 - b^2 = (a - b)(a + b)",
+      "rule": "Kvadratlar ayirmasi: a^2 - b^2 = (a-b)(a+b). Yig'indining kvadrati: (a+b)^2 = a^2 + 2ab + b^2. Ayirmaning kvadrati: (a-b)^2 = a^2 - 2ab + b^2.",
+      "formula": "(a +- b)^2 = a^2 +- 2ab + b^2; a^2 - b^2 = (a - b)(a + b)",
       "keywords": [
         "algebra",
         "qisqa ko'paytirish",
@@ -150,10 +284,10 @@
     {
       "grade": 7,
       "subject": "Fizika",
-      "chapter": "Tezlik, Zichlik va Nyutonning 1-qonuni",
+      "chapter": "Mexanik harakat, Tezlik, Zichlik va Nyuton qonunlari",
       "page": 40,
-      "rule": "Tezlik — bosib o'tilgan yo'lning ketgan vaqtga nisbatidir: v = S / t. Jismning zichligi esa massaning hajmga nisbatidir: rho = m / V. Nyuton 1-qonuni: Jismga tashqi kuch ta'sir etmasa, u tinch turadi yoki to'g'ri chiziqli tekis harakatlanadi.",
-      "formula": "v = S / t; rho = m / V; F = m * a",
+      "rule": "Zichlik rho = m / V. Nyutonning 1-qonuni (Inersiya): tashqi kuch bo'lmasa tezlik o'zgarmaydi. Nyuton 2-qonuni: F = m * a. Og'irlik kuchi: F_og' = m * g (g = 9.8 m/s^2).",
+      "formula": "rho = m / V; F = m * a; F_og = m * g; v = s / t",
       "keywords": [
         "fizika",
         "tezlik",
@@ -161,32 +295,51 @@
         "nyuton",
         "massa",
         "7-sinf",
-        "kuch"
+        "kuch",
+        "bosim"
+      ]
+    },
+    {
+      "grade": 7,
+      "subject": "Kimyo",
+      "chapter": "Atom tuzilishi, Valentlik va Kimyoviy formulalar",
+      "page": 48,
+      "rule": "Atom yadro (proton + neytron) va elektron qobiqdan iborat. Valentlik — atomning boshqa atomlarni biriktirib olish qobiliyati. Modda miqdori: n = m / M (mol).",
+      "formula": "n = m / M; N = n * N_A (N_A = 6.02 * 10^23 ta/mol)",
+      "keywords": [
+        "kimyo",
+        "atom",
+        "molekula",
+        "valentlik",
+        "modda miqdori",
+        "mol",
+        "7-sinf"
       ]
     },
     {
       "grade": 8,
       "subject": "Geometriya",
-      "chapter": "Pifagor Teoremasi va To'g'ri burchakli uchburchak",
+      "chapter": "Pifagor Teoremasi va Uchburchak yuzi",
       "page": 78,
-      "rule": "To'g'ri burchakli uchburchakda gipotenuza kvadratining qiymati katetlar kvadratlari yig'indisiga teng: c^2 = a^2 + b^2. Uchburchak ichki burchaklari yig'indisi har doim 180 gradusga teng.",
-      "formula": "c^2 = a^2 + b^2; alpha + beta + gamma = 180°",
+      "rule": "To'g'ri burchakli uchburchakda gipotenuza kvadrati katetlar kvadratlari yig'indisiga teng: c^2 = a^2 + b^2. Uchburchak yuzi: S = 0.5 * a * h.",
+      "formula": "c^2 = a^2 + b^2; S = (a * h) / 2; S_trapetsiya = ((a + b) / 2) * h",
       "keywords": [
         "pifagor",
         "gipotenuza",
         "katet",
         "uchburchak",
         "geometriya",
-        "8-sinf"
+        "8-sinf",
+        "yuza"
       ]
     },
     {
       "grade": 8,
       "subject": "Fizika",
-      "chapter": "Elektr toki, Kuchlanish va Om qonuni",
+      "chapter": "Elektr toki, Zanjir qismi uchun Om qonuni va Joul-Lens",
       "page": 92,
-      "rule": "Zanjir qismidagi tok kuchi (I) kuchlanishga (U) to'g'ri proporsional va qarshilikka (R) teskari proporsionaldir: I = U / R. Elektr toki zaryadlangan zarrachalarning tartibli harakatidir.",
-      "formula": "I = U / R; P = U * I (Elektr quvvati)",
+      "rule": "Om qonuni: Tok kuchi kuchlanishga to'g'ri, qarshilikka teskari proporsional: I = U / R. Ketma-ket ulanishda R_umum = R1 + R2. Parallel ulanishda 1/R = 1/R1 + 1/R2.",
+      "formula": "I = U / R; P = U * I; Q = I^2 * R * t (Joul-Lens)",
       "keywords": [
         "om qonuni",
         "tok kuchi",
@@ -200,27 +353,27 @@
     {
       "grade": 8,
       "subject": "Kimyo",
-      "chapter": "Mendeleyev davriy jadvali va Kimyoviy bog'lanish",
-      "page": 62,
-      "rule": "Elementlarning xossalari ularning atom yadrosi zaryadiga davriy bog'liqdir. Valentlik — atomning boshqa atomlarni biriktirib olish qobiliyati. Suv molekulasi H2O kovalent qutbli bog'lanishga ega.",
-      "formula": "M(H2O) = 1*2 + 16 = 18 g/mol; n = m / M",
+      "chapter": "Anorganik birikmalarning asosiy sinflari",
+      "page": 65,
+      "rule": "Oksidlar (asosli, kislotali), Kislotalar (HCl, H2SO4), Asoslar (NaOH, Ca(OH)2) va Tuzlar (NaCl). Neytrallanish reaksiyasi: Kislota + Asos => Tuz + Suv.",
+      "formula": "HCl + NaOH => NaCl + H2O; Kislota + Asos = Tuz + Suv",
       "keywords": [
+        "oksid",
+        "kislota",
+        "asos",
+        "tuz",
+        "reaksiya",
         "kimyo",
-        "mendeleyev",
-        "valentlik",
-        "atom",
-        "molekula",
-        "8-sinf",
-        "davriy qonun"
+        "8-sinf"
       ]
     },
     {
       "grade": 9,
       "subject": "Algebra",
-      "chapter": "Kvadrat tenglamalar va Viyet Teoremasi",
+      "chapter": "Kvadrat tenglamalar, Diskriminant va Viyet Teoremasi",
       "page": 85,
-      "rule": "ax^2 + bx + c = 0 kvadrat tenglama diskriminant D = b^2 - 4ac orqali yechiladi. D > 0 bo'lsa 2 ta ildiz, D = 0 bo'lsa 1 ta ildiz, D < 0 bo'lsa haqiqiy ildiz yo'q. Viyet teoremasi: x1 + x2 = -b/a, x1 * x2 = c/a.",
-      "formula": "D = b^2 - 4ac; x = (-b +- sqrt(D)) / (2a); x1+x2 = -b/a, x1*x2 = c/a",
+      "rule": "ax^2 + bx + c = 0 kvadrat tenglama. Diskriminant D = b^2 - 4ac. Agar D > 0 => 2 ta ildiz x1,2 = (-b +- sqrt(D))/(2a). Viyet teoremasi: x1 + x2 = -b/a, x1 * x2 = c/a.",
+      "formula": "D = b^2 - 4ac; x = (-b +- sqrt(D))/(2a); x1+x2 = -b/a; x1*x2 = c/a",
       "keywords": [
         "kvadrat tenglama",
         "diskriminant",
@@ -231,12 +384,44 @@
       ]
     },
     {
+      "grade": 9,
+      "subject": "Biologiya",
+      "chapter": "Genetika asoslari va Mendel Qonunlari",
+      "page": 70,
+      "rule": "Mendelning 1-qonuni (Bir xillik qonuni), 2-qonuni (Belgilarning ajralish qonuni: 3:1 fenotipik nisbat). Genotip — organizm genlari yig'indisi, fenotip — tashqi belgilar.",
+      "formula": "P: AA x aa => F1: Aa (100% bir xil); F2: 1 AA : 2 Aa : 1 aa",
+      "keywords": [
+        "genetika",
+        "mendel",
+        "dnk",
+        "gen",
+        "biologiya",
+        "9-sinf"
+      ]
+    },
+    {
+      "grade": 9,
+      "subject": "Fizika",
+      "chapter": "Gravitatsiya va Butun olam tortishish qonuni",
+      "page": 82,
+      "rule": "Har qanday ikki jism bir-birini massalari ko'paytmasiga to'g'ri, masofa kvadratiga teskari proporsional kuch bilan tortadi: F = G * (m1 * m2) / R^2.",
+      "formula": "F = G * (m1 * m2) / R^2; (G = 6.67 * 10^-11 N*m^2/kg^2)",
+      "keywords": [
+        "gravitatsiya",
+        "tortishish",
+        "nyuton",
+        "massa",
+        "fizika",
+        "9-sinf"
+      ]
+    },
+    {
       "grade": 10,
-      "subject": "Algebra va Analiz",
-      "chapter": "Trigonometrik funksiyalar va Asosiy ayniyatlar",
+      "subject": "Algebra",
+      "chapter": "Trigonometrik Ayniyatlar va Funksiyalar",
       "page": 110,
-      "rule": "Asosiy trigonometrik ayniyat: sin^2(x) + cos^2(x) = 1. Tangens tg(x) = sin(x) / cos(x). Ikkilangan burchak formulasi: sin(2x) = 2*sin(x)*cos(x).",
-      "formula": "sin^2(alpha) + cos^2(alpha) = 1; tg(alpha) = sin(alpha)/cos(alpha)",
+      "rule": "Asosiy trigonometrik ayniyat: sin^2(x) + cos^2(x) = 1. tg(x) = sin(x)/cos(x). Ikkilangan burchak: sin(2x) = 2*sin(x)*cos(x), cos(2x) = cos^2(x) - sin^2(x).",
+      "formula": "sin^2(alpha) + cos^2(alpha) = 1; sin(2alpha) = 2sin(alpha)cos(alpha)",
       "keywords": [
         "trigonometriya",
         "sinus",
@@ -249,10 +434,10 @@
     {
       "grade": 10,
       "subject": "Fizika",
-      "chapter": "Molekulyar fizika va Termodinamika qonunlari",
+      "chapter": "Molekulyar Fizika va Termodinamika",
       "page": 95,
-      "rule": "Ideal gaz holat tenglamasi (Mendeleyev-Klapeyron): P * V = (m/M) * R * T. Termodinamikaning 1-qonuni: Tizimga berilgan issiqlik miqdori uning ichki energiyasini oshirishga va tashqi kuchlarga qarshi ish bajarishga sarflanadi (Q = deltaU + A).",
-      "formula": "P * V = nu * R * T; Q = deltaU + A",
+      "rule": "Ideal gaz holat tenglamasi: P * V = (m/M) * R * T. Termodinamikaning 1-qonuni: Tizimga berilgan issiqlik ichki energiyani o'zgartirish va ish bajarishga sarflanadi (Q = deltaU + A).",
+      "formula": "P * V = (m/M) * R * T; Q = deltaU + A; eta = (T1 - T2) / T1 (Karno)",
       "keywords": [
         "termodinamika",
         "ideal gaz",
@@ -263,12 +448,28 @@
       ]
     },
     {
+      "grade": 10,
+      "subject": "Kimyo",
+      "chapter": "Organik Kimyo: To'yingan va To'yinmagan Uglevodorodlar",
+      "page": 80,
+      "rule": "Alkanlar (CnH2n+2) — birikish reaksiyasiga kirishmaydi, o'rin olish xos. Alkenlar (CnH2n) — qo'shbog' mavjud, birikish va polimerlanish xos. Alkinlar (CnH2n-2) — uchbog'li birikmalar.",
+      "formula": "Alkan: CnH2n+2 | Alken: CnH2n | Alkin: CnH2n-2",
+      "keywords": [
+        "organik kimyo",
+        "alkan",
+        "alken",
+        "uglevodorod",
+        "metan",
+        "10-sinf"
+      ]
+    },
+    {
       "grade": 11,
-      "subject": "Algebra va Analiz",
-      "chapter": "Hosilalar va Integrallar (Matematik analiz)",
+      "subject": "Algebra",
+      "chapter": "Hosilalar, Integrallar va Matematik Analiz",
       "page": 130,
-      "rule": "Hosila — funksiyaning o'zgarish tezligini ifodalaydi. (x^n)' = n * x^(n-1). Boshlang'ich funksiya (aniqmas integral) esa differensiallashning teskarisidir: integral(x^n dx) = (x^(n+1))/(n+1) + C.",
-      "formula": "(x^n)' = n * x^(n-1); (sin x)' = cos x; integral(x^n dx) = x^(n+1)/(n+1) + C",
+      "rule": "Hosila funksiyaning o'zgarish tezligini ko'rsatadi: (x^n)' = n*x^(n-1). Integral hosilaning teskari amali bo'lib, egri chiziqli trapetsiya yuzini hisoblashda qo'llaniladi.",
+      "formula": "(x^n)' = n*x^(n-1); integral(x^n dx) = (x^(n+1))/(n+1) + C; S = integral_a^b f(x)dx",
       "keywords": [
         "hosila",
         "integral",
@@ -281,34 +482,35 @@
     {
       "grade": 11,
       "subject": "Fizika",
-      "chapter": "Optika, Kvant fizikasi va Eynshteyn formulasi",
+      "chapter": "Optika, Kvant Fizikasi va Eynshteyn Formulalari",
       "page": 145,
-      "rule": "Yorug'lik ham to'lqin, ham zarracha (foton) tabiatiga ega (korpuskulyar-to'lqin dualizmi). Foton energiyasi E = h * nu ga teng. Eynshteynning mashhur massa va energiya ekvivalentligi formulasi: E = m * c^2.",
-      "formula": "E = h * nu; E = m * c^2; lambda = c / nu",
+      "rule": "Fotoeffekt uchun Eynshteyn tenglamasi: h * nu = A_chiqish + (m * v^2)/2. Foton energiyasi: E = h * nu. Massa va energiya ekvivalentligi: E = m * c^2.",
+      "formula": "E = h * nu; E = m * c^2; h*nu = A_ch + E_k",
       "keywords": [
         "kvant",
         "foton",
         "eynshteyn",
         "optika",
+        "fotoeffekt",
         "fizika",
-        "11-sinf",
-        "yorug'lik"
+        "11-sinf"
       ]
     },
     {
       "grade": 11,
       "subject": "Informatika",
-      "chapter": "Python Dasturlash & Sun'iy Intellekt Asoslari",
+      "chapter": "Python Dasturlash & Sun'iy Intellekt Algoritmlari",
       "page": 80,
-      "rule": "Pythonda ma'lumotlar turlari (int, float, str, list, dict). Shart operatorlari (if-elif-else) va sikllar (for, while). Sun'iy intellekt (Machine Learning) ma'lumotlar to'plami (dataset) orqali naqshlarni o'rganadi.",
-      "formula": "def calculate_dts(score): return 'A' if score >= 86 else 'B'",
+      "rule": "Pythonda murakkab ma'lumotlar tuzilmalari, fayllar bilan ishlash, rekursiya, obyektga yo'naltirilgan dasturlash (OOP) va Machine Learning asoslari.",
+      "formula": "class MaktabAI: def __init__(self, grade): self.grade = grade",
       "keywords": [
         "python",
         "dasturlash",
         "informatika",
         "11-sinf",
         "ai",
-        "algoritm"
+        "algoritm",
+        "oop"
       ]
     }
   ]
